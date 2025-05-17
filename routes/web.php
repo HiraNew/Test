@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\Protfolio\ContactController;
 
 // Route::get('/', function () {
 //     return Inertia::render('Welcome', [
@@ -29,3 +30,4 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return Inertia::render('Portfolio/firstpage');
 });
+Route::post('/contact', [ContactController::class, 'store']);

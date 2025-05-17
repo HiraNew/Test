@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState } from "react";
+import { motion } from "framer-motion";
 import { TypeAnimation } from 'react-type-animation';
+import Layout from "@/Layouts/navbar";
+import { router } from "@inertiajs/react";
 
-
-
-// Single animated card
+// Single animated card 
 const AboutCard = ({ img, text, delay = 0 }) => (
+  
   <motion.div
     className="bg-white rounded-lg shadow-lg p-6 text-center max-w-xs w-full"
     initial={{ opacity: 0, y: 40 }}
@@ -37,21 +38,37 @@ const aboutCards = [
 ];
 
 const App = () => {
+   const [form, setForm] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+
+  const [errors, setErrors] = useState({});
+  const [success, setSuccess] = useState(false);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setErrors({});
+    setSuccess(false);
+
+    router.post("/contact", form, {
+      onSuccess: () => {
+        setSuccess(true);
+        setForm({ name: "", email: "", message: "" });
+      },
+      onError: (err) => {
+        setErrors(err);
+      },
+    });
+  };
   return (
     <div className="font-sans">
-      {/* Header */}
-      <header className="bg-gray-900 text-white p-4 flex justify-between items-center sticky top-0 z-50">
-        <h1 className="text-2xl font-bold">My Portfolio</h1>
-        
-        <nav className="space-x-4">
-          <a href="#home" className="hover:text-yellow-400">Home</a>
-          <a href="#about" className="hover:text-yellow-400">About Me</a>
-          <a href="#contact" className="hover:text-yellow-400">Contact</a>
-        </nav>
-      </header>
-
-
-      {/* Hero / Home Section */}
+      <Layout>
       {/* Hero / Home Section */}
         <section
           id="home"
@@ -131,42 +148,70 @@ const App = () => {
     </section>
 
 
-      {/* Contact Us Section */}
-      <section id="contact" className="min-h-screen bg-gray-100 p-8 flex flex-col justify-center items-center">
-        <motion.div
-          initial={{ x: 100, opacity: 0 }}
-          whileInView={{ x: 0, opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1 }}
-          className="max-w-3xl w-full"
-        >
-          <h3 className="text-3xl font-bold mb-4 text-center">Contact Me</h3>
-          <form className="space-y-4">
-            <input
-              type="text"
-              placeholder="Your Name"
-              className="w-full border border-gray-300 p-3 rounded"
-            />
-            <input
-              type="email"
-              placeholder="Your Email"
-              className="w-full border border-gray-300 p-3 rounded"
-            />
-            <textarea
-              placeholder="Your Message"
-              className="w-full border border-gray-300 p-3 rounded h-32"
-            ></textarea>
-            <button className="bg-gray-900 text-white px-6 py-3 rounded hover:bg-gray-700">
-              Send Message
-            </button>
-          </form>
-        </motion.div>
-      </section>
+      {/* Contact Section */}
+        <section id="contact" className="py-16 px-4 flex justify-center items-center">
+          <motion.div
+            initial={{ x: 100, opacity: 0 }}
+            whileInView={{ x: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1 }}
+            className="w-full max-w-3xl p-8 rounded-xl shadow-lg bg-white"
+          >
+            <h3 className="text-3xl font-bold mb-6 text-center text-gray-800">Contact Me</h3>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white p-4 text-center">
-        &copy; {new Date().getFullYear()} My Portfolio. All rights reserved.
-      </footer>
+            {success && (
+              <div className="mb-4 text-green-600 text-center font-semibold">
+                Message sent successfully!
+              </div>
+            )}
+
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              <div>
+                <input
+                  type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  placeholder="Your Name"
+                  className="w-full border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-700"
+                />
+                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+              </div>
+
+              <div>
+                <input
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="Your Email"
+                  className="w-full border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-700"
+                />
+                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+              </div>
+
+              <div>
+                <textarea
+                  name="message"
+                  value={form.message}
+                  onChange={handleChange}
+                  placeholder="Your Message"
+                  rows={6}
+                  className="w-full border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-700"
+                />
+                {errors.message && <p className="text-red-500 text-sm mt-1">{errors.message}</p>}
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-gray-900 text-white py-3 rounded-md hover:bg-gray-800 transition"
+              >
+                Send Message
+              </button>
+            </form>
+          </motion.div>
+        </section>
+      </Layout>
     </div>
   );
 };
