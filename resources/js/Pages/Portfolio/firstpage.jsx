@@ -101,21 +101,24 @@ const App = () => {
       {/* About Me Section */}
       <section
       id="about"
-      className="min-h-screen bg-white text-gray-900 py-16 px-4"
+      className="bg-white text-gray-900 py-16 px-4"
     >
+      {/* Section Header */}
       <motion.div
         initial={{ y: 50, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 1 }}
-        className="text-center mb-12"
+        className="text-center mb-16"
       >
         <h3 className="text-4xl font-bold mb-4">About Me</h3>
-        <p className="text-gray-600 text-lg">What I do and how I do it...</p>
+        <p className="text-gray-600 text-lg max-w-xl mx-auto">
+          Here’s a closer look at my professional focus and passion for web development.
+        </p>
       </motion.div>
 
       {/* Responsive Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 max-w-7xl mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 max-w-[1280px] mx-auto px-2">
         {aboutCards.map((card, index) => (
           <AboutCard
             key={index}
