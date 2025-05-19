@@ -30,4 +30,17 @@ use App\Http\Controllers\Protfolio\ContactController;
 Route::get('/', function () {
     return Inertia::render('Portfolio/firstpage');
 });
-Route::post('/contact', [ContactController::class, 'store']);
+Route::post('/contact-us', [ContactController::class, 'store']);
+// Route::get('/privacyPolicy', [ContactController::class, 'privacyPolicy']);
+Route::get('/privacy-policy', function () {
+    return Inertia::render('PrivacyPolicy');
+});
+Route::get('/about-us', function () {
+    return Inertia::render('AboutUs');
+});
+Route::get('/privacy&policy', function () {
+    return Inertia::render('p&v');
+});
+Route::get('/contact', function () {
+    return Inertia::render('ContactUs');
+});

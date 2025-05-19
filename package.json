@@ -23,6 +23,8 @@
     },
     "dependencies": {
         "framer-motion": "^12.12.1",
+        "inertia": "^0.0.7",
+        "react-icons": "^5.5.0",
         "react-type-animation": "^3.2.0"
     }
 }

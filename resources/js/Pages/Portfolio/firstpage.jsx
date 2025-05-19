@@ -5,8 +5,7 @@ import Layout from "@/Layouts/navbar";
 import { router } from "@inertiajs/react";
 
 // Single animated card 
-const AboutCard = ({ img, text, delay = 0 }) => (
-  
+const AboutCard = ({ img, video, text, delay = 0 }) => (
   <motion.div
     className="bg-white rounded-lg shadow-lg p-6 text-center max-w-xs w-full"
     initial={{ opacity: 0, y: 40 }}
@@ -14,33 +13,87 @@ const AboutCard = ({ img, text, delay = 0 }) => (
     viewport={{ once: true }}
     transition={{ duration: 0.8, delay }}
   >
-    <img src={img} alt="About" className="w-32 h-32 mx-auto rounded-full object-cover mb-4" />
+    <div className="w-full aspect-w-16 aspect-h-9 mb-4 rounded overflow-hidden">
+    
+  {video ? (
+    <iframe
+      src={video}
+      title="Embedded video"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowFullScreen
+      className="w-full h-full"
+    ></iframe>
+  ) : (
+    <img
+      src={img}
+      alt="About"
+      className="w-full h-full object-cover rounded"
+    />
+  )}
+</div>
+
+
     <p className="text-gray-700">{text}</p>
   </motion.div>
 );
+
 const aboutCards = [
   {
-    img: "code.jpg",
-    text: "I'm a frontend developer focused on responsive and interactive UI using React.",
+    // img: null,
+    video: "https://www.youtube-nocookie.com/embed/Ahsii3YnEuU?si=b5rQD9sjYRXQksoJ",
+    text: "Watch our demo class for frontend development.",
+    link: "#",
   },
   {
-    img: "code.jpg",
-    text: "I craft elegant, accessible, and performance-optimized interfaces.",
+    // img: "code.jpg",
+    video: "https://www.youtube.com/embed/Ahsii3YnEuU?si=ctwC9Fmp0n4hom5r",
+    text: "I craft elegant, accessible, and performance-optimized.",
+    link: "#",
   },
   {
-    img: "code.jpg",
-    text: "I love designing creative UI/UX with a focus on user delight.",
+    // img: null,https://player.vimeo.com/video/76979871
+    video: "https://www.youtube.com/embed/Ahsii3YnEuU?si=ctwC9Fmp0n4hom5r",
+    text: "Explore creative UI/UX design thinking.",
+    link: "#",
   },
   {
-    img: "code.jpg",
+    // img: "code.jpg",
+    video: "https://www.youtube.com/embed/Ahsii3YnEuU?si=ctwC9Fmp0n4hom5r",
     text: "I build end-to-end web apps from scratch to deployment.",
+    link: "#",
+  },
+  {
+    // img: null,
+    video: "https://www.youtube-nocookie.com/embed/Ahsii3YnEuU?si=b5rQD9sjYRXQksoJ",
+    text: "Watch our demo class for frontend development.",
+    link: "#",
+  },
+  {
+    // img: "code.jpg",
+    video: "https://www.youtube.com/embed/Ahsii3YnEuU?si=ctwC9Fmp0n4hom5r",
+    text: "I craft elegant, accessible, and performance-optimized.",
+    link: "#",
+  },
+  {
+    // img: null,https://player.vimeo.com/video/76979871
+    video: "https://www.youtube.com/embed/Ahsii3YnEuU?si=ctwC9Fmp0n4hom5r",
+    text: "Explore creative UI/UX design thinking.",
+    link: "#",
+  },
+  {
+    // img: "code.jpg",
+    video: "https://www.youtube.com/embed/Ahsii3YnEuU?si=ctwC9Fmp0n4hom5r",
+    text: "I build end-to-end web apps from scratch to deployment.",
+    link: "#",
   },
 ];
+
 
 const App = () => {
    const [form, setForm] = useState({
     name: "",
     email: "",
+    mobile: "",
     message: "",
   });
 
@@ -56,10 +109,10 @@ const App = () => {
     setErrors({});
     setSuccess(false);
 
-    router.post("/contact", form, {
+    router.post("/contact-us", form, {
       onSuccess: () => {
         setSuccess(true);
-        setForm({ name: "", email: "", message: "" });
+        setForm({ name: "", email: "", mobile: "", message: "" });
       },
       onError: (err) => {
         setErrors(err);
@@ -107,6 +160,8 @@ const App = () => {
               2000,
               "I Love Coding.",
               2000,
+              "I Love YOU.",
+              2000,
             ]}
             wrapper="p"
             cursor={true}
@@ -116,36 +171,47 @@ const App = () => {
         </section>
 
       {/* About Me Section */}
-      <section
-      id="about"
-      className="bg-white text-gray-900 py-16 px-4"
+      <section id="about" className="bg-white text-gray-900 py-16 px-4">
+  <motion.div
+    initial={{ y: 50, opacity: 0 }}
+    whileInView={{ y: 0, opacity: 1 }}
+    viewport={{ once: true }}
+    transition={{ duration: 1 }}
+    className="text-center mb-16"
+  >
+    <h3 className="text-4xl font-bold mb-4">About Me</h3>
+    <p className="text-gray-600 text-lg max-w-xl mx-auto">
+      Here’s a closer look at my professional focus and passion for web development.
+    </p>
+    <a
+      href="/resume.pdf"
+      className="inline-block mt-6 text-blue-600 hover:text-blue-800 underline text-lg transition-colors duration-300"
+      target="_blank"
+      rel="noopener noreferrer"
     >
-      {/* Section Header */}
-      <motion.div
-        initial={{ y: 50, opacity: 0 }}
-        whileInView={{ y: 0, opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 1 }}
-        className="text-center mb-16"
-      >
-        <h3 className="text-4xl font-bold mb-4">About Me</h3>
-        <p className="text-gray-600 text-lg max-w-xl mx-auto">
-          Here’s a closer look at my professional focus and passion for web development.
-        </p>
-      </motion.div>
+      View My Resume
+    </a>
+  </motion.div>
 
-      {/* Responsive Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 max-w-[1280px] mx-auto px-2">
-        {aboutCards.map((card, index) => (
-          <AboutCard
-            key={index}
-            img={card.img}
-            text={card.text}
-            delay={index * 0.2}
-          />
-        ))}
-      </div>
-    </section>
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 max-w-[1280px] mx-auto px-4">
+    {aboutCards.map((card, index) => (
+      <a
+        key={index}
+        href={card.link}
+        rel="noopener noreferrer"
+        className="block transition-transform hover:scale-105"
+      >
+        <AboutCard
+          img={card.img}
+          video={card.video}
+          text={card.text}
+          delay={index * 0.2}
+        />
+      </a>
+    ))}
+  </div>
+</section>
+
 
 
       {/* Contact Section */}
@@ -188,6 +254,18 @@ const App = () => {
                   className="w-full border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-700"
                 />
                 {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+              </div>
+
+              <div>
+                <input
+                  type="mobile"
+                  name="mobile"
+                  value={form.mobile}
+                  onChange={handleChange}
+                  placeholder="Mobile Number"
+                  className="w-full border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-700"
+                />
+                {errors.mobile && <p className="text-red-500 text-sm mt-1">{errors.mobile}</p>}
               </div>
 
               <div>
