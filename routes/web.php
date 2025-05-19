@@ -1,0 +1,45 @@
+<?php
+
+// use App\Http\Controllers\UserDashboard\ProductController;
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
+|
+*/
+// Route::get('/home1', [App\Http\Controllers\InternetCheckController::class, 'checkInternetConnection']);
+// Route::get('/', function () {
+//     return view('home');
+// });
+Auth::routes();
+
+// Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
+// Route::get('/hiralal', [App\Http\Controllers\HomeController::class, 'hiralal']);
+Route::get('/', [App\Http\Controllers\UserDashboard\ProductController::class, 'product'])->name('products');
+
+
+
+Route::middleware('auth')->group(function () {
+    // Define your routes that require authentication here
+    Route::get('/carting', [App\Http\Controllers\UserDashboard\ProductController::class, 'carting'])->name('carting');
+    
+    
+    Route::get('/detail/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'detail'])->name('detail');
+    Route::get('/addTocart/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'addTocart'])->name('addCart');
+    Route::get('/removeTocart/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'removeTocart'])->name('removeCart');
+    Route::get('/removeItemTocart/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'removeItemTocart'])->name('removeItemTocart');
+    Route::get('/cart', [App\Http\Controllers\UserDashboard\ProductController::class, 'cartView'])->name('cartView');
+    Route::get('/updateAddress', [App\Http\Controllers\UserDashboard\ProductController::class, 'updateAddress'])->name('updateAddress');
+    Route::post('/cart-Proceed', [App\Http\Controllers\UserDashboard\ProductController::class, 'cartProceed'])->name('cartProceed');
+    Route::get('/orderNow', [App\Http\Controllers\UserDashboard\ProductController::class, 'orderNow'])->name('orderNow');
+    Route::get('/paymentMethod', [App\Http\Controllers\UserDashboard\ProductController::class, 'paymentMethod'])->name('paymentMethod');
+    Route::get('/notification', [App\Http\Controllers\UserDashboard\ProductController::class, 'notification'])->name('notification');
+    Route::get('/notificationView', [App\Http\Controllers\UserDashboard\ProductController::class, 'notificationView'])->name('notificationView');
+    
+});
