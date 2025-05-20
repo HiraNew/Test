@@ -1,7 +1,7 @@
 // src/components/Layout.jsx
 import React from "react";
-import { FaLinkedin, FaGithub, FaTwitter, FaInstagram, FaYoutube, FaFacebook } from "react-icons/fa";
-import { Link } from '@inertiajs/react';
+import {FaLinkedin, FaGithub, FaTwitter, FaInstagram, FaYoutube, FaFacebook } from "react-icons/fa";
+
 
 
 
@@ -18,19 +18,19 @@ console.log("URL:",currentUrl);
     <div className="font-sans min-h-screen flex flex-col bg-gray-100">
       {/* Header */}
       <header className="bg-gray-900 text-white p-4 flex justify-between items-center sticky top-0 z-50 shadow-md">
-        <h1 className="text-2xl font-bold">My Portfolio</h1>
+        <h1 className="text-2xl font-bold">DLS</h1>
         <nav className="space-x-4">
         {currentUrl != baserUrl ? (
   <>
-    <a href="#home" className="hover:text-yellow-400">Home</a>
-    <a href="#about" className="hover:text-yellow-400">About</a>
-    <a href="#contact" className="hover:text-yellow-400">Contact</a>
+    <a href="/" className="hover:text-yellow-400">Home</a>
+    <a href="/about-us" className="hover:text-yellow-400">About</a>
+    <a href="/contact" className="hover:text-yellow-400">Contact</a>
   </>
 ) : (
   <a href="#home" className="hover:text-yellow-400">LAL</a>
 )}
 
-          <a href="/privacy&policy" className="hover:text-yellow-400">Privacy Policy</a>
+          <a href="/services" className="hover:text-yellow-400">Our Services</a>
         </nav>
       </header>
 
@@ -43,7 +43,7 @@ console.log("URL:",currentUrl);
     
     {/* Company/Brand Info */}
     <div>
-      <h4 className="text-lg font-semibold mb-4">My Portfolio</h4>
+      <h4 className="text-lg font-semibold mb-4">Our DLS</h4>
       <p className="text-gray-400">
         Showcasing my journey, skills, and work in web development.
       </p>
@@ -67,7 +67,7 @@ console.log("URL:",currentUrl);
         <li><a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-400">Resume</a></li>
         <li><a href="/blog" className="hover:text-yellow-400">Blog</a></li>
         <li><a href="/terms" className="hover:text-yellow-400">Terms of Service</a></li>
-        <li><a href="/privacy&policy" className="hover:text-yellow-400">Privacy Policy</a></li>
+        <li><a href="/services" className="hover:text-yellow-400">Top Services</a></li>
         {/* <li><a href="/privacy-policy" className="hover:text-yellow-400"></a></li> */}
       </ul>
     </div>
@@ -151,7 +151,7 @@ console.log("URL:",currentUrl);
 
   {/* Footer Bottom */}
   <div className="mt-10 border-t border-gray-700 pt-6 text-center text-xs text-gray-500">
-    &copy; {new Date().getFullYear()} My Portfolio. All rights reserved.
+    &copy; {new Date().getFullYear()} DLS. All rights reserved.
   </div>
 </footer>
 

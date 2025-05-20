@@ -38,9 +38,14 @@ Route::get('/privacy-policy', function () {
 Route::get('/about-us', function () {
     return Inertia::render('AboutUs');
 });
-Route::get('/privacy&policy', function () {
-    return Inertia::render('p&v');
+// Route::get('/privacy&policy', function () {
+//     return Inertia::render('p&v');
+// });
+
+Route::get('/services', function () {
+    return Inertia::render('Service');
 });
+
 Route::get('/contact', function () {
     return Inertia::render('ContactUs');
 });
