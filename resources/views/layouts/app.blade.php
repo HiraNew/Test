@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'DLS') }}</title>
 
     <!-- Fonts & Icons -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
@@ -119,12 +119,23 @@
     <div id="app">
 
         {{-- Mobile Search Header --}}
-        <nav class="navbar navbar-light bg-white shadow-sm d-md-none justify-content-center">
-            <div class="icon-container">
-                <i class="fas fa-search icon search-mobile"></i>
+       {{-- Mobile Header --}}
+        <nav class="navbar navbar-light bg-white shadow-sm d-md-none justify-content-between px-3 py-2">
+            <a class="navbar-brand fw-bold text-primary" href="{{ url('/') }}">
+                {{ config('app.name', 'DLS') }}
+            </a>
+
+            <div class="d-flex align-items-center">
+                <div class="icon-container me-2">
+                    <i class="fas fa-search icon search-mobile"></i>
+                </div>
+                @guest
+                    <a href="{{ route('login') }}" class="btn btn-outline-primary btn-sm me-1">Login</a>
+                    <a href="{{ route('register') }}" class="btn btn-primary btn-sm">Register</a>
+                @endguest
             </div>
+            <input type="search" class="form-control searchbar-mobile" placeholder="Search..." aria-label="Search">
         </nav>
-        <input type="search" class="form-control searchbar-mobile" placeholder="Search..." aria-label="Search">
 
         {{-- Desktop Navbar --}}
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm desktop-navbar">

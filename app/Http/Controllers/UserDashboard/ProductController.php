@@ -6,13 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Addre;
 use App\Models\Cart;
 use App\Models\Notification;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -52,12 +55,8 @@ class ProductController extends Controller
             // Fetch the cart items for the authenticated user
             $cartItems = $user->carts->count();
             session(['key' => $cartItems]);
-            // return response()->json([
-            //     'status' => 'success',
-            //     'notification' => $cartItems,
-            // ]);
         }
-        // dd($cartItems);
+     
     }
     public function notification()
     {
@@ -91,14 +90,12 @@ class ProductController extends Controller
     public function notificationView()
     {
         $user = Auth::user();
-        // $notifications = Notification::where('user_id', $user->id)->get();
+       
         $notifications = Notification::where('user_id', $user->id)
                                      ->with('creator') // Load the creator (admin or manager)
                                      ->orderByDesc('created_at')
                                      ->get();
-        // $noti = User::find(1);
-        // dd($notifications);
-                            // dd($notifications->created_by);
+        
         if(isset($notifications))
         {
             DB::table('notifications')
@@ -114,11 +111,7 @@ class ProductController extends Controller
     }
     public function product()
     { 
-        // dd('home');
-        // $this->notification();
         $this->carting();
-        // dd(isset($user->name));
-        // $this->checkInternetConnection();
         try{
             $Products = Product::all();
 
@@ -135,9 +128,7 @@ class ProductController extends Controller
             return view('error')->with('issue', $e);
         }
         
-        // dd($Products);
         return view('error');
-        // return view('home',compact('Products'));
     }
     public function detail($id){
         // dd($id);
@@ -153,31 +144,17 @@ class ProductController extends Controller
     public function addTocart($id)
     {
         try{
-            // dd($id);
             $user = Auth::user();
-            // $cartItems = $user->carts->count();
-            //     // dd($cartItems);
-            //     if($cartItems >= 1)
-            //     {
-            //         return redirect()->back()->with('error','Only 1 Items allowed In Cart.');
-            //     }
-            // if(!isset($user))
-            // {
-            //     return redirect()->route('login');
-            // }
+            
             $Product = Product::find($id);
             if (!$Product) {
                 // Handle case when product is not found
                 return redirect()->back()->with('error', 'Product not found.');
             }
-            // dd($Product);
-            
-            // $cart = Cart::where('product_id',$Product->id);
-            // Check if the product is already in the cart for the logged-in user
             $cart = Cart::where('user_id', $user->id)
                   ->where('product_id', $Product->id)
                   ->first();  // This finds the cart item if it exists for the user and product
-            // dd($cart);
+           
             
             if($cart)
             {
@@ -187,40 +164,25 @@ class ProductController extends Controller
                  return redirect()->back()->with('error','Can,t Add More Than 10 Quantity of Any Item.');
                 }
                 $cart->quantity += 1;
-                // dd($cart->quantity);
                 $cart->save();
                 return redirect()->back()->with('insert','Total '. $cart->quantity. ' Quantity Added To '. $Product->name);
-                // return response()->json([
-                //     'status' => 'success',
-                //     'msg' => 'Total '. $cart->quantity. ' Quantity Added To '. $Product->name,
-                // ]);
-                // dd($cart->quantity);
+                
             }
          else{
             $cart = new Cart();
             $cart->user_id = $user->id;
             $cart->product_id = $Product->id;
-            // $cart->price = $Product->price;
-            // $cart->image = $Product->image;
             $cart->save();
             return redirect()->back()->with('insert',' '. $Product->name. ' Added To Your Cart');
-            // return response()->json([
-            //     'status' => 'success',
-            //     'msg' => ' '. $Product->name. ' Added To Your Cart',
-            // ]);
         }
-        // dd($cart);
-        // $cart = new Cart();
         }
         catch (\Exception $e) {
             return redirect()->back()->with('error', 'An error occurred while adding the product to your cart: ' . $e->getMessage());
         }
 
-        // dd($Product);
     }
     public function removeTocart($id)
     {
-        // dd('userCart');
         $user = Auth::user();
         $Product = Product::find($id);
             if (!$Product) {
@@ -230,7 +192,6 @@ class ProductController extends Controller
         $cart = Cart::where('user_id', $user->id)
                   ->where('product_id', $Product->id)
                   ->first();
-        // dd($cart);
         if($cart)
         {
             if($cart->quantity < 2)
@@ -238,7 +199,6 @@ class ProductController extends Controller
                 return redirect()->back()->with('error','Item quantity can not less than 1.');
             }
                 $cart->quantity -= 1;
-                // dd($cart->quantity);
                 $cart->save();
             return redirect()->back()->with('success', 'Item Decreased.');
         }
@@ -253,82 +213,104 @@ class ProductController extends Controller
         }
             // Fetch the cart items for the authenticated user
         $cartItems = $user->carts;
-            // dd($cartItems->find($id));
         if(isset($cartItems)){
             $cartItems->find($id)->delete();
             session(['key' => $cartItems->count()-1]);
             return redirect()->back()->with('success', 'Item Decreased.');
         }
-            // $removeItem->delete();
-        // dd('userCart'.$id);
     }
     public function cartView()
     {
         $this->carting();
-        // dd('userCart');
         $user = Auth::user();
-        // $cart = Cart::where('user_id',$user->id)->get();
-        // // $product = Product::
-        // dd($cart->product_id);
         $carts = Cart::where('user_id', $user->id)
                      ->with('product') // eager load product details
                      ->get();
-        // dd($carts);
         return view('userCart',compact('carts'));
     }
     public function updateAddress()
     {
-        // dd('userAddress');
         $user = Auth::user();
-        // dd($user->id);
         $address = Addre::where('user_id', $user->id)->first();
-        // dd(isset($address));
         if(isset($address))
         {
-            // dd($address);
             return view('userAddress',compact('address'));
         }
         return view('userAddress');
     }
     public function cartProceed(Request $request)
-    {
-        // dd(Auth::id());
-        $user = Auth::user();
-        // dd($user->id);
-        $address = Addre::where('user_id', $user->id)->first();
-        // dd($address);
-        if(isset($address)){
-            $address->update([
-                'address' => $request->address,
-                'pincode' => $request->pincode,
-            ]);
-            return view('Order/paymentMethod');
-        }
-        else{
-        // dd($user->id);
-        // $Address = Addre::where('user_id', $user->id);
-        // dd(isset($Address));
-        // if(isset($Address))
-        // {
-        //     return view('userAddress',compact('Address'));
-        // }
-        // $request->validate([
-        //     'address' => 'required|string|max:255',
-        //     'pincode' => 'required|numeric|min:100000|max:999999',
-        // ]);
-        $newAddress = new Addre();
-        $newAddress->user_id = $user->id;
-        $newAddress->address = $request->address;
-        $newAddress->pincode = $request->pincode;
-        $newAddress->save();
-        // $this->orderNow();
-        return redirect()->route('paymentMethod');
-        }
+{
+    // Validate incoming request
+    $request->validate([
+        'address' => 'required|string|max:255',
+        'pincode' => 'required|string|max:10',
+    ]);
+
+    $user = Auth::user();
+
+    if (!$user) {
+        return redirect()->route('login')->with('error', 'Please log in to continue.');
     }
+
+    // Check if the user already has an address
+    $address = Addre::firstOrNew(['user_id' => $user->id]);
+
+    $address->address = $request->address;
+    $address->pincode = $request->pincode;
+    $address->save();
+
+    return redirect()->route('paymentMethod')->with('success', 'Address saved. Proceed to payment.');
+}
+
     public function paymentMethod()
     {
         return view('Order/paymentMethod');
-        // return redirect()->route('orderNow')->with('success','Cash On Delevery');
+    }
+    public function generateUniqueCode($length = 7, $prefix = 'DLS') {
+    $randomLength = $length - strlen($prefix);
+
+    do {
+        // Generate random alphanumeric part
+        $randomPart = Str::upper(Str::random($randomLength));
+        $code = $prefix . $randomPart;
+
+        // Check uniqueness in DB (example uses "orders" table and "code" column)
+    } while (Payment::where('orderid', $code)->exists());
+
+    return $code;
+}
+    public function paymentMethodProceed(Request $request){
+        $gst = 0.18;
+        $plateFromCharge = 0;
+        $orderId = $this->generateUniqueCode();
+        $indiaTime = Carbon::now('Asia/Kolkata');
+        $tomorrow = $indiaTime->copy()->addDay();
+        $user = Auth::id();
+        $orders = Cart::where('user_id',$user)->get();
+        // If cart is empty, redirect back with message
+        if ($orders->isEmpty()) {
+            return redirect()->back()->with('error', 'Your cart is empty. Please add items before placing an order.');
+        }
+        $address = Addre::where('user_id', $user)->first();
+        foreach($orders as $order){
+        $product = Product::find($order->product_id);
+         if ($product && $address) {
+            $confirm = new Payment();
+            $confirm->user_id = $user;
+            $confirm->product_id = $order->product_id;
+            $confirm->qty = $order->quantity;
+            $confirm->amount = ($product->price* $order->quantity)+ (($product->price* $order->quantity)*$gst);
+            $confirm->payment_mode = $request->payment_method;
+            $confirm->pincode = $address->pincode;
+            $confirm->order_date = $indiaTime;
+            $confirm->delevery_date = $tomorrow;
+            $confirm->orderid = $orderId;
+            $confirm->save();
+        }
+     }
+     Cart::where('user_id',$user)->delete();
+     $this->carting();
+        return redirect()->route('orderNow')->with('success', 'Your Order is Confirmed Order ID:'. $orderId);
     }
     public function orderNow()
     {

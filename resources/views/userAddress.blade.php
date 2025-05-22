@@ -64,7 +64,7 @@
                         </fieldset>
 
                         <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm">
-                            <i class="fas fa-check-circle me-2"></i>Order Now
+                            <i class="fas fa-check-circle me-2"></i>Address
                         </button>
                     </form>
                 </div>

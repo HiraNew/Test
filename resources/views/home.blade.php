@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+{{-- SweetAlert2 CSS & JS --}}
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
 {{-- Alerts --}}
@@ -83,12 +87,84 @@
 {{-- JS --}}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function () {
-        $('.outstock').click(function (e) {
-            e.preventDefault();
-            alert('This product is currently out of stock.');
+$(document).ready(function () {
+    $('.addToCart').click(function (e) {
+        e.preventDefault();
+
+        const button = $(this);
+        const isGoToCart = button.hasClass('goToCart');
+
+        // If already converted, just go to cart
+        if (isGoToCart) {
+            window.location.href = "{{ route('cartView') }}";
+            return;
+        }
+
+        const addUrl = button.attr('href');
+
+        $.ajax({
+            url: addUrl,
+            type: 'GET',
+            success: function () {
+                let secondsLeft = 5;
+                let timerInterval;
+
+                Swal.fire({
+                    title: '🛒 Item Added!',
+                    html: `
+                        <div class="mt-2">
+                            <p>You will be redirected to your cart in <b id="countdown">${secondsLeft}</b> seconds.</p>
+                            <p class="small text-muted">Click "Stay Here" to cancel redirection.</p>
+                        </div>
+                    `,
+                    icon: 'success',
+                    showCancelButton: true,
+                    cancelButtonText: 'Stay Here',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        const countdownEl = document.getElementById('countdown');
+                        timerInterval = setInterval(() => {
+                            secondsLeft--;
+                            if (countdownEl) countdownEl.textContent = secondsLeft;
+
+                            if (secondsLeft <= 0) {
+                                clearInterval(timerInterval);
+                                Swal.close();
+                                window.location.href = "{{ route('cartView') }}";
+                            }
+                        }, 1000);
+                    },
+                    willClose: () => {
+                        clearInterval(timerInterval);
+                    }
+                });
+
+                // Change the button to "Go to Cart"
+                convertToGoToCart(button);
+            },
+            error: function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops!',
+                    text: 'Failed to add item. Please try again.',
+                });
+            }
         });
     });
+
+    // Function to switch the button state
+    function convertToGoToCart(button) {
+        button
+            .removeClass('btn-success addToCart')
+            .addClass('btn-outline-info goToCart')
+            .html('<i class="fas fa-shopping-cart me-1"></i>Go to Cart')
+            .attr('href', "{{ route('cartView') }}");
+    }
+});
 </script>
+
+
+
 
 @endsection

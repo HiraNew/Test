@@ -1,6 +1,38 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    @media (max-width: 575.98px) {
+        .table thead {
+            display: none;
+        }
+
+        .table tbody tr {
+            display: block;
+            margin-bottom: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 0.75rem;
+        }
+
+        .table tbody td {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+        }
+
+        .table tbody td::before {
+            content: attr(data-label);
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .table tbody img {
+            max-width: 60px;
+        }
+    }
+</style>
+
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-10">
@@ -35,8 +67,9 @@
                     @if ($carts->isEmpty())
                         <div class="p-4 text-center text-muted">Your cart is currently empty. <a href="{{ route('products') }}">Continue Soping</a></div>
                     @else
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
+                        <div class="table-responsive-sm">
+                            <table class="table table-bordered align-middle mb-0 w-100">
+
                                 <thead class="table-light">
                                     <tr>
                                         <th>Image</th>
@@ -55,20 +88,21 @@
                                             $total += $itemTotal;
                                         @endphp
                                         <tr>
-                                            <td><img src="{{ asset($item->product->image) }}" alt="{{ $item->product->name }}" width="60" class="rounded shadow-sm"></td>
-                                            <td>₹{{ $item->product->price }}</td>
-                                            <td>
+                                            <td data-label="Image"><img src="{{ asset($item->product->image) }}" alt="{{ $item->product->name }}" width="60" class="rounded shadow-sm"></td>
+                                            <td data-label="Price">₹{{ $item->product->price }}</td>
+                                            <td data-label="Quantity">
                                                 <div class="d-flex align-items-center gap-2">
                                                     <a href="{{ url('removeTocart', $item->product->id) }}" class="btn btn-sm btn-outline-warning">−</a>
                                                     <span>{{ $item->quantity }}</span>
                                                     <a href="{{ url('addTocart', $item->product->id) }}" class="btn btn-sm btn-outline-success">+</a>
                                                 </div>
                                             </td>
-                                            <td>{{ $item->product->name }}</td>
-                                            <td>₹{{ $itemTotal }}</td>
-                                            <td>
+                                            <td data-label="Item Name">{{ $item->product->name }}</td>
+                                            <td data-label="Total">₹{{ $itemTotal }}</td>
+                                            <td data-label="Action">
                                                 <a href="{{ url('removeItemTocart', $item->id) }}" class="btn btn-sm btn-danger">Remove</a>
                                             </td>
+
                                         </tr>
                                     @endforeach
                                 </tbody>
