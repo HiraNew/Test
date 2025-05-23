@@ -4,6 +4,16 @@
 
 @section('content')
 <style>
+    .review {
+    background-color: #f8f9fa; /* Light neutral */
+    border-left: 4px solid #007bff;
+    transition: all 0.3s ease;
+}
+
+.review:hover {
+    background-color: #e9ecef;
+}
+
     .card {
     border: none;
     border-radius: 10px;
@@ -193,40 +203,11 @@
 </div>
 
     </div>
-
-    <!-- Product Reviews -->
     <!-- Product Reviews -->
     <div class="mt-5">
-       {{-- <div class="card mb-4 shadow-sm">
-            <div class="card-body">
-                <h4 class="card-title mb-3">Customer Reviews Overview</h4>
-
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="mb-1">Average Rating</h5>
-                        <div class="d-flex align-items-center">
-                            @for($i = 1; $i <= 5; $i++)
-                                <i class="fa fa-star {{ $i <= round($averageRating) ? 'text-warning' : 'text-muted' }}"></i>
-                            @endfor
-                            <span class="ms-2 text-secondary">({{ $averageRating }}/5)</span>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h5 class="mb-1">Total Reviews</h5>
-                        <span class="badge bg-primary fs-6">{{ $product->reviews->count() }}</span>
-                    </div>
-                </div>
-            </div>
-        </div> --}}
 
         @if($averageRating > 0)
     <div class="mb-3">
-        {{-- <strong>Average Rating:</strong>
-        @for($i = 1; $i <= 5; $i++)
-            <i class="fa fa-star {{ $i <= round($averageRating) ? 'text-warning' : 'text-muted' }}"></i>
-        @endfor
-        <small class="text-muted">({{ $averageRating }}/5 from {{ $product->reviews->count() }} reviews)</small> --}}
     </div>
     <div class="card mb-4">
     <div class="card-body">
@@ -306,9 +287,6 @@
         </div>
 
 
-        {{-- @guest
-            <div class="alert alert-info mt-4">Please <a href="{{ route('login') }}">login</a> to leave a review.</div>
-        @endguest --}}
     </div>
 
 
@@ -317,6 +295,38 @@
     <h3>Related Products</h3>
     <div class="d-flex overflow-auto">
         @foreach($relatedProducts as $related)
+            <div class="card mx-2" style="min-width: 250px;">
+                <img src="{{ asset($related->image) }}" alt="{{ $related->name }}" class="card-img-top">
+                <div class="card-body">
+                    <h5 class="card-title">{{ $related->name }}</h5>
+                    <p class="card-text">₹{{ number_format($related->price, 2) }}</p>
+                    <a href="{{ url('detail', $related->id) }}" class="btn btn-secondary">View Details</a>
+                </div>
+            </div>
+            <div class="card mx-2" style="min-width: 250px;">
+                <img src="{{ asset($related->image) }}" alt="{{ $related->name }}" class="card-img-top">
+                <div class="card-body">
+                    <h5 class="card-title">{{ $related->name }}</h5>
+                    <p class="card-text">₹{{ number_format($related->price, 2) }}</p>
+                    <a href="{{ url('detail', $related->id) }}" class="btn btn-secondary">View Details</a>
+                </div>
+            </div>
+            <div class="card mx-2" style="min-width: 250px;">
+                <img src="{{ asset($related->image) }}" alt="{{ $related->name }}" class="card-img-top">
+                <div class="card-body">
+                    <h5 class="card-title">{{ $related->name }}</h5>
+                    <p class="card-text">₹{{ number_format($related->price, 2) }}</p>
+                    <a href="{{ url('detail', $related->id) }}" class="btn btn-secondary">View Details</a>
+                </div>
+            </div>
+            <div class="card mx-2" style="min-width: 250px;">
+                <img src="{{ asset($related->image) }}" alt="{{ $related->name }}" class="card-img-top">
+                <div class="card-body">
+                    <h5 class="card-title">{{ $related->name }}</h5>
+                    <p class="card-text">₹{{ number_format($related->price, 2) }}</p>
+                    <a href="{{ url('detail', $related->id) }}" class="btn btn-secondary">View Details</a>
+                </div>
+            </div>
             <div class="card mx-2" style="min-width: 250px;">
                 <img src="{{ asset($related->image) }}" alt="{{ $related->name }}" class="card-img-top">
                 <div class="card-body">
