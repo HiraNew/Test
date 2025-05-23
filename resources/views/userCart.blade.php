@@ -78,6 +78,7 @@
                                     @endphp
 
                                     @foreach ($carts as $item)
+                                    {{-- @dd($item->product_id); --}}
                                         @php
                                             $itemTotal = $item->quantity * $item->product->price;
                                             $total += $itemTotal;
@@ -90,7 +91,7 @@
                                             }
                                         @endphp
 
-                                        <tr onclick="showLoaderAndRedirect('{{ url('detail', $item->id) }}')" class="cursor-pointer hover:bg-gray-100 transition">
+                                        <tr onclick="showLoaderAndRedirect('{{ url('detail', $item->product_id) }}')" class="cursor-pointer hover:bg-gray-100 transition">
                                             <td data-label="Image" class="text-center py-2">
                                                 <img src="{{ asset($item->product->image) }}" alt="{{ $item->product->name }}" width="60" class="w-40 sm:w-20 md:w-16 h-auto mx-auto rounded shadow-md">
                                             </td>

@@ -130,16 +130,39 @@ class ProductController extends Controller
         
         return view('error');
     }
-    public function detail($id){
-        dd($id);
-        $product = Product::with(['reviews.user'])->findOrFail($id);
-        $relatedProducts = Product::where('category_id', $product->category_id)
-                              ->where('id', '!=', $id)
-                              ->limit(4)
-                              ->get();
+    public function detail($id)
+{
+    $product = Product::with(['reviews.user'])->findOrFail($id);
 
-        return view('productDetailed', compact('product', 'relatedProducts'));
+    // Calculate average rating (optional: round to 1 decimal place)
+    $averageRating = round($product->reviews->avg('rating'), 1);
+    // dd($averageRating);
+
+    $relatedProducts = Product::where('category_id', $product->category_id)
+                            ->where('id', '!=', $id)
+                            ->limit(4)
+                            ->get();
+
+    return view('productDetailed', compact('product', 'relatedProducts', 'averageRating'));
+}
+
+
+    public function storeReview(Request $request, Product $product)
+    {
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'required|string|max:1000',
+        ]);
+        // dd($product->reviews);
+        $product->reviews()->create([
+            'user_id' => auth()->id(),
+            'rating' => $request->rating,
+            'review' => $request->comment ?? 'N/A  ',
+        ]);
+
+        return back()->with('success', 'Review submitted successfully!');
     }
+
     
     public function addTocart($id)
     {
@@ -228,12 +251,16 @@ class ProductController extends Controller
                      ->with('product.category') // eager load product details
                      ->get();
                     //  dd($carts[0]->product->category_id);
+                    // dd($carts[0]->product_id);
+        $idDetail = [];
         $categoryName = [];
         foreach($carts as $cart){
             $categoryName[] = $cart->product->category->name;
+            $idDetail[] = $cart->product_id;
         }
+        // dd($idDetail);
         // dd($categoryName);
-        return view('userCart',compact('carts', 'categoryName'));
+        return view('userCart',compact('carts', 'categoryName', 'idDetail'));
     }
     public function updateAddress()
     {

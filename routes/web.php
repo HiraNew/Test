@@ -32,9 +32,10 @@ Route::middleware('auth')->group(function () {
     
     Route::get('/detail/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'detail'])->name('detail');
     Route::get('/addTocart/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'addTocart'])->name('addCart');
+    Route::post('/product/{product}/review', [App\Http\Controllers\UserDashboard\ProductController::class, 'storeReview'])->name('reviews.store');
     Route::get('/removeTocart/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'removeTocart'])->name('removeCart');
     Route::get('/removeItemTocart/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'removeItemTocart'])->name('removeItemTocart');
-    Route::get('/cart', [App\Http\Controllers\UserDashboard\ProductController::class, 'cartView'])->name('cartView');
+    Route::get('/cart', [App\Http\Controllers\UserDashboard\ProductController::class, 'cartView'])->name('cartView'); 
     Route::get('/updateAddress', [App\Http\Controllers\UserDashboard\ProductController::class, 'updateAddress'])->name('updateAddress');
     Route::match(['get', 'post'], '/cart-Proceed', [App\Http\Controllers\UserDashboard\ProductController::class, 'cartProceed'])->name('cart-Proceed');
     Route::get('/orderNow', [App\Http\Controllers\UserDashboard\ProductController::class, 'orderNow'])->name('orderNow');
