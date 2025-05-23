@@ -40,7 +40,7 @@ const stats = [
     delay: 0.4,
   },
   {
-    title: "Total Free Demos Attended",
+    title: "Total Free Demo's Student's Attended",
     value: "300+",
     icon: <FaChalkboardTeacher className="text-red-600 text-4xl" />,
     delay: 0.5,
@@ -167,8 +167,9 @@ const App = () => {
               repeat={Infinity}
               className="text-3xl md:text-3xl text-blue-800 font-bold"
             />
-            <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+              <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {/* Card 1: Shop Now */}
+            <a href="http://127.0.0.1:8001/" target="_blank">
             <div className="bg-white bg-opacity-90 rounded-lg shadow-md p-6 flex flex-col items-center hover:scale-105 transition-transform">
             {/* Fresh Shopping Cart Icon */}
             <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-green-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -176,6 +177,7 @@ const App = () => {
             </svg>
             <h4 className="text-xl font-bold text-green-800">Shop Your Faviroute Products Now</h4>
           </div>
+            </a>
 
 
 
