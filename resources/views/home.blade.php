@@ -127,7 +127,6 @@ $(document).ready(function () {
                         timerInterval = setInterval(() => {
                             secondsLeft--;
                             if (countdownEl) countdownEl.textContent = secondsLeft;
-
                             if (secondsLeft <= 0) {
                                 clearInterval(timerInterval);
                                 Swal.close();
@@ -138,6 +137,11 @@ $(document).ready(function () {
                     willClose: () => {
                         clearInterval(timerInterval);
                     }
+                }).then((result) => {
+                    if (result.dismiss === Swal.DismissReason.cancel) {
+                        // User clicked "Stay Here" button
+                        window.location.href = "{{ route('products') }}"; // Replace with your actual route
+                    }
                 });
 
                 // Change the button to "Go to Cart"
@@ -147,8 +151,14 @@ $(document).ready(function () {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops!',
-                    text: 'Failed to add item. Please try again.',
+                    text: 'Please Login First.',
+                    timer: 2000, // closes after 3 seconds
+                    showConfirmButton: false,
                 });
+
+                setTimeout(() => {
+                    window.location.href = '/login'; // <-- Change this
+                }, 3000);
             }
         });
     });

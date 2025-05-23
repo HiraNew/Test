@@ -131,7 +131,7 @@ class ProductController extends Controller
         return view('error');
     }
     public function detail($id){
-        // dd($id);
+        dd($id);
         $product = Product::with(['reviews.user'])->findOrFail($id);
         $relatedProducts = Product::where('category_id', $product->category_id)
                               ->where('id', '!=', $id)
@@ -221,12 +221,19 @@ class ProductController extends Controller
     }
     public function cartView()
     {
+        // dd('uierhf');
         $this->carting();
         $user = Auth::user();
         $carts = Cart::where('user_id', $user->id)
-                     ->with('product') // eager load product details
+                     ->with('product.category') // eager load product details
                      ->get();
-        return view('userCart',compact('carts'));
+                    //  dd($carts[0]->product->category_id);
+        $categoryName = [];
+        foreach($carts as $cart){
+            $categoryName[] = $cart->product->category->name;
+        }
+        // dd($categoryName);
+        return view('userCart',compact('carts', 'categoryName'));
     }
     public function updateAddress()
     {
@@ -299,7 +306,7 @@ class ProductController extends Controller
             $confirm->user_id = $user;
             $confirm->product_id = $order->product_id;
             $confirm->qty = $order->quantity;
-            $confirm->amount = ($product->price* $order->quantity)+ (($product->price* $order->quantity)*$gst);
+            $confirm->amount = ($product->price* $order->quantity);
             $confirm->payment_mode = $request->payment_method;
             $confirm->pincode = $address->pincode;
             $confirm->order_date = $indiaTime;
