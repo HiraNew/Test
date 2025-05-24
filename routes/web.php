@@ -32,7 +32,13 @@ Route::middleware('auth')->group(function () {
     
     Route::get('/detail/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'detail'])->name('detail');
     Route::get('/addTocart/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'addTocart'])->name('addCart');
+    // Review Related route start
     Route::post('/product/{product}/review', [App\Http\Controllers\UserDashboard\ProductController::class, 'storeReview'])->name('reviews.store');
+    Route::post('/review/{id}/like', [App\Http\Controllers\UserDashboard\ProductController::class, 'like'])->name('review.like');
+    Route::post('/review/vote', [App\Http\Controllers\UserDashboard\ProductController::class, 'vote'])->name('review.vote');
+    Route::post('/review/{id}/dislike', [App\Http\Controllers\UserDashboard\ProductController::class, 'dislike'])->name('review.dislike');
+
+    // review related route end
     Route::get('/removeTocart/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'removeTocart'])->name('removeCart');
     Route::get('/removeItemTocart/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'removeItemTocart'])->name('removeItemTocart');
     Route::get('/cart', [App\Http\Controllers\UserDashboard\ProductController::class, 'cartView'])->name('cartView'); 

@@ -63,6 +63,7 @@
                         </div>
                     </div>
                 </div>
+                
             @endforeach
         @else
             <div class="col-12 text-center">

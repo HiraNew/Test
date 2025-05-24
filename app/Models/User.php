@@ -52,4 +52,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Cart::class);
     }
+    public function reviewVotes()
+    {
+        return $this->hasMany(ReviewVote::class);
+    }
+
 }

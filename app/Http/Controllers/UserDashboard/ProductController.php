@@ -9,6 +9,8 @@ use App\Models\Notification;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Review;
+use App\Models\ReviewVote;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Session\Session;
@@ -131,21 +133,32 @@ class ProductController extends Controller
         return view('error');
     }
     public function detail($id)
-{
-    $product = Product::with(['reviews.user'])->findOrFail($id);
+    {
+        $product = Product::with(['images', 'reviews.user'])->findOrFail($id);
+        // dd($product->images);
 
-    // Calculate average rating (optional: round to 1 decimal place)
-    $averageRating = round($product->reviews->avg('rating'), 1);
-    // dd($averageRating);
+        $averageRating = round($product->reviews->avg('rating'), 1);
 
-    $relatedProducts = Product::where('category_id', $product->category_id)
-                            ->where('id', '!=', $id)
-                            ->limit(4)
-                            ->get();
+        $relatedProducts = Product::where('category_id', $product->category_id)
+                                ->where('id', '!=', $id)
+                                ->limit(4)
+                                ->get();
 
-    return view('productDetailed', compact('product', 'relatedProducts', 'averageRating'));
-}
+        $reviews = $product->reviews()
+            ->withCount([
+                'likes as likes_count',
+                'dislikes as dislikes_count'
+            ])
+            ->with(['userVote' => function ($query) {
+                $query->where('user_id', auth()->id());
+            }, 'user'])
+            ->get();
 
+        return view('productDetailed', compact('product', 'relatedProducts', 'averageRating', 'reviews'));
+    }
+
+     
+    // Review Controller functions start
 
     public function storeReview(Request $request, Product $product)
     {
@@ -163,6 +176,69 @@ class ProductController extends Controller
         return back()->with('success', 'Review submitted successfully!');
     }
 
+    public function like($id)
+    {
+        $review = Review::findOrFail($id);
+        $review->likes = $review->likes + 1;
+        $review->save();
+
+        return response()->json(['likes' => $review->likes]);
+    }
+
+    public function dislike($id)
+    {
+        $review = Review::findOrFail($id);
+        $review->dislikes = $review->dislikes + 1;
+        $review->save();
+
+        return response()->json(['dislikes' => $review->dislikes]);
+    }
+
+    public function vote(Request $request)
+    {
+        $validated = $request->validate([
+            'review_id' => 'required|exists:reviews,id',
+            'vote' => 'required|in:like,dislike',
+        ]);
+
+        $user = auth()->user();
+        $existingVote = ReviewVote::where('review_id', $validated['review_id'])
+            ->where('user_id', $user->id)
+            ->first();
+
+        if ($existingVote) {
+            if ($existingVote->vote === $validated['vote']) {
+                // Remove vote
+                $existingVote->delete();
+            } else {
+                // Update vote
+                $existingVote->update(['vote' => $validated['vote']]);
+            }
+        } else {
+            ReviewVote::create([
+                'user_id' => $user->id,
+                'review_id' => $validated['review_id'],
+                'vote' => $validated['vote'],
+            ]);
+        }
+
+        $review = Review::withCount([
+            'likes as likes_count',
+            'dislikes as dislikes_count'
+        ])->findOrFail($validated['review_id']);
+
+        return response()->json([
+            'likes' => $review->likes_count,
+            'dislikes' => $review->dislikes_count,
+            'user_vote' => ReviewVote::where('user_id', $user->id)
+                ->where('review_id', $review->id)
+                ->value('vote')
+        ]);
+    }
+
+
+
+// Reviews functions end
     
     public function addTocart($id)
     {

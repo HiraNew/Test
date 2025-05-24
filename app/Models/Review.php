@@ -20,4 +20,24 @@ class Review extends Model
     {
         return $this->belongsTo(Product::class);
     }
+    public function votes()
+    {
+        return $this->hasMany(ReviewVote::class);
+    }
+    public function likes()
+    {
+        return $this->hasMany(ReviewVote::class)->where('vote', 'like');
+    }
+
+    public function dislikes()
+    {
+        return $this->hasMany(ReviewVote::class)->where('vote', 'dislike');
+    }
+
+    public function userVote()
+    {
+        return $this->hasOne(ReviewVote::class)->where('user_id', auth()->id());
+    }
+
+
 }
