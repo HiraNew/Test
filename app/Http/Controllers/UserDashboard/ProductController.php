@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Spatie\FlareClient\View;
 
 class ProductController extends Controller
 {
@@ -425,6 +426,10 @@ class ProductController extends Controller
     public function orderNow()
     {
         return view('orderSuccess');
+    }
+    public function mainance()
+    {
+        return View('maintainance');
     }
 }
 
