@@ -15,29 +15,6 @@ class HomeController extends Controller
      *
      * @return void
      */
-    // public function checkInternetConnection()
-    // {
-    //     try {
-    //         // Try to connect to a reliable external URL (e.g., Google)
-    //         $response = Http::timeout(5)->get('https://www.google.com');
-
-    //         // Check if the request was successful
-    //         if ($response->successful()) {
-    //             session()->flash('status', 'Internet is connected!');
-    //             session()->flash('status_type', 'success'); // To show green or success message
-    //         } else {
-    //             session()->flash('status', 'Internet is not connected!');
-    //             session()->flash('status_type', 'danger'); // To show red or error message
-    //         }
-    //     } catch (\Exception $e) {
-    //         // If the request fails, there is no internet connection
-    //         session()->flash('status', 'Internet is not connected!');
-    //         session()->flash('status_type', 'danger');
-    //     }
-
-    //     // Redirect back to the previous page or to a specific view
-    //     return redirect()->back();
-    // }
     public function __construct()
     {
         $this->middleware('auth');

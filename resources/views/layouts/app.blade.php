@@ -134,7 +134,10 @@
                     <a href="{{ route('register') }}" class="btn btn-primary btn-sm">Register</a>
                 @endguest
             </div>
-            <input type="search" class="form-control searchbar-mobile" placeholder="Search..." aria-label="Search">
+            <form method="GET" action="{{ route('products') }}" class="mb-4">
+                <input type="search" name="query" class="form-control searchbar-mobile" placeholder="Search..." value="{{ request('query') }}">
+            </form>
+
         </nav>
 
         {{-- Desktop Navbar --}}
@@ -152,7 +155,9 @@
                                 <div class="icon-container">
                                     <i class="fas fa-search icon search-desktop"></i>
                                 </div>
-                                <input type="search" class="form-control searchbar" placeholder="Search..." aria-label="Search">
+                                <form method="GET" action="{{ route('products') }}">
+                                <input type="search" name="query" class="form-control searchbar" placeholder="Search..." aria-label="Search">
+                                </form>
 
                                 {{-- Cart --}}
                                 <div class="icon-container">
@@ -298,6 +303,7 @@
                 }
             });
         });
+        
     </script>
 </body>
 </html>

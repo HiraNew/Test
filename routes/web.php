@@ -23,6 +23,8 @@ Auth::routes();
 // Route::get('/hiralal', [App\Http\Controllers\HomeController::class, 'hiralal']);
 Route::get('/', [App\Http\Controllers\UserDashboard\ProductController::class, 'product'])->name('products');
 Route::get('/mainantance', [App\Http\Controllers\UserDashboard\ProductController::class, 'mainance']);
+Route::get('/search-products', [App\Http\Controllers\UserDashboard\ProductController::class, 'searchProducts'])->name('search.products');
+
 
 
 
@@ -33,11 +35,11 @@ Route::middleware('auth')->group(function () {
     
     
     Route::get('/detail/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'detail'])->name('detail');
-    Route::get('/addTocart/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'addTocart'])->name('addCart');
+    Route::match(['get', 'post'],'/addTocart/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'addTocart'])->name('addCart');
     // Review Related route start
     Route::post('/product/{product}/review', [App\Http\Controllers\UserDashboard\ProductController::class, 'storeReview'])->name('reviews.store');
     Route::post('/review/{id}/like', [App\Http\Controllers\UserDashboard\ProductController::class, 'like'])->name('review.like');
-    Route::post('/review/vote', [App\Http\Controllers\UserDashboard\ProductController::class, 'vote'])->name('review.vote');
+    Route::post('/review/vote', [App\Http\Controllers\UserDashboard\ProductController::class, 'vote'])->middleware('auth');
     Route::post('/review/{id}/dislike', [App\Http\Controllers\UserDashboard\ProductController::class, 'dislike'])->name('review.dislike');
 
     // review related route end

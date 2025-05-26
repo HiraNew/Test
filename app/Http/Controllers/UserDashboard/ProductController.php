@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\ReviewVote;
+use App\Models\SearchLog;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Session\Session;
@@ -22,29 +23,29 @@ use Spatie\FlareClient\View;
 
 class ProductController extends Controller
 {
-    public function checkInternetConnection()
-    {
-        try {
-            // Try to connect to a reliable external URL (e.g., Google)
-            $response = Http::timeout(5)->get('https://www.google.com');
+    // public function checkInternetConnection()
+    // {
+    //     try {
+    //         // Try to connect to a reliable external URL (e.g., Google)
+    //         $response = Http::timeout(5)->get('https://www.google.com');
 
-            // Check if the request was successful
-            if ($response->successful()) {
-                session()->flash('status', 'Internet is connected!');
-                session()->flash('status_type', 'success'); // To show green or success message
-            } else {
-                session()->flash('status', 'Internet is not connected!');
-                session()->flash('status_type', 'danger'); // To show red or error message
-            }
-        } catch (\Exception $e) {
-            // If the request fails, there is no internet connection
-            session()->flash('status', 'Internet is not connected!');
-            session()->flash('status_type', 'danger');
-        }
+    //         // Check if the request was successful
+    //         if ($response->successful()) {
+    //             session()->flash('status', 'Internet is connected!');
+    //             session()->flash('status_type', 'success'); // To show green or success message
+    //         } else {
+    //             session()->flash('status', 'Internet is not connected!');
+    //             session()->flash('status_type', 'danger'); // To show red or error message
+    //         }
+    //     } catch (\Exception $e) {
+    //         // If the request fails, there is no internet connection
+    //         session()->flash('status', 'Internet is not connected!');
+    //         session()->flash('status_type', 'danger');
+    //     }
 
-        // Redirect back to the previous page or to a specific view
-        return redirect()->back();
-    }
+    //     // Redirect back to the previous page or to a specific view
+    //     return redirect()->back();
+    // }
     public function carting()
     {
         // Get the authenticated user
@@ -112,32 +113,64 @@ class ProductController extends Controller
         
         // dd($notifications);
     }
-    public function product()
-    { 
-        $this->carting();
-        try{
-            $Products = Product::all();
+    public function product(Request $request)
+{
+    $this->carting();
 
-            // Get product IDs in cart for current user
-            $cartProductIds = [];
-            if (Auth::check()) {
-                $cartProductIds = Cart::where('user_id', Auth::id())->pluck('product_id')->toArray();
-            }
+    try {
+        $start = microtime(true);
 
-            return view('home', compact('Products', 'cartProductIds'));
+        $query = $request->input('query');
+        $ProductsQuery = Product::query();
+
+        if ($query) {
+            $ProductsQuery->where('name', 'like', '%' . $query . '%');
         }
-        catch (\Exception $e)
-        {
-            return view('error')->with('issue', $e);
+
+        $Products = $ProductsQuery->get();
+       
+
+        if ($query && $Products->isEmpty()) {
+            $Products = Product::inRandomOrder()->limit(4)->get();
         }
-        
-        return view('error');
+
+        $end = microtime(true);
+        $duration = round(($end - $start) * 1000); // milliseconds
+
+        if ($query) {
+            SearchLog::create([
+                'user_id' => Auth::id(),
+                'query' => $query,
+                'product_ids' => json_encode($Products->pluck('id')->toArray()), // 🛠️ important!
+                'results_count' => $Products->count(),
+                'time_taken' => $duration,
+                'device_info' => $request->ip(),
+            ]);
+        }
+
+        $cartProductIds = Auth::check()
+            ? Cart::where('user_id', Auth::id())->pluck('product_id')->toArray()
+            : [];
+
+        return view('home', compact('Products', 'cartProductIds', 'query'));
+
+    } catch (\Exception $e) {
+        return view('error')->with('issue', $e);
     }
+}
+
+
+
     public function detail($id)
     {
+        $this->carting();
+        
         $product = Product::with(['images', 'reviews.user'])->findOrFail($id);
         // dd($product->images);
-
+        $inCart = false;
+        $inCart = Cart::where('user_id', auth()->id())
+                ->where('product_id', $product->id)
+                ->exists();
         $averageRating = round($product->reviews->avg('rating'), 1);
 
         $relatedProducts = Product::where('category_id', $product->category_id)
@@ -155,7 +188,7 @@ class ProductController extends Controller
             }, 'user'])
             ->get();
 
-        return view('productDetailed', compact('product', 'relatedProducts', 'averageRating', 'reviews'));
+        return view('productDetailed', compact('product', 'relatedProducts', 'averageRating', 'reviews', 'inCart'));
     }
 
      
@@ -243,6 +276,7 @@ class ProductController extends Controller
     
     public function addTocart($id)
     {
+        $this->carting();
         try{
             $user = Auth::user();
             
@@ -431,5 +465,23 @@ class ProductController extends Controller
     {
         return View('maintainance');
     }
+    // for search product 
+    // public function searchProducts(Request $request)
+    // {
+    //     $query = $request->input('query');
+
+    //     $Products = Product::where('name', 'like', "%{$query}%")
+    //         ->orWhere('sdescription', 'like', "%{$query}%")
+    //         ->get();
+
+    //     $cartProductIds = [];
+    //     if (Auth::check()) {
+    //         $cartProductIds = Cart::where('user_id', Auth::id())->pluck('product_id')->toArray();
+    //     }
+
+    //     return response()->json([
+    //         'html' => view('search.product-cards', compact('Products', 'cartProductIds'))->render()
+    //     ]);
+    // }
 }
 

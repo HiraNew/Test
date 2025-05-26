@@ -242,7 +242,7 @@
                 @endif
 
                 <!-- Thumbnails -->
-                {{-- <div class="d-flex justify-content-center mt-3 flex-wrap gap-2">
+                <div class="d-flex justify-content-center mt-3 flex-wrap gap-2">
                     @foreach($product->images as $index => $img)
                         <img src="{{ asset($img->image_path) }}"
                             alt="Thumb"
@@ -251,7 +251,7 @@
                             onclick="document.querySelector('#productImageCarousel .carousel-item.active').classList.remove('active');
                                     document.querySelectorAll('#productImageCarousel .carousel-item')[{{ $index }}].classList.add('active');">
                     @endforeach
-                </div> --}}
+                </div>
             </div>
         </div>
 
@@ -283,12 +283,18 @@
             <!-- Action Buttons -->
             <div class="row g-2">
                 <div class="col-6">
-                    <form action="{{ url('addTocart', $product->id) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="btn btn-gradient w-100 py-2 fs-6">
-                            <i class="fas fa-cart-plus me-1"></i>Add to Cart
-                        </button>
-                    </form>
+                    @if($inCart)
+                        <a href="{{ route('cartView') }}" class="btn btn-outline-info w-100 py-2 fs-6">
+                            <i class="fas fa-shopping-cart me-1"></i>Go to Cart
+                        </a>
+                    @else
+                        <form action="{{ url('addTocart', $product->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn btn-gradient w-100 py-2 fs-6">
+                                <i class="fas fa-cart-plus me-1"></i>Add to Cart
+                            </button>
+                        </form>
+                    @endif
                 </div>
                 <div class="col-6">
                     <form action="{{ url('buynow', $product->id) }}" method="POST">
@@ -299,6 +305,7 @@
                     </form>
                 </div>
             </div>
+
         </div>
         </div>
 
@@ -367,59 +374,56 @@
 
             <div id="review-container">
                 @foreach($product->reviews as $index => $review)
-                
                 @php
-                    $userVote = $review->userVote; // The logged-in user's vote
+                    $userVote = $review->userVote;
                 @endphp
-                {{-- @dd($review->id) --}}
-                   <div class="review p-3 rounded mb-3 bg-white shadow-sm border">
-                <p class="mb-1"><strong>{{ $review->user->name }}</strong></p>
-                <div class="stars mb-2">
-                    <div class="d-flex align-items-start justify-content-between">
-                    <div class="d-flex align-items-center">
-                        <span class="badge bg-success me-2">{{ $review->rating }}★</span>
-                        <strong class="fs-6">{{ ucfirst($review->rating == '5' ? 'Super' : ($review->rating == '4' ? 'Good choice' : ($review->rating == '3' ? 'Good' : ($review->rating == '2' ? 'Recommended' : 'Not recommended at all')))) }}</strong>
+                <div class="review p-3 rounded mb-3 bg-white shadow-sm border {{ $index >= 3 ? 'd-none extra-review' : '' }}" data-index="{{ $index }}">
+                    <p class="mb-1"><strong>{{ $review->user->name }}</strong></p>
+                    <div class="d-flex align-items-start justify-content-between stars mb-2">
+                        <div class="d-flex align-items-center">
+                            <span class="{{ $review->rating == '1' ? 'badge bg-danger me-2' : 'badge bg-success me-2' }}">{{ $review->rating }}★</span>
+                            <strong class="{{ $review->rating == '1' ? 'badge bg-danger me-2' : '' }} fs-6">
+                                {{ ucfirst(
+                                    match((int)$review->rating) {
+                                        5 => 'Super',
+                                        4 => 'Good choice',
+                                        3 => 'Good',
+                                        2 => 'Recommended',
+                                        default => 'Not recommended at all'
+                                    }
+                                ) }}
+                            </strong>
+                        </div>
+                    </div>
+                    <p class="text-muted">{{ $review->review }}</p>
+
+                    <div class="mt-2 d-flex align-items-center gap-3 text-secondary vote-section">
+                        <span>👍 <span id="likes-{{ $review->id }}">{{ $review->likes_count }}</span></span>
+                        <span>👎 <span id="dislikes-{{ $review->id }}">{{ $review->dislikes_count }}</span></span>
+
+                        @if (!$review->userVote)
+                            <button class="btn btn-outline-success btn-sm vote-btn" data-review-id="{{ $review->id }}" data-vote="like">Like</button>
+                            <button class="btn btn-outline-danger btn-sm vote-btn" data-review-id="{{ $review->id }}" data-vote="dislike">Dislike</button>
+                        @elseif ($review->userVote->vote === 'like')
+                            <button class="btn btn-success btn-sm vote-btn" data-review-id="{{ $review->id }}" data-vote="dislike">Liked (Undo or Switch)</button>
+                        @elseif ($review->userVote->vote === 'dislike')
+                            <button class="btn btn-danger btn-sm vote-btn" data-review-id="{{ $review->id }}" data-vote="like">Disliked (Undo or Switch)</button>
+                        @endif
                     </div>
                 </div>
-                </div>
-                <p class="text-muted">{{ $review->review }}</p>
-
-                <div class="mt-2 d-flex align-items-center gap-3 text-secondary">
-                    <span>
-                        👍 <span id="likes-{{ $review->id }}">{{ $review->likes_count }}</span>
-                    </span>
-
-                    <span>
-                        👎 <span id="dislikes-{{ $review->id }}">{{ $review->dislikes_count }}</span>
-                    </span>
-
-                    <!-- Show only one button based on user vote -->
-                    @if (!$userVote)
-                        <button class="btn btn-outline-success btn-sm vote-btn"
-                                data-review-id="{{ $review->id }}" data-vote="like">Like</button>
-                        <button class="btn btn-outline-danger btn-sm vote-btn"
-                                data-review-id="{{ $review->id }}" data-vote="dislike">Dislike</button>
-                    @elseif ($userVote->vote === 'like')
-                        <button class="btn btn-success btn-sm vote-btn"
-                                data-review-id="{{ $review->id }}" data-vote="dislike">Liked (Undo or Switch)</button>
-                    @elseif ($userVote->vote === 'dislike')
-                        <button class="btn btn-danger btn-sm vote-btn"
-                                data-review-id="{{ $review->id }}" data-vote="like">Disliked (Undo or Switch)</button>
-                    @endif
-                </div>
-    </div>
                 @endforeach
             </div>
 
             @if($totalReviews > 3)
-                <div class="text-center">
-                    <button class="btn btn-outline-primary" id="toggle-reviews" data-state="initial">Show More Reviews</button>
-                    <div id="review-spinner" class="spinner-border text-primary mt-3 d-none" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
+            <div class="text-center">
+                <button class="btn btn-outline-primary" id="toggle-reviews" data-state="first">Show More Reviews</button>
+                <div id="review-spinner" class="spinner-border text-primary mt-3 d-none" role="status">
+                    <span class="visually-hidden">Loading...</span>
                 </div>
+            </div>
             @endif
         </div>
+
 
 
 
@@ -597,47 +601,68 @@
             });
         });
     });
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.vote-btn').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    const reviewId = this.dataset.reviewId;
-                    const voteType = this.dataset.vote;
 
-                    fetch("{{ route('review.vote') }}", {
+        document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.vote-btn').forEach(button => {
+            button.addEventListener('click', async function () {
+                const reviewId = this.getAttribute('data-review-id');
+                const voteType = this.getAttribute('data-vote');
+
+                try {
+                    const response = await fetch('/review/vote', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                         },
                         body: JSON.stringify({
                             review_id: reviewId,
                             vote: voteType
                         })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        // Update counts
-                        document.getElementById(`likes-${reviewId}`).textContent = data.likes;
-                        document.getElementById(`dislikes-${reviewId}`).textContent = data.dislikes;
-
-                        // Remove old color
-                        const likeBtn = document.querySelector(`.vote-btn[data-review-id="${reviewId}"][data-vote="like"]`);
-                        const dislikeBtn = document.querySelector(`.vote-btn[data-review-id="${reviewId}"][data-vote="dislike"]`);
-
-                        likeBtn.classList.remove('text-primary');
-                        dislikeBtn.classList.remove('text-danger');
-
-                        // Add new color based on vote
-                        if (data.user_vote === 'like') {
-                            likeBtn.classList.add('text-primary');
-                        } else if (data.user_vote === 'dislike') {
-                            dislikeBtn.classList.add('text-danger');
-                        }
                     });
-                });
+
+                    const data = await response.json();
+
+                    // Update likes/dislikes counts
+                    document.getElementById(`likes-${reviewId}`).innerText = data.likes;
+                    document.getElementById(`dislikes-${reviewId}`).innerText = data.dislikes;
+
+                    // Replace buttons based on current user vote
+                    const parent = this.closest('.mt-2');
+                    parent.querySelectorAll('.vote-btn').forEach(btn => btn.remove());
+
+                    let newButtons = '';
+                    if (data.user_vote === 'like') {
+                        newButtons = `
+                            <button class="btn btn-success btn-sm vote-btn" data-review-id="${reviewId}" data-vote="dislike">Liked (Undo or Switch)</button>
+                        `;
+                    } else if (data.user_vote === 'dislike') {
+                        newButtons = `
+                            <button class="btn btn-danger btn-sm vote-btn" data-review-id="${reviewId}" data-vote="like">Disliked (Undo or Switch)</button>
+                        `;
+                    } else {
+                        newButtons = `
+                            <button class="btn btn-outline-success btn-sm vote-btn" data-review-id="${reviewId}" data-vote="like">Like</button>
+                            <button class="btn btn-outline-danger btn-sm vote-btn" data-review-id="${reviewId}" data-vote="dislike">Dislike</button>
+                        `;
+                    }
+
+                    parent.insertAdjacentHTML('beforeend', newButtons);
+                    // Re-bind new buttons
+                    document.querySelectorAll('.vote-btn').forEach(btn => btn.addEventListener('click', arguments.callee));
+                } catch (error) {
+                    console.error('Voting failed:', error);
+                }
             });
         });
+    });
 
+    $(window).on('pageshow', function (event) {
+        if (event.originalEvent.persisted || window.performance.navigation.type === 2) {
+            // Page was restored from back/forward cache or accessed via back button
+            location.reload();
+        }
+    });
     // for like dislike review end
     </script>
 
