@@ -17,6 +17,12 @@
 @endforeach
 
 <div class="container-fluid py-4">
+   @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
     <div class="row">
         {{-- Sidebar (collapsible on small screens) --}}
         <div class="col-lg-3 mb-4">
@@ -196,10 +202,10 @@
         });
     });
     // for  refresh page each time code to detect actual conent each time
-    $(window).on('pageshow', function (event) {
-        if (event.originalEvent.persisted || window.performance.navigation.type === 2) {
-            // Page was restored from back/forward cache or accessed via back button
-            location.reload();
+     $(window).on('pageshow', function (event) {
+        if (event.originalEvent.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+            // Force full reload to get fresh state
+            window.location.reload(true);
         }
     });
     

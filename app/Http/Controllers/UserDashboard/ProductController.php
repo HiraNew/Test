@@ -12,40 +12,13 @@ use App\Models\Product;
 use App\Models\Review;
 use App\Models\ReviewVote;
 use App\Models\SearchLog;
-use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
-use Spatie\FlareClient\View;
 
 class ProductController extends Controller
 {
-    // public function checkInternetConnection()
-    // {
-    //     try {
-    //         // Try to connect to a reliable external URL (e.g., Google)
-    //         $response = Http::timeout(5)->get('https://www.google.com');
-
-    //         // Check if the request was successful
-    //         if ($response->successful()) {
-    //             session()->flash('status', 'Internet is connected!');
-    //             session()->flash('status_type', 'success'); // To show green or success message
-    //         } else {
-    //             session()->flash('status', 'Internet is not connected!');
-    //             session()->flash('status_type', 'danger'); // To show red or error message
-    //         }
-    //     } catch (\Exception $e) {
-    //         // If the request fails, there is no internet connection
-    //         session()->flash('status', 'Internet is not connected!');
-    //         session()->flash('status_type', 'danger');
-    //     }
-
-    //     // Redirect back to the previous page or to a specific view
-    //     return redirect()->back();
-    // }
     public function carting()
     {
         // Get the authenticated user
@@ -446,7 +419,6 @@ class ProductController extends Controller
             $confirm->qty = $order->quantity;
             $confirm->amount = ($product->price* $order->quantity);
             $confirm->payment_mode = $request->payment_method;
-            $confirm->pincode = $address->pincode;
             $confirm->order_date = $indiaTime;
             $confirm->delevery_date = $tomorrow;
             $confirm->orderid = $orderId;
@@ -465,23 +437,6 @@ class ProductController extends Controller
     {
         return View('maintainance');
     }
-    // for search product 
-    // public function searchProducts(Request $request)
-    // {
-    //     $query = $request->input('query');
-
-    //     $Products = Product::where('name', 'like', "%{$query}%")
-    //         ->orWhere('sdescription', 'like', "%{$query}%")
-    //         ->get();
-
-    //     $cartProductIds = [];
-    //     if (Auth::check()) {
-    //         $cartProductIds = Cart::where('user_id', Auth::id())->pluck('product_id')->toArray();
-    //     }
-
-    //     return response()->json([
-    //         'html' => view('search.product-cards', compact('Products', 'cartProductIds'))->render()
-    //     ]);
-    // }
+    
 }
 

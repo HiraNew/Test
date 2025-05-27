@@ -1,6 +1,8 @@
 <?php
 
 // use App\Http\Controllers\UserDashboard\ProductController;
+
+use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,6 +26,9 @@ Auth::routes();
 Route::get('/', [App\Http\Controllers\UserDashboard\ProductController::class, 'product'])->name('products');
 Route::get('/mainantance', [App\Http\Controllers\UserDashboard\ProductController::class, 'mainance']);
 Route::get('/search-products', [App\Http\Controllers\UserDashboard\ProductController::class, 'searchProducts'])->name('search.products');
+Route::post('/send-otp', [RegisterController::class, 'sendOtp'])->name('send.otp');
+Route::post('/register', [RegisterController::class, 'register'])->name('registerUser');
+
 
 
 

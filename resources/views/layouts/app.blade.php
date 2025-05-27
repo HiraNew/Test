@@ -117,8 +117,6 @@
 </head>
 <body>
     <div id="app">
-
-        {{-- Mobile Search Header --}}
        {{-- Mobile Header --}}
         <nav class="navbar navbar-light bg-white shadow-sm d-md-none justify-content-between px-3 py-2">
             <a class="navbar-brand fw-bold text-primary" href="{{ url('/') }}">
@@ -190,8 +188,8 @@
                                 </div>
                             </li>
                         @endauth
+                        
                     </ul>
-
                     <ul class="navbar-nav ms-auto">
                         @guest
                             @if (Route::has('login'))

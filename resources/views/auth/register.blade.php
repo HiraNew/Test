@@ -17,13 +17,13 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     @endif
-                    <form method="POST" action="{{ route('register') }}">
+                    <form method="POST" action="{{ route('registerUser') }}">
                         @csrf
 
                         <!-- Name Field -->
                         <div class="mb-4">
                             <label for="name" class="form-label">{{ __('Name') }}</label>
-                            <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required autocomplete="name" autofocus>
+                            <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required autocomplete="name" autofocus placeholder="Enter full name.">
                             @error('name')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -34,30 +34,45 @@
                         <!-- Email Address -->
                         <div class="mb-4">
                             <label for="email" class="form-label">{{ __('Email Address') }}</label>
-                            <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email">
+                            <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" autocomplete="email" placeholder="Enter email.">
                             @error('email')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
                             @enderror
                         </div>
-
-                        <!-- Password -->
+                        <!-- Mobile Number -->
                         <div class="mb-4">
-                            <label for="password" class="form-label">{{ __('Password') }}</label>
-                            <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
-                            @error('password')
+                            <label for="number" class="form-label">{{ __('Mobile Number') }}</label>
+                            <input id="number" type="text" maxlength="10" class="form-control @error('number') is-invalid @enderror"
+                                name="number" required placeholder="Enter 10-digit mobile number." value="{{ old('number') }}" autocomplete="number">
+                            <div id="send-otp-container" class="mt-2" style="display: none;">
+                                <button type="button" id="send-otp-btn" class="btn btn-outline-primary btn-sm">Send OTP</button>
+                                <small id="otp-status" class="text-success d-block mt-1"></small>
+                            </div>
+                            @error('number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
                             @enderror
                         </div>
 
-                        <!-- Confirm Password -->
-                        <div class="mb-4">
-                            <label for="password-confirm" class="form-label">{{ __('Confirm Password') }}</label>
-                            <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
+                        <!-- OTP Field -->
+                       <div class="mb-4">
+                        <label for="otp" class="form-label">{{ __('Enter OTP') }}</label>
+                        <input id="otp" type="number" name="otp" class="form-control @error('otp') is-invalid @enderror" value="{{ old('otp') }}" required>
+
+                        @error('otp')
+                            <span class="invalid-feedback d-block" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
+
+
+
                         </div>
+
 
                         <!-- Register Button -->
                         <div class="d-flex justify-content-between align-items-center">
@@ -74,9 +89,51 @@
         </div>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const numberInput = document.getElementById('number');
+    const sendOtpContainer = document.getElementById('send-otp-container');
+    const sendOtpBtn = document.getElementById('send-otp-btn');
+    const otpField = document.getElementById('otp-field');
+    const otpStatus = document.getElementById('otp-status');
+
+    numberInput.addEventListener('input', function () {
+        const value = numberInput.value;
+        if (/^\d{10}$/.test(value)) {
+            sendOtpContainer.style.display = 'block';
+        } else {
+            sendOtpContainer.style.display = 'none';
+        }
+    });
+
+    sendOtpBtn.addEventListener('click', function () {
+        const number = numberInput.value;
+        otpStatus.textContent = 'Sending OTP...';
+
+        fetch('{{ route('send.otp') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ number })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                otpStatus.textContent = 'OTP sent successfully!';
+                otpField.style.display = 'block';
+            } else {
+                otpStatus.textContent = 'Failed to send OTP.';
+            }
+        });
+    });
+});
+</script>
+
 @endsection
 
-{{-- Styles --}}
+{{-- Styles
 <style>
     .card {
         border-radius: 10px;
@@ -146,4 +203,4 @@
         border-color: #007bff;
         box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
     }
-</style>
+</style> --}}

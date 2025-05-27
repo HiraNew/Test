@@ -5,9 +5,18 @@
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card shadow-lg border-0 rounded-lg">
+               
+
                 <div class="card-header text-center bg-primary text-white">
+                     @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+
                     <h3>{{ __('Login') }}</h3>
-                    <p class="text-sm">Only Admin can login here</p> <!-- Small text for clarification -->
+                    <p class="text-sm">You are few step away to get shoping.</p> <!-- Small text for clarification -->
                 </div>
 
                 <div class="card-body">
@@ -16,9 +25,9 @@
 
                         <!-- Email Address -->
                         <div class="mb-4">
-                            <label for="email" class="form-label">{{ __('Email Address') }}</label>
-                            <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
-                            @error('email')
+                            <label for="number" class="form-label">{{ __('Enter Mobile Number') }}</label>
+                            <input id="number" type="number" class="form-control @error('number') is-invalid @enderror" name="number" value="{{ old('number') }}" required autocomplete="number" autofocus>
+                            @error('number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
@@ -26,7 +35,7 @@
                         </div>
 
                         <!-- Password -->
-                        <div class="mb-4">
+                        {{-- <div class="mb-4">
                             <label for="password" class="form-label">{{ __('Password') }}</label>
                             <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
                             @error('password')
@@ -34,7 +43,7 @@
                                     <strong>{{ $message }}</strong>
                                 </span>
                             @enderror
-                        </div>
+                        </div> --}}
 
                         <!-- Remember Me Checkbox -->
                         <div class="form-check mb-4">
@@ -63,7 +72,7 @@
 @endsection
 
 {{-- Styles --}}
-<style>
+{{-- <style>
     .card {
         border-radius: 10px;
         background: #fff;
@@ -132,4 +141,4 @@
         background-color: #0056b3;
         border-color: #004085;
     }
-</style>
+</style> --}}

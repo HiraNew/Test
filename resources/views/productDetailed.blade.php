@@ -282,7 +282,7 @@
             <!-- Add to Cart Button -->
             <!-- Action Buttons -->
             <div class="row g-2">
-                <div class="col-6">
+                {{-- <div class="col-6"> --}}
                     @if($inCart)
                         <a href="{{ route('cartView') }}" class="btn btn-outline-info w-100 py-2 fs-6">
                             <i class="fas fa-shopping-cart me-1"></i>Go to Cart
@@ -295,15 +295,15 @@
                             </button>
                         </form>
                     @endif
-                </div>
-                <div class="col-6">
-                    <form action="{{ url('buynow', $product->id) }}" method="POST">
+                {{-- </div> --}}
+                {{-- <div class="col-6">
+                    <form action="{{ url('addCart', $product->id) }}" method="POST">
                         @csrf
                         <button type="submit" class="btn btn-danger w-100 py-2 fs-6">
                             <i class="fas fa-bolt me-1"></i>Buy Now
                         </button>
                     </form>
-                </div>
+                </div> --}}
             </div>
 
         </div>
@@ -382,7 +382,7 @@
                     <div class="d-flex align-items-start justify-content-between stars mb-2">
                         <div class="d-flex align-items-center">
                             <span class="{{ $review->rating == '1' ? 'badge bg-danger me-2' : 'badge bg-success me-2' }}">{{ $review->rating }}★</span>
-                            <strong class="{{ $review->rating == '1' ? 'badge bg-danger me-2' : '' }} fs-6">
+                            <strong class="{{ $review->rating == '1' ? 'badge text-danger me-2' : '' }} fs-6">
                                 {{ ucfirst(
                                     match((int)$review->rating) {
                                         5 => 'Super',
@@ -657,10 +657,10 @@
         });
     });
 
-    $(window).on('pageshow', function (event) {
-        if (event.originalEvent.persisted || window.performance.navigation.type === 2) {
-            // Page was restored from back/forward cache or accessed via back button
-            location.reload();
+     $(window).on('pageshow', function (event) {
+        if (event.originalEvent.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+            // Force full reload to get fresh state
+            window.location.reload(true);
         }
     });
     // for like dislike review end

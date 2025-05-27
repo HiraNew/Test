@@ -5,7 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
@@ -50,8 +51,16 @@ class RegisterController extends Controller
     {
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users'],
+            'number' => ['required', 'digits:10'],
+            'otp' => ['required', 'digits:4', function ($attribute, $value, $fail) use ($data) {
+            $storedOtp = Session::get('otp_' . $data['number']);
+
+            if (!$storedOtp || $storedOtp != $value) {
+                $fail('Invalid OTP. Please try again.');
+            }
+         }],
+
         ]);
     }
 
@@ -65,8 +74,26 @@ class RegisterController extends Controller
     {
         return User::create([
             'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+            'email' => $data['email'] ?? '',
+            'number' => $data['number'],
+            'verified' => '1',
         ]);
+    }
+    public function sendOtp(Request $request)
+    {
+        $request->validate([
+            'number' => 'required|digits:10'
+        ]);
+
+        $otp = rand(1000, 9999);
+        dump($otp);
+
+        // Store OTP in session (or use Redis/DB)
+        Session::put('otp_' . $request->number, $otp);
+
+        // Simulate OTP sending (replace with actual SMS API call)
+        logger("OTP for {$request->number} is: {$otp}");
+
+        return response()->json(['success' => true]);
     }
 }
