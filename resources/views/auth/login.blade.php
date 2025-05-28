@@ -14,6 +14,12 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     @endif
+                    @if(session('danger'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ session('danger') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
 
                     <h3>{{ __('Login') }}</h3>
                     <p class="text-sm">You are few step away to get shoping.</p> <!-- Small text for clarification -->

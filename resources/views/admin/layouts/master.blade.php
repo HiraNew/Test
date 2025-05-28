@@ -93,11 +93,11 @@
             </button>
 
             <a class="navbar-brand" href="{{ url('/admin/dashboard') }}">
-                <span class="">{{ Auth::user()->name ?? 'Admin' }}</span>
+                <span class="">{{ Auth::guard('admin')->user()->name ?? 'Admin' }}</span>
             </a>
 
             <div class="ms-auto d-none d-md-block">
-                <span class="fw-bold">{{ Auth::user()->name ?? 'Admin' }}</span>
+                <span class="fw-bold">{{ Auth::guard('admin')->user()->name ?? 'Admin' }}</span>
             </div>
         </div>
     </nav>
@@ -154,7 +154,6 @@
         </main>
     </div>
 </div>
-
 {{-- JS for Sidebar Toggle and Outside Click --}}
 <script>
     const sidebar = document.getElementById('sidebar');
@@ -175,5 +174,9 @@
         }
     });
 </script>
+
+@stack('scripts')  {{-- Add this line here --}}
+
 </body>
 </html>
+

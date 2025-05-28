@@ -48,8 +48,8 @@ class LoginController extends Controller
      */
     public function showLoginForm()
     {
-        $view_data['title'] = 'Admin Login';
-        return view('admin.auth.login', $view_data);
+        // $view_data['title'] = 'Admin';
+        return view('admin.auth.login');
     }
 
     public function validateLogin(Request $request)

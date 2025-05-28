@@ -72,45 +72,42 @@
 
                                 
                                 <tbody>
-                                   @php
-                                        $total = 0;
-                                        $totalGST = 0;
-                                    @endphp
-
-                                    @foreach ($carts as $item)
-                                    {{-- @dd($item->product_id); --}}
-                                        @php
-                                            $itemTotal = $item->quantity * $item->product->price;
-                                            $total += $itemTotal;
-
-                                            // Apply GST only if not Fruits
-                                            $itemGST = 0;
-                                            if ($item->product->category->name !== 'Fruits') {
-                                                $itemGST = $itemTotal * 0.18;
-                                                $totalGST += $itemGST;
-                                            }
-                                        @endphp
-
-                                        <tr onclick="showLoaderAndRedirect('{{ url('detail', $item->product_id) }}')" class="cursor-pointer hover:bg-gray-100 transition">
+                                    @foreach ($cartDetails as $item)
+                                    {{-- @dd($item); --}}
+                                        <tr onclick="showLoaderAndRedirect('{{ url('detail', $item['product_id']) }}')" class="cursor-pointer hover:bg-gray-100 transition">
                                             <td data-label="Image" class="text-center py-2">
-                                                <img src="{{ asset($item->product->image) }}" alt="{{ $item->product->name }}" width="60" class="w-40 sm:w-20 md:w-16 h-auto mx-auto rounded shadow-md">
+                                                <img src="{{ asset($item['image']) }}" alt="{{ $item['product_name'] }}" width="60" class="w-40 sm:w-20 md:w-16 h-auto mx-auto rounded shadow-md">
                                             </td>
-                                            <td data-label="Price" class="text-center py-2">₹{{ $item->product->price }}</td>
+                                            <td data-label="Price" class="text-center py-2">₹{{ $item['base_price'] }}</td>
                                             <td data-label="Quantity" class="text-center py-2">
                                                 <div class="d-flex align-items-center gap-2" onclick="event.stopPropagation()">
-                                                    <a href="{{ url('removeTocart', $item->product->id) }}" class="btn btn-sm btn-outline-warning">−</a>
-                                                    <span>{{ $item->quantity }}</span>
-                                                    <a href="{{ url('addTocart', $item->product->id) }}" class="btn btn-sm btn-outline-success">+</a>
+                                                    <a href="{{ url('removeTocart', $item['product_id']) }}" class="btn btn-sm btn-outline-warning">−</a>
+                                                    <span>{{ $item['qty'] }}</span>
+                                                    <a href="{{ url('addTocart', $item['product_id']) }}" class="btn btn-sm btn-outline-success">+</a>
                                                 </div>
                                             </td>
-                                            <td data-label="Item Name" class="text-center py-2">{{ $item->product->name }}</td>
+                                            <td data-label="Item Name" class="text-center py-2">{{ $item['product_name'] }}</td>
+                                            <td data-label="Charges" class="text-center py-2">
+                                                @if(!empty($item['extra_charges']))
+                                                    <ul class="list-unstyled mb-0 small text-start">
+                                                        @foreach($item['extra_charges'] as $type => $amount)
+                                                            <li><strong>{{ ucfirst(str_replace('_', ' ', $type)) }}:</strong> ₹{{ number_format($amount, 2) }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                @else
+                                                    <span class="text-success small">No Extra Charges</span>
+                                                @endif
+                                            </td>
+                                            <td data-label="Total" class="text-center py-2">
+                                                ₹{{ number_format($item['total_with_charges'], 2) }}
+                                            </td>
                                             <td data-label="Action" class="text-center py-2">
-                                                <a href="{{ url('removeItemTocart', $item->id) }}" class="btn btn-sm btn-danger" onclick="event.stopPropagation()">Remove</a>
+                                                <a href="{{ url('removeItemTocart', $item['cart_id']) }}" class="btn btn-sm btn-danger" onclick="event.stopPropagation()">Remove</a>
                                             </td>
                                         </tr>
                                     @endforeach
-
                                 </tbody>
+
                             </table>
                         </div>
 
@@ -122,26 +119,31 @@
                         <div class="bg-light p-4 mt-3 border-top">
                             <h5 class="mb-3 text-center text-primary">Cart Summary</h5>
                             <div class="row text-center">
-                                <div class="col-md-4">
+                                <div class="col-md-4 mb-3 mb-md-0">
                                     <div class="border rounded p-3 shadow-sm bg-white">
                                         <strong>Subtotal:</strong><br>
-                                        ₹{{ number_format($total, 2) }}
+                                        ₹{{ number_format($cartSummary['total_product_amount'], 2) }}
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-4 mb-3 mb-md-0">
                                     <div class="border rounded p-3 shadow-sm bg-white">
-                                        <strong>GST (18% on non-Fruits):</strong><br>
-                                        ₹{{ number_format($totalGST, 2) }}
+                                        <strong>Extra Charges:</strong><br>
+                                        ₹{{ number_format($cartSummary['total_extra_charges'], 2) }}
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="border rounded p-3 shadow-sm bg-white">
                                         <strong>Total Amount:</strong><br>
-                                        ₹{{ number_format($total + $totalGST, 2) }}
+                                        ₹{{ number_format($cartSummary['grand_total'], 2) }}
                                     </div>
                                 </div>
                             </div>
+
+                            @if($cartSummary['user_exempt'])
+                                <p class="text-center text-muted mt-2"><em>No extra charges applied (Exempt User)</em></p>
+                            @endif
                         </div>
+
 
 
                         <div class="d-flex justify-content-center my-4">

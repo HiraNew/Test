@@ -24,5 +24,15 @@ class Category extends Model
     {
         return $this->hasMany(Product::class);
     }
+    public function charges()
+    {
+        return $this->hasMany(CategoryCharge::class);
+    }
+    // public function charges()
+    // {
+    //     return $this->hasMany(Extra::class);
+    // }
+
+
 }
 

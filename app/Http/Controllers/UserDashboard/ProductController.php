@@ -328,24 +328,92 @@ class ProductController extends Controller
     }
     public function cartView()
     {
-        // dd('uierhf');
         $this->carting();
         $user = Auth::user();
+
         $carts = Cart::where('user_id', $user->id)
-                     ->with('product.category') // eager load product details
-                     ->get();
-                    //  dd($carts[0]->product->category_id);
-                    // dd($carts[0]->product_id);
-        $idDetail = [];
+                    ->with('product.category.charges') // Eager load category and its charges
+                    ->get();
+
         $categoryName = [];
-        foreach($carts as $cart){
-            $categoryName[] = $cart->product->category->name;
-            $idDetail[] = $cart->product_id;
+        $idDetail = [];
+        $cartDetails = [];
+
+        $totalProductAmount = 0;
+        $totalExtraCharges = 0;
+
+        foreach ($carts as $cart) {
+            $product = $cart->product;
+            $category = $product->category;
+
+            $productAmount = $product->price * $cart->quantity;
+            $extraCharge = 0;
+            $appliedCharges = [];
+
+            if (!$user->is_charge_exempt && $category && $category->charges) {
+                foreach ($category->charges as $charge) {
+                    if (!$charge->is_active) continue;
+
+                    switch ($charge->charge_type) {
+                        case 'gst':
+                            $amount = $productAmount * ($charge->amount / 100);
+                            $extraCharge += $amount;
+                            $appliedCharges['gst'] = $amount;
+                            break;
+
+                        case 'platform_charge':
+                            $extraCharge += $charge->amount;
+                            $appliedCharges['platform_charge'] = $charge->amount;
+                            break;
+
+                        case 'delivery_charge':
+                            $extraCharge += $charge->amount;
+                            $appliedCharges['delivery_charge'] = $charge->amount;
+                            break;
+
+                        case 'cod_charge':
+                            $extraCharge += $charge->amount;
+                            $appliedCharges['cod_charge'] = $charge->amount;
+                            break;
+
+                        default:
+                            $extraCharge += $charge->amount;
+                            $appliedCharges[$charge->charge_type] = $charge->amount;
+                            break;
+                    }
+                }
+            }
+
+            $categoryName[] = $category->name ?? 'N/A';
+            $idDetail[] = $product->id;
+
+            $cartDetails[] = [
+                'cart_id' => $cart->id,
+                'product_id' => $product->id,
+                'product_name' => $product->name,
+                'image' => $product->image,
+                'qty' => $cart->quantity,
+                'base_price' => $product->price,
+                'extra_charges' => $appliedCharges, // show detailed breakdown
+                'total_with_charges' => $productAmount + $extraCharge,
+            ];
+
+
+
+            $totalProductAmount += $productAmount;
+            $totalExtraCharges += $extraCharge;
         }
-        // dd($idDetail);
-        // dd($categoryName);
-        return view('userCart',compact('carts', 'categoryName', 'idDetail'));
+
+        $cartSummary = [
+            'total_product_amount' => $totalProductAmount,
+            'total_extra_charges' => $user->is_charge_exempt ? 0 : $totalExtraCharges,
+            'grand_total' => $user->is_charge_exempt ? $totalProductAmount : $totalProductAmount + $totalExtraCharges,
+            'user_exempt' => $user->is_charge_exempt,
+        ];
+
+        return view('userCart', compact('carts', 'categoryName', 'idDetail', 'cartDetails', 'cartSummary'));
     }
+
     public function updateAddress()
     {
         $user = Auth::user();
@@ -398,36 +466,59 @@ class ProductController extends Controller
     return $code;
 }
     public function paymentMethodProceed(Request $request){
-        $gst = 0.18;
-        $plateFromCharge = 0;
+        $user = Auth::user(); // Full user object instead of just ID
+
+        $orders = Cart::where('user_id', $user->id)->get();
+        $address = Addre::where('user_id', $user->id)->first();
         $orderId = $this->generateUniqueCode();
-        $indiaTime = Carbon::now('Asia/Kolkata');
+        $indiaTime = now('Asia/Kolkata');
         $tomorrow = $indiaTime->copy()->addDay();
-        $user = Auth::id();
-        $orders = Cart::where('user_id',$user)->get();
-        // If cart is empty, redirect back with message
-        if ($orders->isEmpty()) {
-            return redirect()->back()->with('error', 'Your cart is empty. Please add items before placing an order.');
+
+        foreach ($orders as $order) {
+            $product = Product::find($order->product_id);
+            
+            if ($product && $address) {
+                $category = $product->category;
+                $charges = $category->charges()->where('is_active', true)->get()->keyBy('charge_type');
+
+                $baseAmount = $product->price * $order->quantity;
+                $extraCharges = 0;
+
+                if (!$user->is_charge_exempt) {
+                    if ($charges->has('gst')) {
+                        $extraCharges += $baseAmount * ($charges['gst']->amount / 100);
+                    }
+                    if ($charges->has('platform_charge')) {
+                        $extraCharges += $charges['platform_charge']->amount;
+                    }
+                    if ($charges->has('delivery_charge')) {
+                        $extraCharges += $charges['delivery_charge']->amount;
+                    }
+                    if ($request->payment_method == 'cod' && $charges->has('cod_charge')) {
+                        $extraCharges += $charges['cod_charge']->amount;
+                    }
+                }
+
+                $totalAmount = $baseAmount + $extraCharges;
+
+                $confirm = new Payment();
+                $confirm->user_id = $user->id;
+                $confirm->product_id = $product->id;
+                $confirm->qty = $order->quantity;
+                $confirm->amount = $totalAmount;
+                $confirm->payment_mode = $request->payment_method;
+                $confirm->order_date = $indiaTime;
+                $confirm->delevery_date = $tomorrow;
+                $confirm->orderid = $orderId;
+                $confirm->save();
+            }
         }
-        $address = Addre::where('user_id', $user)->first();
-        foreach($orders as $order){
-        $product = Product::find($order->product_id);
-         if ($product && $address) {
-            $confirm = new Payment();
-            $confirm->user_id = $user;
-            $confirm->product_id = $order->product_id;
-            $confirm->qty = $order->quantity;
-            $confirm->amount = ($product->price* $order->quantity);
-            $confirm->payment_mode = $request->payment_method;
-            $confirm->order_date = $indiaTime;
-            $confirm->delevery_date = $tomorrow;
-            $confirm->orderid = $orderId;
-            $confirm->save();
-        }
-     }
-     Cart::where('user_id',$user)->delete();
-     $this->carting();
-        return redirect()->route('orderNow')->with('success', 'Your Order is Confirmed Order ID:'. $orderId);
+
+        Cart::where('user_id', $user->id)->delete();
+        $this->carting();
+
+        return redirect()->route('orderNow')->with('success', 'Your Order is Confirmed. Order ID: ' . $orderId);
+
     }
     public function orderNow()
     {

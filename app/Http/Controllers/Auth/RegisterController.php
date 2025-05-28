@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class RegisterController extends Controller
 {
@@ -52,7 +54,7 @@ class RegisterController extends Controller
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users'],
-            'number' => ['required', 'digits:10'],
+            'number' => ['required', 'digits:10', Rule::unique('users', 'number')->ignore(Auth::id())],
             'otp' => ['required', 'digits:4', function ($attribute, $value, $fail) use ($data) {
             $storedOtp = Session::get('otp_' . $data['number']);
 
