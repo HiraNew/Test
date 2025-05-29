@@ -17,7 +17,7 @@ class DashboardController extends Controller
             // Stats Data
             $stats = [
                 ['title' => 'Total Registered Users', 'value' => User::count()],
-                ['title' => 'Total Logged-in Users', 'value' => User::whereNotNull('last_login_at')->count()],
+                ['title' => 'Total Logged-in Users', 'value' => User::where('status',1)->count()],
                 ['title' => 'Total Revenue', 'value' => '$' . Payment::sum('amount')],
                 ['title' => 'Users in Portfolio', 'value' => DB::table('portfolios')->count()],
                 ['title' => 'Monthly Revenue', 'value' => '$' . Payment::whereMonth('created_at', now()->month)->sum('amount')],
