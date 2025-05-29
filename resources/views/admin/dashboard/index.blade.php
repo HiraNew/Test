@@ -10,21 +10,41 @@
 
     <!-- Stats Cards -->
     <div class="row mb-5">
-        @foreach($stats as $stat)
-            <div class="col-md-3 mb-4">
-                <div class="card shadow-sm border-0 rounded-3 h-100">
-                    <div class="card-body d-flex align-items-center">
-                        <div class="me-3 fs-1 text-{{ $stat['color'] ?? 'primary' }}">
-                            <i class="{{ $stat['icon'] ?? 'fas fa-chart-bar' }}"></i>
+        <!-- Search Input -->
+        <div class="row mb-3">
+            <div class="col-md-6 mx-auto">
+                <input type="text" id="statsSearch" class="form-control form-control-lg" placeholder="Search stats (e.g., revenue, users, orders)">
+            </div>
+        </div>
+
+        <!-- Categorized Stats -->
+        @php
+            $colors = ['primary', 'success', 'danger', 'warning', 'info', 'dark'];
+            $icons = ['fa-user', 'fa-users', 'fa-money-bill', 'fa-box', 'fa-chart-line', 'fa-file-invoice-dollar'];
+        @endphp
+
+        @foreach($stats as $group => $items)
+            <div class="mb-4">
+                <h4 class="text-uppercase fw-bold text-muted border-bottom pb-1 mb-3">{{ $group }}</h4>
+                <div class="row">
+                    @foreach($items as $index => $stat)
+                        <div class="col-md-3 mb-4 stat-card" data-title="{{ strtolower($stat['title']) }}">
+                            <div class="card shadow-sm border-0 rounded-3 h-100">
+                                <div class="card-body d-flex align-items-center">
+                                    <div class="me-3 fs-1 text-{{ $colors[$index % count($colors)] }}">
+                                        <i class="fas {{ $icons[$index % count($icons)] }}"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="text-uppercase text-muted mb-1" 
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $stat['title'] }}">
+                                            {{ $stat['title'] }}
+                                        </h6>
+                                        <h3 class="fw-bold mb-0">{{ $stat['value'] }}</h3>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <h6 class="text-uppercase text-muted mb-1" 
-                                data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $stat['title'] }}">
-                                {{ $stat['title'] }}
-                            </h6>
-                            <h3 class="fw-bold mb-0">{{ $stat['value'] }}</h3>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
         @endforeach
@@ -185,6 +205,16 @@
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         tooltipTriggerList.forEach(tooltipTriggerEl => {
             new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+    });
+
+    document.getElementById('statsSearch').addEventListener('input', function () {
+        let search = this.value.toLowerCase();
+        let cards = document.querySelectorAll('.stat-card');
+
+        cards.forEach(card => {
+            let title = card.getAttribute('data-title');
+            card.style.display = title.includes(search) ? 'block' : 'none';
         });
     });
 </script>
