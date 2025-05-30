@@ -14,10 +14,20 @@ class DashboardController extends Controller
 {
      public function index()
         {
-            // Stats Data
+            $completedStatus = 'completed';
+            $canceledStatus = 'canceled';
+            $pendingStatus = 'pending';
+
+            // Time filters
+            $today = today();
+            $startOfWeek = now()->startOfWeek();
+            $endOfWeek = now()->endOfWeek();
+            $currentMonth = now()->month;
+
+            // Stats Data (modified + added)
             $stats = [
                 ['title' => 'Total Registered Users', 'value' => User::count()],
-                ['title' => 'Total Logged-in Users', 'value' => User::where('status',1)->count()],
+                ['title' => 'Total Logged-in Users', 'value' => User::whereNotNull('last_login_at')->count()],
                 ['title' => 'Total Revenue', 'value' => '$' . Payment::sum('amount')],
                 ['title' => 'Users in Portfolio', 'value' => DB::table('portfolios')->count()],
                 ['title' => 'Monthly Revenue', 'value' => '$' . Payment::whereMonth('created_at', now()->month)->sum('amount')],

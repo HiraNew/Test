@@ -317,19 +317,41 @@
     <div class="mb-3">
     </div>
         <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title">Average Customer Rating</h5>
-            <div class="d-flex align-items-center">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <i class="fa fa-star {{ $i <= round($averageRating) ? 'text-warning' : 'text-muted' }}"></i>
-                                @endfor
-                                <span class="ms-2 text-secondary">({{ $averageRating }}/5)</span>
-                            </div>
-            <p class="card-text">
-                <strong>{{ number_format($averageRating, 1) }} / 5</strong> 
-                <span class="badge bg-primary">{{ $product->reviews->count() }} Reviews</span>
-            </p>
-        </div>
+       <div class="card-body">
+    <h5 class="card-title">Customer Rating</h5>
+    <div class="d-flex align-items-center">
+        @php
+            $avgRating = round($averageRating, 1); // e.g., 4.3
+            $filledStars = floor($avgRating);      // e.g., 4
+            $halfStar = ($avgRating - $filledStars) >= 0.25 && ($avgRating - $filledStars) < 0.75;
+            $emptyStars = 5 - $filledStars - ($halfStar ? 1 : 0);
+        @endphp
+
+        {{-- Full stars --}}
+        @for($i = 0; $i < $filledStars; $i++)
+            <i class="fa fa-star text-success"></i>
+        @endfor
+
+        {{-- Half star --}}
+        @if($halfStar)
+            <i class="fa fa-star-half-alt text-success"></i>
+        @endif
+
+        {{-- Empty stars --}}
+        @for($i = 0; $i < $emptyStars; $i++)
+            <i class="far fa-star text-muted"></i>
+        @endfor
+
+        {{-- Optional rating display --}}
+        <span class="ms-2 {{ $avgRating < 3 ? 'text-danger' : 'text-secondary' }}">({{ $avgRating }}/5)</span>
+    </div>
+
+    <p class="card-text">
+        <strong>{{ number_format($averageRating, 1) }} / 5</strong> 
+        <span class="badge bg-primary">{{ $product->reviews->count() }} Reviews</span>
+    </p>
+</div>
+
     </div>
 
     @else
@@ -424,11 +446,6 @@
             @endif
         </div>
 
-
-
-
-
-
     </div>
 
 
@@ -450,7 +467,39 @@
                             <div class="card-body">
                                 <h5 class="card-title">{{ $related->name }}</h5>
                                 <p class="card-text">₹{{ number_format($related->price, 2) }}</p>
+
+                                @if($related->averageRating > 0)
+                                    <div class="d-flex align-items-center">
+                                        @php
+                                            $avgRating = round($related->averageRating, 1);
+                                            $fullStars = floor($avgRating);
+                                            $hasHalfStar = ($avgRating - $fullStars) >= 0.25 && ($avgRating - $fullStars) < 0.75;
+                                            $emptyStars = 5 - $fullStars - ($hasHalfStar ? 1 : 0);
+                                        @endphp
+
+                                        {{-- Full stars --}}
+                                        @for ($i = 0; $i < $fullStars; $i++)
+                                            <i class="fa fa-star text-success"></i>
+                                        @endfor
+
+                                        {{-- Half star --}}
+                                        @if ($hasHalfStar)
+                                            <i class="fa fa-star-half-alt text-success"></i>
+                                        @endif
+
+                                        {{-- Empty stars --}}
+                                        @for ($i = 0; $i < $emptyStars; $i++)
+                                            <i class="far fa-star text-muted"></i>
+                                        @endfor
+
+                                        <small class="ms-1 text-muted">({{ number_format($avgRating, 1) }})</small>
+                                    </div>
+                                @else
+                                    <small class="text-muted">No ratings yet</small>
+                                @endif
                             </div>
+
+
                         </div>
                     </a>
                     
@@ -463,6 +512,71 @@
             </button>
         </div>
     </div>
+    @if($recentlyViewedProducts->count())
+    {{-- @dd($recentlyViewedProducts->count()); --}}
+    <div class="mt-5">
+        <h3>Recently Viewed Products</h3>
+        <div class="position-relative">
+            <!-- Left Arrow -->
+            <button class="scroll-btn left" onclick="scrollRecently(-1)">
+                &#9664;
+            </button>
+
+            <!-- Scrollable container -->
+            <div id="recent-scroll" class="d-flex overflow-auto hide-scroll" style="scroll-behavior: smooth;">
+                @foreach($recentlyViewedProducts as $recent)
+                    <a href="{{ url('detail', $recent->id) }}" class="card-link-wrapper">
+                        <div class="card mx-2" style="min-width: 250px;">
+                            <img src="{{ asset($recent->image ?? $recent->images->first()->image_path ?? 'placeholder.jpg') }}" alt="{{ $recent->name }}" class="card-img-top">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ $recent->name }}</h5>
+                                <p class="card-text">₹{{ number_format($recent->price, 2) }}</p>
+
+                                @if($recent->averageRating > 0)
+                                    <div class="d-flex align-items-center">
+                                        @php
+                                            $avgRating = round($recent->averageRating, 1);
+                                            $fullStars = floor($avgRating);
+                                            $hasHalfStar = ($avgRating - $fullStars) >= 0.25 && ($avgRating - $fullStars) < 0.75;
+                                            $emptyStars = 5 - $fullStars - ($hasHalfStar ? 1 : 0);
+                                        @endphp
+
+                                        {{-- Full stars --}}
+                                        @for ($i = 0; $i < $fullStars; $i++)
+                                            <i class="fa fa-star text-success"></i>
+                                        @endfor
+
+                                        {{-- Half star --}}
+                                        @if ($hasHalfStar)
+                                            <i class="fa fa-star-half-alt text-success"></i>
+                                        @endif
+
+                                        {{-- Empty stars --}}
+                                        @for ($i = 0; $i < $emptyStars; $i++)
+                                            <i class="far fa-star text-muted"></i>
+                                        @endfor
+
+                                        <small class="ms-1 text-muted">({{ number_format($avgRating, 1) }})</small>
+                                    </div>
+                                @else
+                                    <small class="text-muted">No ratings yet</small>
+                                @endif
+                            </div>
+
+
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+
+            <!-- Right Arrow -->
+            <button class="scroll-btn right" onclick="scrollRecently(1)">
+                &#9654;
+            </button>
+        </div>
+    </div>
+@endif
+
 
 
 
@@ -664,6 +778,14 @@
         }
     });
     // for like dislike review end
+    function scrollRecently(direction) {
+        const container = document.getElementById('recent-scroll');
+        const scrollAmount = 300;
+        container.scrollBy({
+            left: direction * scrollAmount,
+            behavior: 'smooth'
+        });
+    }
     </script>
 
 

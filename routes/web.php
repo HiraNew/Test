@@ -3,6 +3,7 @@
 // use App\Http\Controllers\UserDashboard\ProductController;
 
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -58,5 +59,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/paymentMethod/proceed', [App\Http\Controllers\UserDashboard\ProductController::class, 'paymentMethodProceed'])->name('paymentMethod.proceed');
     Route::get('/notification', [App\Http\Controllers\UserDashboard\ProductController::class, 'notification'])->name('notification');
     Route::get('/notificationView', [App\Http\Controllers\UserDashboard\ProductController::class, 'notificationView'])->name('notificationView');
+
+
+    //not decide
+      Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+      // web.php
+    Route::post('/wishlist/toggled/{id}', [WishlistController::class, 'toggled'])->name('wishlist.toggled');
+
     
 });
