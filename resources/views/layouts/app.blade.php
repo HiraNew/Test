@@ -113,6 +113,39 @@
                 width: 90%;
             }
         }
+        //for mobile footer sticky
+        .icon-container i {
+            font-size: 20px;
+        }
+        .icon-container small {
+            font-size: 12px;
+            line-height: 1;
+        }
+        .badge-count {
+            position: absolute;
+            top: 4px;
+            right: 12px;
+            font-size: 10px;
+            background: red;
+            color: white;
+            padding: 2px 5px;
+            border-radius: 50%;
+        }
+        .badge-count-custom {
+            position: absolute;
+            bottom: 0px;   /* Moves the badge below */
+            right: 1px;     /* Moves the badge to the left */
+            background-color: red;
+            color: white;
+            font-size: 10px;
+            padding: 2px 5px;
+            border-radius: 50%;
+            /* min-width: 16px;
+            text-align: center;
+            line-height: 1; */
+        }
+
+
     </style>
 </head>
 <body>
@@ -122,19 +155,31 @@
             <a class="navbar-brand fw-bold text-primary" href="{{ url('/') }}">
                 {{ config('app.name', 'DLS') }}
             </a>
+            
 
             <div class="d-flex align-items-center">
-                <div class="icon-container me-2">
+                
+                {{-- <div class="icon-container me-2">
                     <i class="fas fa-search icon search-mobile"></i>
-                </div>
+                </div> --}}
                 @guest
                     <a href="{{ route('login') }}" class="btn btn-outline-primary btn-sm me-1">Login</a>
                     <a href="{{ route('register') }}" class="btn btn-primary btn-sm">Register</a>
                 @endguest
+                
             </div>
-            <form method="GET" action="{{ route('products') }}" class="mb-4">
-                <input type="search" name="query" class="form-control searchbar-mobile" placeholder="Search..." value="{{ request('query') }}">
-            </form>
+            
+            @auth
+           {{-- Mobile Searchbar --}}
+                <form method="GET" action="{{ route('products') }}" class="position-relative mb-4">
+                    <input type="search" name="query" id="live-search-mobile" class="form-control searchbar-mobile" placeholder="Search..." autocomplete="off">
+                    <div id="live-search-results-mobile" class="list-group position-absolute w-100 d-none" style="z-index: 999;"></div>
+                </form>
+                {{-- <form id="logout-form-mobile" action="{{ route('logout') }}" method="POST">@csrf</form>
+                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form-mobile').submit();" class="btn btn-outline-danger btn-sm ms-2">Logout</a> --}}
+            @endauth
+            
+
 
         </nav>
 
@@ -150,11 +195,13 @@
                         @auth
                             <li class="nav-item desktop-icons">
                                 {{-- Search --}}
-                                <div class="icon-container">
+                                {{-- <div class="icon-container">
                                     <i class="fas fa-search icon search-desktop"></i>
-                                </div>
-                                <form method="GET" action="{{ route('products') }}">
-                                <input type="search" name="query" class="form-control searchbar" placeholder="Search..." aria-label="Search">
+                                </div> --}}
+                               {{-- Desktop Searchbar --}}
+                                <form method="GET" action="{{ route('products') }}" class="position-relative">
+                                    <input type="search" name="query" id="live-search" class="form-control searchbar" placeholder="Search..." autocomplete="off">
+                                    <div id="live-search-results" class="list-group position-absolute w-100 d-none" style="z-index: 999;"></div>
                                 </form>
 
                                 {{-- Cart --}}
@@ -230,36 +277,45 @@
         {{-- Mobile Sticky Footer --}}
         @auth
         <footer class="mobile-footer d-md-none">
-            <div class="d-flex justify-content-around align-items-center py-2">
+            <div class="d-flex justify-content-around align-items-center py-2 text-center">
                 {{-- Home --}}
-                <a href="{{ url('/') }}" class="icon-container">
+                <a href="{{ url('/') }}" class="icon-container d-flex flex-column align-items-center text-decoration-none text-dark">
                     <i class="fas fa-home icon"></i>
+                    <small>Home</small>
                 </a>
 
                 {{-- Cart --}}
-                <a href="{{ route('cartView') }}" class="icon-container">
-                    <i class="fas fa-shopping-cart icon"></i>
-                    <span class="badge-count" id="cart-count-mobile">{{ Session::get('key') ?? 0 }}</span>
+                <a href="{{ route('cartView') }}" class="icon-container d-flex flex-column align-items-center position-relative text-decoration-none text-dark">
+                    <div class="icon-container position-relative">
+                        <i class="fas fa-shopping-cart icon"></i>
+                        <span class="badge-count-custom" id="cart-count-mobile">
+                            {{ Session::get('key') ?? 0 }}
+                        </span>
+                    </div>
+                    <small>Cart</small>
                 </a>
 
                 {{-- Notifications --}}
-                <a href="{{ route('notificationView') }}" class="icon-container">
+                <a href="{{ route('notificationView') }}" class="icon-container d-flex flex-column align-items-center position-relative text-decoration-none text-dark">
                     <i class="fas fa-bell icon"></i>
                     <span class="badge-count clickNotification">0</span>
+                    <small>Notifications</small>
                 </a>
 
-                {{-- Coins --}}
-                <div class="icon-container">
-                    <i class="fas fa-coins icon"></i>
-                    <span class="badge-count">{{ Auth::user()->coins ?? 0 }}</span>
-                </div>
+                {{-- Logout --}}
+                <a href="#" class="icon-container d-flex flex-column align-items-center text-decoration-none text-dark" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="fas fa-sign-out-alt icon"></i>
+                    <small>Logout</small>
+                </a>
 
                 {{-- Profile --}}
-                {{-- {{ route('profile') }} --}}
-                <a href="" class="icon-container">
+                <a href="#" class="icon-container d-flex flex-column align-items-center text-decoration-none text-dark">
                     <i class="fas fa-user icon"></i>
+                    <small>Profile</small>
                 </a>
             </div>
+
+            
         </footer>
         @endauth
     </div>
@@ -271,13 +327,13 @@
     <script>
         $(document).ready(function () {
             // Toggle search bar (desktop)
-            $(".searchbar").hide();
+            $(".searchbar").show();
             $(".search-desktop").click(function () {
                 $(".searchbar").fadeToggle("fast").focus();
             });
 
             // Toggle search bar (mobile)
-            $(".searchbar-mobile").hide();
+            $(".searchbar-mobile").show();
             $(".search-mobile").click(function () {
                 $(".searchbar-mobile").fadeToggle("fast").focus();
             });
@@ -304,6 +360,69 @@
             });
             
         });
+         $(document).ready(function () {
+        // Desktop live search
+        $('#live-search').on('input', function () {
+            let query = $(this).val();
+
+            if (query.length >= 2) {
+                $.ajax({
+                    url: "{{ route('products.liveSearch') }}",
+                    type: 'GET',
+                    data: { query: query },
+                    success: function (response) {
+                        let resultBox = $('#live-search-results');
+                        resultBox.empty().removeClass('d-none');
+
+                        if (response.length === 0) {
+                            resultBox.append('<div class="list-group-item">No results found</div>');
+                        } else {
+                            response.forEach(function (product) {
+                                resultBox.append(`
+                                    <a href="/product/${product.id}" class="list-group-item list-group-item-action">
+                                        ${product.name}
+                                    </a>
+                                `);
+                            });
+                        }
+                    }
+                });
+            } else {
+                $('#live-search-results').addClass('d-none').empty();
+            }
+        });
+
+        // Mobile live search
+        $('#live-search-mobile').on('input', function () {
+            let query = $(this).val();
+
+            if (query.length >= 2) {
+                $.ajax({
+                    url: "{{ route('products.liveSearch') }}",
+                    type: 'GET',
+                    data: { query: query },
+                    success: function (response) {
+                        let resultBox = $('#live-search-results-mobile');
+                        resultBox.empty().removeClass('d-none');
+
+                        if (response.length === 0) {
+                            resultBox.append('<div class="list-group-item">No results found</div>');
+                        } else {
+                            response.forEach(function (product) {
+                                resultBox.append(`
+                                    <a href="/product/${product.id}" class="list-group-item list-group-item-action">
+                                        ${product.name}
+                                    </a>
+                                `);
+                            });
+                        }
+                    }
+                });
+            } else {
+                $('#live-search-results-mobile').addClass('d-none').empty();
+            }
+        });
+    });
         
         
     </script>
