@@ -29,6 +29,9 @@ Route::get('/mainantance', [App\Http\Controllers\UserDashboard\ProductController
 Route::get('/search-products', [App\Http\Controllers\UserDashboard\ProductController::class, 'searchProducts'])->name('search.products');
 Route::post('/send-otp', [RegisterController::class, 'sendOtp'])->name('send.otp');
 Route::post('/register', [RegisterController::class, 'register'])->name('registerUser');
+Route::get('/detail/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'detail'])->name('detail');
+Route::get('/live-search', [App\Http\Controllers\UserDashboard\ProductController::class, 'liveSearch'])->name('products.liveSearch');
+// Route::get('/product/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'show'])->name('product.show');
 
 
 
@@ -40,7 +43,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/carting', [App\Http\Controllers\UserDashboard\ProductController::class, 'carting'])->name('carting');
     
     
-    Route::get('/detail/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'detail'])->name('detail');
+    
     Route::match(['get', 'post'],'/addTocart/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'addTocart'])->name('addCart');
     // Review Related route start
     Route::post('/product/{product}/review', [App\Http\Controllers\UserDashboard\ProductController::class, 'storeReview'])->name('reviews.store');
@@ -64,7 +67,7 @@ Route::middleware('auth')->group(function () {
     //not decide
       Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
       // web.php
-    Route::post('/wishlist/toggled/{id}', [WishlistController::class, 'toggled'])->name('wishlist.toggled');
+    // Route::post('/wishlist/toggled/{id}', [WishlistController::class, 'toggled'])->name('wishlist.toggled');
 
     
 });

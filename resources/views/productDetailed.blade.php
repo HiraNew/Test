@@ -217,21 +217,34 @@
 </style>
 <div class="container py-5">
     <div class="row">
-        <!-- Product Image -->
-       <div class="col-md-6">
+    <!-- Left Side: Product Image -->
+    <div class="col-md-6 mb-4">
+        <div class="position-sticky" style="top: 80px; z-index: 1;">
             <div id="productImageCarousel" class="carousel slide" data-bs-ride="carousel">
                 <div class="carousel-inner">
                     @foreach($product->images as $key => $img)
                         <div class="carousel-item {{ $key == 0 ? 'active' : '' }}">
                             <img src="{{ asset($img->image_path) }}"
-                                class="d-block w-100 rounded border shadow-sm"
-                                style="max-height: 400px; object-fit: contain;"
-                                alt="Product Image {{ $key + 1 }}">
+                                 class="d-block w-100 rounded border shadow-sm"
+                                 style="max-height: 400px; object-fit: contain;"
+                                 alt="Product Image {{ $key + 1 }}">
                         </div>
                     @endforeach
+                    <!-- Wishlist & Share Buttons -->
+                    <div class="position-absolute top-0 end-0 m-2 d-flex gap-2">
+                        <button class="btn btn-light border rounded-circle p-2 wishlist-btn" data-id="{{ $product->id }}">
+                            <i class="{{ in_array($product->id, $wishlistProductIds ?? []) ? 'fas' : 'far' }} fa-heart text-danger"></i>
+                        </button>
+                        <button onclick="shareProduct('{{ url()->current() }}')" class="btn btn-outline-primary d-none d-sm-inline-block">
+                            <i class="fas fa-share-alt me-1"></i> Share
+                        </button>
+                        <button class="btn btn-outline-primary d-block d-sm-none" onclick="openShareOptions('{{ urlencode(url()->current()) }}')">
+                            <i class="fas fa-share-alt me-1"></i> Share
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Controls -->
+                <!-- Carousel Controls -->
                 @if($product->images->count() > 1)
                     <button class="carousel-control-prev" type="button" data-bs-target="#productImageCarousel" data-bs-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -245,208 +258,209 @@
                 <div class="d-flex justify-content-center mt-3 flex-wrap gap-2">
                     @foreach($product->images as $index => $img)
                         <img src="{{ asset($img->image_path) }}"
-                            alt="Thumb"
-                            class="img-thumbnail"
-                            style="width: 60px; height: 60px; object-fit: cover; cursor: pointer;"
-                            onclick="document.querySelector('#productImageCarousel .carousel-item.active').classList.remove('active');
-                                    document.querySelectorAll('#productImageCarousel .carousel-item')[{{ $index }}].classList.add('active');">
+                             alt="Thumb"
+                             class="img-thumbnail"
+                             style="width: 60px; height: 60px; object-fit: cover; cursor: pointer;"
+                             onclick="document.querySelector('#productImageCarousel .carousel-item.active').classList.remove('active');
+                                      document.querySelectorAll('#productImageCarousel .carousel-item')[{{ $index }}].classList.add('active');">
                     @endforeach
                 </div>
             </div>
         </div>
+    </div>
 
-
-
-        <!-- Product Information -->
-        <div class="col-md-6 col-12 mt-4 mt-md-0">
-        <div class="p-4 rounded shadow-sm bg-light border h-100 d-flex flex-column justify-content-between">
-
+    <!-- Right Side: Product Info and Specifications -->
+    <div class="col-md-6">
+        <div class="p-4 rounded shadow-sm bg-light border mb-4">
             <h2 class="product-title text-primary">{{ $product->name }}</h2>
-
+            <p class="card-text">
+                        <strong class="badge bg-success me-2">{{ number_format($averageRating, 1) }} ★</strong>                         
+                        <span class="badge bg-primary">{{ $product->reviews->count() }} Reviews</span>
+                    </p>
             <ul class="list-unstyled mb-4">
                 <li><strong class="text-dark">Seller:</strong> <span class="text-secondary">{{ $product->seller->name ?? 'DLS' }}</span></li>
                 <li><strong class="text-dark">Size:</strong> <span class="text-secondary">{{ $product->size ?? 'N/A' }}</span></li>
-                <li><strong class="text-dark"></strong> <span class="text-success fs-5">₹{{ number_format($product->price, 2) }}</span></li>
+                <li><span class="text-success fs-5">₹{{ number_format($product->price, 2) }}</span></li>
                 <li><strong class="text-dark">Availability:</strong>
                     <span class="{{ $product->quantity > 0 ? 'text-success' : 'text-danger' }}">
                         {{ $product->quantity > 0 ? 'In Stock' : 'Out of Stock' }}
                     </span>
                 </li>
             </ul>
-
             <div class="mb-4">
                 <h6 class="text-dark">Description:</h6>
                 <p class="text-muted">{!! nl2br(e($product->ldescription)) !!}</p>
             </div>
 
-            <!-- Add to Cart Button -->
-            <!-- Action Buttons -->
-            <div class="row g-2">
-                {{-- <div class="col-6"> --}}
-                    @if($inCart)
-                        <a href="{{ route('cartView') }}" class="btn btn-outline-info w-100 py-2 fs-6">
-                            <i class="fas fa-shopping-cart me-1"></i>Go to Cart
-                        </a>
-                    @else
-                        <form action="{{ url('addTocart', $product->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="btn btn-gradient w-100 py-2 fs-6">
-                                <i class="fas fa-cart-plus me-1"></i>Add to Cart
-                            </button>
-                        </form>
-                    @endif
-                {{-- </div> --}}
-                {{-- <div class="col-6">
-                    <form action="{{ url('addCart', $product->id) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="btn btn-danger w-100 py-2 fs-6">
-                            <i class="fas fa-bolt me-1"></i>Buy Now
-                        </button>
-                    </form>
-                </div> --}}
-            </div>
-
-        </div>
-        </div>
-
-    </div>
-    <!-- Product Reviews -->
-    <div class="mt-5">
-
-        @if($averageRating > 0)
-    <div class="mb-3">
-    </div>
-        <div class="card mb-4">
-       <div class="card-body">
-    <h5 class="card-title">Customer Rating</h5>
-    <div class="d-flex align-items-center">
-        @php
-            $avgRating = round($averageRating, 1); // e.g., 4.3
-            $filledStars = floor($avgRating);      // e.g., 4
-            $halfStar = ($avgRating - $filledStars) >= 0.25 && ($avgRating - $filledStars) < 0.75;
-            $emptyStars = 5 - $filledStars - ($halfStar ? 1 : 0);
-        @endphp
-
-        {{-- Full stars --}}
-        @for($i = 0; $i < $filledStars; $i++)
-            <i class="fa fa-star text-success"></i>
-        @endfor
-
-        {{-- Half star --}}
-        @if($halfStar)
-            <i class="fa fa-star-half-alt text-success"></i>
-        @endif
-
-        {{-- Empty stars --}}
-        @for($i = 0; $i < $emptyStars; $i++)
-            <i class="far fa-star text-muted"></i>
-        @endfor
-
-        {{-- Optional rating display --}}
-        <span class="ms-2 {{ $avgRating < 3 ? 'text-danger' : 'text-secondary' }}">({{ $avgRating }}/5)</span>
-    </div>
-
-    <p class="card-text">
-        <strong>{{ number_format($averageRating, 1) }} / 5</strong> 
-        <span class="badge bg-primary">{{ $product->reviews->count() }} Reviews</span>
-    </p>
-</div>
-
-    </div>
-
-    @else
-        <p class="text-danger">No ratings yet.</p>
-    @endif
-
-
-        @auth
-        <!-- Add Review Form -->
-        <div class="card my-4">
-            <div class="card-body">
-                <h5 class="card-title">Write a Review</h5>
-                <form action="{{ route('reviews.store', $product->id) }}" method="POST">
+            @if($inCart)
+                <a href="{{ route('cartView') }}" class="btn btn-outline-info w-100 py-2 fs-6">
+                    <i class="fas fa-shopping-cart me-1"></i>Go to Cart
+                </a>
+            @else
+                <form action="{{ url('addTocart', $product->id) }}" method="POST">
                     @csrf
-                    <div class="mb-3">
-                        <label class="form-label d-block">Rating</label>
-                            <div id="starRating" class="mb-3">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <i class="fa fa-star fs-4 text-muted star" data-value="{{ $i }}"></i>
-                                @endfor
-                            </div>
-                            <input type="hidden" name="rating" id="ratingInput" required>
-
-                    </div>
-                    <div class="mb-3">
-                        <label for="comment" class="form-label">Comment</label>
-                        <textarea name="comment" id="comment" rows="3" class="form-control" placeholder="Write your thoughts..." required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-success">Submit Review</button>
+                    <button type="submit" class="btn btn-gradient w-100 py-2 fs-6">
+                        <i class="fas fa-cart-plus me-1"></i>Add to Cart
+                    </button>
                 </form>
-            </div>
-        </div>
-        @endauth
-        
-
-       @php
-            $totalReviews = $product->reviews->count();
-        @endphp
-
-        <div class="mt-4">
-            <h5 class="mb-3">Customer Reviews <span class="badge bg-primary">{{ $totalReviews }}</span></h5>
-
-            <div id="review-container">
-                @foreach($product->reviews as $index => $review)
-                @php
-                    $userVote = $review->userVote;
-                @endphp
-                <div class="review p-3 rounded mb-3 bg-white shadow-sm border {{ $index >= 3 ? 'd-none extra-review' : '' }}" data-index="{{ $index }}">
-                    <p class="mb-1"><strong>{{ $review->user->name }}</strong></p>
-                    <div class="d-flex align-items-start justify-content-between stars mb-2">
-                        <div class="d-flex align-items-center">
-                            <span class="{{ $review->rating == '1' ? 'badge bg-danger me-2' : 'badge bg-success me-2' }}">{{ $review->rating }}★</span>
-                            <strong class="{{ $review->rating == '1' ? 'badge text-danger me-2' : '' }} fs-6">
-                                {{ ucfirst(
-                                    match((int)$review->rating) {
-                                        5 => 'Super',
-                                        4 => 'Good choice',
-                                        3 => 'Good',
-                                        2 => 'Recommended',
-                                        default => 'Not recommended at all'
-                                    }
-                                ) }}
-                            </strong>
-                        </div>
-                    </div>
-                    <p class="text-muted">{{ $review->review }}</p>
-
-                    <div class="mt-2 d-flex align-items-center gap-3 text-secondary vote-section">
-                        <span>👍 <span id="likes-{{ $review->id }}">{{ $review->likes_count }}</span></span>
-                        <span>👎 <span id="dislikes-{{ $review->id }}">{{ $review->dislikes_count }}</span></span>
-
-                        @if (!$review->userVote)
-                            <button class="btn btn-outline-success btn-sm vote-btn" data-review-id="{{ $review->id }}" data-vote="like">Like</button>
-                            <button class="btn btn-outline-danger btn-sm vote-btn" data-review-id="{{ $review->id }}" data-vote="dislike">Dislike</button>
-                        @elseif ($review->userVote->vote === 'like')
-                            <button class="btn btn-success btn-sm vote-btn" data-review-id="{{ $review->id }}" data-vote="dislike">Liked (Undo or Switch)</button>
-                        @elseif ($review->userVote->vote === 'dislike')
-                            <button class="btn btn-danger btn-sm vote-btn" data-review-id="{{ $review->id }}" data-vote="like">Disliked (Undo or Switch)</button>
-                        @endif
-                    </div>
-                </div>
-                @endforeach
-            </div>
-
-            @if($totalReviews > 3)
-            <div class="text-center">
-                <button class="btn btn-outline-primary" id="toggle-reviews" data-state="first">Show More Reviews</button>
-                <div id="review-spinner" class="spinner-border text-primary mt-3 d-none" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </div>
             @endif
         </div>
 
+        <!-- Specification Section -->
+        <div class="p-4 rounded shadow-sm bg-white border">
+            <h4 class="text-dark">Specifications</h4>
+            <ul class="list-unstyled mt-3 text-muted">
+                <li><strong>Material:</strong> {{ $product->material ?? 'Not specified' }}</li>
+                <li><strong>Brand:</strong> {{ $product->brand ?? 'Not specified' }}</li>
+                <li><strong>Color:</strong> {{ $product->color ?? 'Not specified' }}</li>
+                <li><strong>Weight:</strong> {{ $product->weight ?? 'Not specified' }}</li>
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nobis unde eius corporis non tenetur labore neque, asperiores natus assumenda accusantium quo et. Facilis enim nam consequuntur reiciendis est quas autem delectus ad qui fuga ipsa corrupti, praesentium distinctio ea inventore laborum nulla eveniet optio debitis, officiis.
+                <!-- Add more fields as needed -->
+
+                
+                    <!-- Product Reviews -->
+                    <div class="mt-5">
+
+                        @if($averageRating > 0)
+                    <div class="mb-3">
+                    </div>
+                        <div class="card mb-4">
+                    <div class="card-body">
+                    <h5 class="card-title">Rating & Reviews</h5>
+                    <div class="d-flex align-items-center">
+                        @php
+                            $avgRating = round($averageRating, 1); // e.g., 4.3
+                            $filledStars = floor($avgRating);      // e.g., 4
+                            $halfStar = ($avgRating - $filledStars) >= 0.25 && ($avgRating - $filledStars) < 0.75;
+                            $emptyStars = 5 - $filledStars - ($halfStar ? 1 : 0);
+                        @endphp
+
+                        {{-- Full stars --}}
+                        @for($i = 0; $i < $filledStars; $i++)
+                            <i class="fa fa-star text-success"></i>
+                        @endfor
+
+                        {{-- Half star --}}
+                        @if($halfStar)
+                            <i class="fa fa-star-half-alt text-success"></i>
+                        @endif
+
+                        {{-- Empty stars --}}
+                        @for($i = 0; $i < $emptyStars; $i++)
+                            <i class="far fa-star text-muted"></i>
+                        @endfor
+
+                        {{-- Optional rating display --}}
+                        <span class="ms-2 {{ $avgRating < 3 ? 'text-danger' : 'text-secondary' }}">({{ $avgRating }}/5)</span>
+                    </div>
+
+                    <p class="card-text">
+                        <strong>{{ number_format($averageRating, 1) }} / 5</strong> 
+                        <span class="badge bg-primary">{{ $product->reviews->count() }} Reviews</span>
+                    </p>
+                </div>
+
+                    </div>
+
+                    @else
+                        <p class="text-danger">No ratings yet.</p>
+                    @endif
+
+
+                        @auth
+                        <!-- Add Review Form -->
+                        <div class="card my-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Write a Review</h5>
+                                <form action="{{ route('reviews.store', $product->id) }}" method="POST">
+                                    @csrf
+                                    <div class="mb-3">
+                                        <label class="form-label d-block">Rating</label>
+                                            <div id="starRating" class="mb-3">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <i class="fa fa-star fs-4 text-muted star" data-value="{{ $i }}"></i>
+                                                @endfor
+                                            </div>
+                                            <input type="hidden" name="rating" id="ratingInput" required>
+
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="comment" class="form-label">Comment</label>
+                                        <textarea name="comment" id="comment" rows="3" class="form-control" placeholder="Write your thoughts..." required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-success">Submit Review</button>
+                                </form>
+                            </div>
+                        </div>
+                        @endauth
+                        
+                        
+                    @php
+                            $totalReviews = $product->reviews->count();
+                        @endphp
+
+                        <div class="mt-4">
+                            <h5 class="mb-3">Customer Reviews <span class="badge bg-primary">{{ $totalReviews }}</span></h5>
+
+                            <div id="review-container">
+                                @foreach($product->reviews as $index => $review)
+                                @php
+                                    $userVote = $review->userVote;
+                                @endphp
+                                <div class="review p-3 rounded mb-3 bg-white shadow-sm border {{ $index >= 3 ? 'd-none extra-review' : '' }}" data-index="{{ $index }}">
+                                    <p class="mb-1"><strong>{{ $review->user->name }}</strong></p>
+                                    <div class="d-flex align-items-start justify-content-between stars mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <span class="{{ $review->rating == '1' ? 'badge bg-danger me-2' : 'badge bg-success me-2' }}">{{ $review->rating }}★</span>
+                                            <strong class="{{ $review->rating == '1' ? 'badge text-danger me-2' : '' }} fs-6">
+                                                {{ ucfirst(
+                                                    match((int)$review->rating) {
+                                                        5 => 'Super',
+                                                        4 => 'Good choice',
+                                                        3 => 'Good',
+                                                        2 => 'Recommended',
+                                                        default => 'Not recommended at all'
+                                                    }
+                                                ) }}
+                                            </strong>
+                                        </div>
+                                    </div>
+                                    <p class="text-muted">{{ $review->review }}</p>
+
+                                    <div class="mt-2 d-flex align-items-center gap-3 text-secondary vote-section">
+                                        <span>👍 <span id="likes-{{ $review->id }}">{{ $review->likes_count }}</span></span>
+                                        <span>👎 <span id="dislikes-{{ $review->id }}">{{ $review->dislikes_count }}</span></span>
+                                        @auth
+                                        @if (!$review->userVote)
+                                            <button class="btn btn-outline-success btn-sm vote-btn" data-review-id="{{ $review->id }}" data-vote="like">Like</button>
+                                            <button class="btn btn-outline-danger btn-sm vote-btn" data-review-id="{{ $review->id }}" data-vote="dislike">Dislike</button>
+                                        @elseif ($review->userVote->vote === 'like')
+                                            <button class="btn btn-success btn-sm vote-btn" data-review-id="{{ $review->id }}" data-vote="dislike">Liked (Undo or Switch)</button>
+                                        @elseif ($review->userVote->vote === 'dislike')
+                                            <button class="btn btn-danger btn-sm vote-btn" data-review-id="{{ $review->id }}" data-vote="like">Disliked (Undo or Switch)</button>
+                                        @endif
+                                        @endauth
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+
+                            @if($totalReviews > 3)
+                            <div class="text-center">
+                                <button class="btn btn-outline-primary" id="toggle-reviews" data-state="first">Show More Reviews</button>
+                                <div id="review-spinner" class="spinner-border text-primary mt-3 d-none" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+
+                    </div>
+            </ul>
+        </div>
     </div>
+</div>
+
 
 
     <!-- Related Products -->
@@ -581,6 +595,7 @@
 
 
  </div>
+ {{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> --}}
  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -786,7 +801,225 @@
             behavior: 'smooth'
         });
     }
-    </script>
+    $(document).ready(function () {
+    // Wishlist toggle
+    $(document).on('click', '.wishlist-btn', function (e) {
+        e.preventDefault();
+        const btn = $(this);
+        const productId = btn.data('id');
+        const icon = btn.find('i');
+
+        $.ajax({
+            url: '{{ route("wishlist.toggle") }}',
+            method: 'POST',
+            data: {
+                product_id: productId,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function (response) {
+                if (response.status === 'added') {
+                    icon.removeClass('far').addClass('fas');
+                } else if (response.status === 'removed') {
+                    icon.removeClass('fas').addClass('far');
+                }
+            },
+            error: function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Please Login First',
+                    timer: 2000,
+                    showConfirmButton: false,
+                });
+                setTimeout(() => window.location.href = '/login', 2000);
+            }
+        });
+    });
+
+    // Share functionality
+    window.shareProduct = function (url) {
+        if (navigator.share) {
+            navigator.share({
+                title: document.title,
+                url: url
+            })
+            .then(() => console.log('Shared successfully'))
+            .catch((error) => {
+                console.error('Error sharing:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Sharing failed',
+                    text: error.message || 'Please try again.',
+                    timer: 2000,
+                    showConfirmButton: false,
+                });
+            });
+        } else if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url)
+            .then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Product link copied!',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+            })
+            .catch((error) => {
+                console.error('Clipboard write failed:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Copy failed',
+                    text: error.message || 'Please copy manually.',
+                    timer: 2000,
+                    showConfirmButton: false,
+                });
+            });
+        } else {
+            Swal.fire({
+                icon: 'info',
+                title: 'Clipboard not supported',
+                text: 'Please copy the URL manually.',
+                timer: 2000,
+                showConfirmButton: false,
+            });
+        }
+    };
+
+    });
+    function shareProduct(url) {
+    const fallbackInput = () => {
+        Swal.fire({
+            title: 'Copy Product Link',
+            html: `<input type="text" value="${url}" id="shareInput" class="swal2-input" readonly onfocus="this.select()">`,
+            showConfirmButton: false,
+            didOpen: () => {
+                const input = document.getElementById('shareInput');
+                input.focus();
+                input.select();
+            }
+        });
+    };
+
+    // Optional: Google Analytics tracking
+    if (typeof gtag === "function") {
+        gtag('event', 'share_product', {
+            event_category: 'engagement',
+            event_label: url,
+        });
+    }
+
+    if (navigator.share && window.innerWidth < 768) {
+        // Mobile or small screen with native share support
+        navigator.share({
+            title: document.title,
+            url: url
+        }).then(() => {
+            console.log('Shared successfully');
+        }).catch((error) => {
+            console.warn('Native share failed:', error);
+            fallbackInput();
+        });
+    } else if (navigator.clipboard && navigator.clipboard.writeText) {
+        // Clipboard fallback
+        navigator.clipboard.writeText(url)
+        .then(() => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Link copied to clipboard!',
+                timer: 1500,
+                showConfirmButton: false,
+            });
+        })
+        .catch((error) => {
+            console.error('Clipboard write failed:', error);
+            fallbackInput();
+        });
+    } else {
+        // Manual fallback
+        fallbackInput();
+    }
+}
+
+
+</script>
+<script>
+function openShareOptions(encodedUrl) {
+    const decodedUrl = decodeURIComponent(encodedUrl);
+    const text = encodeURIComponent(document.title);
+
+    const shareLinks = `
+        <div class="d-flex flex-column align-items-start gap-2">
+            <button class="btn btn-sm btn-success w-100" onclick="shareProduct('${decodedUrl}')">
+                📱 Native Share / Copy
+            </button>
+            <a href="https://wa.me/?text=${text}%20${encodedUrl}" target="_blank" class="btn btn-sm btn-success w-100">
+                🟢 WhatsApp
+            </a>
+            <a href="https://twitter.com/intent/tweet?text=${text}&url=${encodedUrl}" target="_blank" class="btn btn-sm btn-info w-100">
+                🔵 Twitter
+            </a>
+            <a href="https://t.me/share/url?url=${encodedUrl}&text=${text}" target="_blank" class="btn btn-sm btn-primary w-100">
+                🔷 Telegram
+            </a>
+        </div>
+    `;
+
+    Swal.fire({
+        title: 'Share This Product',
+        html: shareLinks,
+        showConfirmButton: false,
+        showCloseButton: true,
+        width: 350
+    });
+}
+
+function shareProduct(url) {
+    if (navigator.share && window.innerWidth < 768) {
+        navigator.share({
+            title: document.title,
+            url: url
+        }).then(() => {
+            console.log('Shared successfully');
+        }).catch((err) => {
+            fallbackCopy(url);
+        });
+    } else {
+        fallbackCopy(url);
+    }
+}
+
+function fallbackCopy(url) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url)
+            .then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Link copied to clipboard!',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            })
+            .catch((error) => {
+                console.error('Clipboard failed:', error);
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Copy failed',
+                    html: `<input value="${url}" readonly class="swal2-input" onfocus="this.select()">`,
+                    showConfirmButton: false
+                });
+            });
+    } else {
+        Swal.fire({
+            icon: 'info',
+            title: 'Copy not supported',
+            html: `<input value="${url}" readonly class="swal2-input" onfocus="this.select()">`,
+            showConfirmButton: false
+        });
+    }
+}
+</script>
+
+
+
 
 
 @endsection

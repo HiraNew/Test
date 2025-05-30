@@ -85,29 +85,27 @@ class ProductController extends Controller
             ]);
             return view('userNotification',compact('notifications'));
         }
-        
-        // dd($notifications);
     }
+
     public function product(Request $request)
     {
-        $this->carting(); // Assuming this loads cart session or sets defaults
+        $this->carting(); // Loads or prepares cart session data
 
         try {
             $start = microtime(true);
             $query = $request->input('query');
             // dd($query);
 
-            // Start with base query and eager load related models
-           $ProductsQuery = Product::with(['tags', 'reviews', 'wishlists'])
-            ->withAvg('reviews', 'rating') // Get average rating
-            ->withCount('reviews');        // Get review count
-
-            // dd($ProductsQuery->get());
+            // Start with base query
+            $ProductsQuery = Product::with(['tags', 'reviews', 'wishlists'])
+                ->withAvg('reviews', 'rating')
+                ->withCount('reviews');
+                // dd($ProductsQuery->get());
 
             if ($query) {
                 $ProductsQuery->where(function ($q) use ($query) {
                     $q->where('name', 'like', '%' . $query . '%')
-                    ->orWhere('description', 'like', '%' . $query . '%')
+                    ->orWhere('sdescription', 'like', '%' . $query . '%')
                     ->orWhereHas('tags', function ($tagQuery) use ($query) {
                         $tagQuery->where('name', 'like', '%' . $query . '%');
                     });
@@ -115,21 +113,21 @@ class ProductController extends Controller
                 // dd($ProductsQuery->get());
             }
 
-           $Products = $ProductsQuery->paginate(16); // or whatever per-page count you want
+            $Products = $ProductsQuery->paginate(16);
             // dd($Products);
 
-            // Show random if no results
+            // If query is present but no results, fallback to random
             if ($query && $Products->isEmpty()) {
                 $Products = Product::with(['tags', 'reviews', 'wishlists'])
-                    ->inRandomOrder()->limit(4)->get();
+                    ->inRandomOrder()
+                    ->limit(4)
+                    ->get();
             }
 
-            $end = microtime(true);
-            $duration = round(($end - $start) * 1000); // in ms
-
-            // Log the search
+            // Log the search if query was used
             if ($query) {
-                // dd($query);
+                $duration = round((microtime(true) - $start) * 1000); // in ms
+
                 SearchLog::create([
                     'user_id' => auth()->id(),
                     'query' => $query,
@@ -140,12 +138,17 @@ class ProductController extends Controller
                 ]);
             }
 
-            // Prepare cart product ids
+            // Cart product IDs
             $cartProductIds = Auth::check()
                 ? Cart::where('user_id', Auth::id())->pluck('product_id')->toArray()
                 : [];
 
-            // Track recent views
+            // Wishlist product IDs
+            $wishlistProductIds = Auth::check()
+                ? Wishlist::where('user_id', Auth::id())->pluck('product_id')->toArray()
+                : [];
+
+            // Recent views
             if (Auth::check()) {
                 foreach ($Products as $product) {
                     RecentView::updateOrCreate(
@@ -153,34 +156,27 @@ class ProductController extends Controller
                         ['viewed_at' => now()]
                     );
                 }
+
+                $recentViews = Product::whereIn('id', RecentView::where('user_id', Auth::id())
+                    ->orderByDesc('viewed_at')
+                    ->limit(8)
+                    ->pluck('product_id'))
+                    ->with(['tags', 'reviews', 'wishlists'])
+                    ->withAvg('reviews', 'rating')
+                    ->withCount('reviews')
+                    ->get();
+            } else {
+                $recentViews = collect();
             }
-            $recentViews = Auth::check()
-            ? Product::whereIn('id', RecentView::where('user_id', Auth::id())
-                ->orderByDesc('viewed_at')
-                ->limit(8)
-                ->pluck('product_id'))
-                ->with(['tags', 'reviews', 'wishlists'])
-                ->withAvg('reviews', 'rating')
-                ->withCount('reviews')
-                ->get()
-            : collect();
-
-
-
-            // Prepare wishlist product ids
-            $wishlistProductIds = Auth::check()
-                ? Wishlist::where('user_id', Auth::id())->pluck('product_id')->toArray()
-                : [];
 
             return view('home', compact('Products', 'cartProductIds', 'wishlistProductIds', 'query', 'recentViews'));
-
 
         } catch (\Exception $e) {
             \Log::error('Product Search Error: ' . $e->getMessage(), ['exception' => $e]);
             return view('error')->with('issue', $e->getMessage());
         }
-
     }
+
 
 
 
@@ -188,6 +184,10 @@ class ProductController extends Controller
     public function detail($id)
     {
         $this->carting();
+        $wishlistProductIds = [];
+            $wishlistProductIds = Wishlist::where('user_id', Auth::id())
+                                    ->pluck('product_id')
+                                    ->toArray();
 
         $product = Product::with(['images', 'reviews.user'])->findOrFail($id);
 
@@ -196,7 +196,6 @@ class ProductController extends Controller
         $inCart = Cart::where('user_id', $userId)
             ->where('product_id', $product->id)
             ->exists();
-
         $averageRating = round($product->reviews->avg('rating'), 1);
         // dd($averageRating);
 
@@ -244,7 +243,8 @@ class ProductController extends Controller
             'averageRating',
             'reviews',
             'inCart',
-            'recentlyViewedProducts'
+            'recentlyViewedProducts',
+            'wishlistProductIds'
         ));
     }
 

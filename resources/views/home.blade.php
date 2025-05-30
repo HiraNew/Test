@@ -246,84 +246,69 @@
 <script>
     $(function () {
         $('.addToCart').click(function (e) {
-            e.preventDefault();
-            const button = $(this);
-            if (button.hasClass('goToCart')) {
-                window.location.href = "{{ route('cartView') }}";
-                return;
-            }
-
-            const addUrl = button.attr('href');
-            $.ajax({
-                url: addUrl,
-                type: 'GET',
-                success: function () {
-                    let secondsLeft = 5;
-                    Swal.fire({
-                        title: '🛒 Item Added!',
-                        html: `Redirecting in <b id="countdown">${secondsLeft}</b>s. Click "Stay Here" to cancel.`,
-                        icon: 'success',
-                        showCancelButton: true,
-                        cancelButtonText: 'Stay Here',
-                        showConfirmButton: false,
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            const countdownEl = document.getElementById('countdown');
-                            const interval = setInterval(() => {
-                                secondsLeft--;
-                                if (countdownEl) countdownEl.textContent = secondsLeft;
-                                if (secondsLeft <= 0) {
-                                    clearInterval(interval);
-                                    Swal.close();
-                                    window.location.href = "{{ route('cartView') }}";
-                                }
-                            }, 1000);
-                        }
-                    });
-
-                    button
-                        .removeClass('btn-success addToCart')
-                        .addClass('btn-outline-info goToCart')
-                        .html('<i class="fas fa-shopping-cart me-1"></i>Go to Cart')
-                        .attr('href', "{{ route('cartView') }}");
-                },
-                error: function () {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Please Login First',
-                        timer: 2000,
-                        showConfirmButton: false,
-                    });
-                    setTimeout(() => window.location.href = '/login', 2000);
-                }
-            });
-        }); 
-    });
-    $(window).on('pageshow', function (e) {
-            if (e.originalEvent.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
-                window.location.reload(true);
-            }
-        });
-
-    $('.wishlist-btn').click(function (e) {
     e.preventDefault();
-    const btn = $(this);
-    const id = btn.data('id');
-    const icon = btn.find('i');
+    const button = $(this);
+
+    if (button.hasClass('goToCart')) {
+        window.location.href = "{{ route('cartView') }}";
+        return;
+    }
+
+    const addUrl = button.attr('href');
 
     $.ajax({
-        url: '{{ route("wishlist.toggle") }}',
-        method: 'POST',
-        data: {
-            product_id: id,
-            _token: '{{ csrf_token() }}'
-        },
-        success: function (response) {
-            if (response.status === 'added') {
-                icon.removeClass('far').addClass('fas');
-            } else if (response.status === 'removed') {
-                icon.removeClass('fas').addClass('far');
-            }
+        url: addUrl,
+        type: 'GET',
+        success: function () {
+            let secondsLeft = 5;
+            let countdownInterval;
+            let redirectCanceled = false;
+
+            Swal.fire({
+                title: '🛒 Item Added!',
+                html: `Redirecting in <b id="countdown">${secondsLeft}</b>s. Click "Stay Here" to cancel.`,
+                icon: 'success',
+                showCancelButton: true,
+                cancelButtonText: 'Stay Here',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    const countdownEl = document.getElementById('countdown');
+                    countdownInterval = setInterval(() => {
+                        secondsLeft--;
+                        if (countdownEl) countdownEl.textContent = secondsLeft;
+
+                        if (secondsLeft <= 0) {
+                            clearInterval(countdownInterval);
+                            if (!redirectCanceled) {
+                                Swal.close();
+                                window.location.href = "{{ route('cartView') }}";
+                            }
+                        }
+                    }, 1000);
+                }
+            }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.cancel) {
+                    redirectCanceled = true;
+                    clearInterval(countdownInterval);
+
+                    // Update all visible cart counters
+                    ['#cart-count', '#cart-count-mobile'].forEach(selector => {
+                        let badge = $(selector);
+                        if (badge.length) {
+                            let count = parseInt(badge.text()) || 0;
+                            badge.text(count + 1);
+                        }
+                    });
+                }
+            });
+
+            // Change button to "Go to Cart"
+            button
+                .removeClass('btn-success addToCart')
+                .addClass('btn-outline-info goToCart')
+                .html('<i class="fas fa-shopping-cart me-1"></i>Go to Cart')
+                .attr('href', "{{ route('cartView') }}");
         },
         error: function () {
             Swal.fire({
@@ -337,5 +322,47 @@
     });
 });
 
+
+    });
+    $(window).on('pageshow', function (e) {
+            if (e.originalEvent.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+                window.location.reload(true);
+            }
+    });
+
+    $('.wishlist-btn').click(function (e) {
+    e.preventDefault();
+
+    const clickedBtn = $(this);
+    const productId = clickedBtn.data('id');
+
+    $.ajax({
+        url: '{{ route("wishlist.toggle") }}',
+        method: 'POST',
+        data: {
+            product_id: productId,
+            _token: '{{ csrf_token() }}'
+        },
+        success: function (response) {
+            // Find all wishlist buttons with this product ID
+            const allBtns = $(`.wishlist-btn[data-id="${productId}"]`);
+            
+            if (response.status === 'added') {
+                allBtns.find('i').removeClass('far').addClass('fas');
+            } else if (response.status === 'removed') {
+                allBtns.find('i').removeClass('fas').addClass('far');
+            }
+        },
+        error: function () {
+            Swal.fire({
+                icon: 'error',
+                title: 'Please Login First',
+                timer: 2000,
+                showConfirmButton: false,
+            });
+            setTimeout(() => window.location.href = '/login', 2000);
+        }
+    });
+});
 </script>
 @endsection
