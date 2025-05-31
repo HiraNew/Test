@@ -5,6 +5,7 @@ namespace App\Http\Controllers\UserDashboard;
 use App\Http\Controllers\Controller;
 use App\Models\Addre;
 use App\Models\Cart;
+use App\Models\Category;
 use App\Models\Notification;
 use App\Models\Payment;
 use Illuminate\Http\Request;
@@ -87,9 +88,35 @@ class ProductController extends Controller
         }
     }
 
+    public function categoryView($slug)
+    {
+        $categories = Category::where('slug', $slug)->firstOrFail();
+
+        $Products = Product::with(['tags', 'reviews', 'wishlists'])
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews')
+            ->where('category_id', $categories->id)
+            ->paginate(20);
+
+        $cartProductIds = Auth::check()
+            ? Cart::where('user_id', Auth::id())->pluck('product_id')->toArray()
+            : [];
+
+        $wishlistProductIds = Auth::check()
+            ? Wishlist::where('user_id', Auth::id())->pluck('product_id')->toArray()
+            : [];
+
+        // $categories = Category::all();
+
+        return view('layouts/category-products', compact('Products', 'categories', 'cartProductIds', 'wishlistProductIds'));
+    }
+
+
     public function product(Request $request)
     {
+        
         $this->carting(); // Loads or prepares cart session data
+        
 
         try {
             $start = microtime(true);
@@ -113,7 +140,7 @@ class ProductController extends Controller
                 // dd($ProductsQuery->get());
             }
 
-            $Products = $ProductsQuery->paginate(16);
+            $Products = $ProductsQuery->paginate(20);
             // dd($Products);
 
             // If query is present but no results, fallback to random
@@ -147,7 +174,6 @@ class ProductController extends Controller
             $wishlistProductIds = Auth::check()
                 ? Wishlist::where('user_id', Auth::id())->pluck('product_id')->toArray()
                 : [];
-
             // Recent views
             if (Auth::check()) {
                 foreach ($Products as $product) {
@@ -168,8 +194,39 @@ class ProductController extends Controller
             } else {
                 $recentViews = collect();
             }
+             // carousle
+            $carouselItems = [
+                (object)['image' => 'papaya.png', 'caption' => 'Welcome to Slide 1'],
+                (object)['image' => 'mango.webp', 'caption' => 'Explore Slide 2'],
+                (object)['image' => 'apple.png'], // No caption
+            ];
+            // dd($carouselItems);
+            // $categories = Category::select('id', 'name', 'slug', 'description')
+            // ->where('status', 0)
+            // ->orderBy('name')
+            // ->get()
+            // ->map(function ($category) {
+            //     // Default icon map by category name (extend as needed)
+            //     $iconMap = [
+            //         'Fruits' => 'fas fa-apple-alt',
+            //         // 'Vegetables' => 'fas fa-carrot',
+            //         // 'Dairy' => 'fas fa-cheese',
+            //         // 'Bakery' => 'fas fa-bread-slice',
+            //         // 'Beverages' => 'fas fa-coffee',
+            //         // 'Snacks' => 'fas fa-cookie-bite',
+            //         // 'Grains' => 'fas fa-seedling',
+            //         // 'Meat' => 'fas fa-drumstick-bite',
+            //         'Clothes' => 'fas fa-tshirt',
+            //     ];
 
-            return view('home', compact('Products', 'cartProductIds', 'wishlistProductIds', 'query', 'recentViews'));
+            //     $category->icon = $iconMap[$category->name] ?? 'fas fa-tags'; // fallback icon
+            //     return $category;
+            // });
+            $categories = Category::all();
+            // dd($categories);
+            // dd($categories);
+
+            return view('home', compact('Products', 'cartProductIds', 'wishlistProductIds', 'query', 'recentViews', 'carouselItems', 'categories'));
 
         } catch (\Exception $e) {
             \Log::error('Product Search Error: ' . $e->getMessage(), ['exception' => $e]);

@@ -32,6 +32,7 @@ Route::post('/register', [RegisterController::class, 'register'])->name('registe
 Route::get('/detail/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'detail'])->name('detail');
 Route::get('/live-search', [App\Http\Controllers\UserDashboard\ProductController::class, 'liveSearch'])->name('products.liveSearch');
 // Route::get('/product/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'show'])->name('product.show');
+Route::get('/category/{slug}', [App\Http\Controllers\UserDashboard\ProductController::class, 'categoryView'])->name('category.view');
 
 
 

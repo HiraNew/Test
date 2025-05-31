@@ -367,7 +367,7 @@
                     @endif
 
 
-                        @auth
+                        {{-- @auth --}}
                         <!-- Add Review Form -->
                         <div class="card my-4">
                             <div class="card-body">
@@ -392,7 +392,7 @@
                                 </form>
                             </div>
                         </div>
-                        @endauth
+                        {{-- @endauth --}}
                         
                         
                     @php
@@ -464,6 +464,7 @@
 
 
     <!-- Related Products -->
+    @if($relatedProducts->count())
     <div class="mt-5">
         <h3>Related Products</h3>
         <div class="position-relative">
@@ -526,6 +527,7 @@
             </button>
         </div>
     </div>
+    @endif
     @if($recentlyViewedProducts->count())
     {{-- @dd($recentlyViewedProducts->count()); --}}
     <div class="mt-5">
