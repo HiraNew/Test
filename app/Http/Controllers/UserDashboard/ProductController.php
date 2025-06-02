@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\UserDashboard;
 
 use App\Http\Controllers\Controller;
+use App\Mail\LowStockAlertMail;
 use App\Models\Addre;
 use App\Models\Cart;
 use App\Models\Category;
@@ -19,6 +20,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderConfirmationMail;
 
 class ProductController extends Controller
 {
@@ -91,6 +94,7 @@ class ProductController extends Controller
     public function categoryView($slug)
     {
         $categories = Category::where('slug', $slug)->firstOrFail();
+        // dd($categories);
 
         $Products = Product::with(['tags', 'reviews', 'wishlists'])
             ->withAvg('reviews', 'rating')
@@ -106,9 +110,12 @@ class ProductController extends Controller
             ? Wishlist::where('user_id', Auth::id())->pluck('product_id')->toArray()
             : [];
 
-        // $categories = Category::all();
+        $categoriesList = Category::select('id', 'name', 'slug', 'icon', 'description')
+            ->where('status', 0)
+            ->orderBy('name')
+            ->get();
 
-        return view('layouts/category-products', compact('Products', 'categories', 'cartProductIds', 'wishlistProductIds'));
+        return view('layouts/category-products', compact('Products', 'categories', 'cartProductIds', 'wishlistProductIds', 'categoriesList'));
     }
 
 
@@ -222,9 +229,10 @@ class ProductController extends Controller
             //     $category->icon = $iconMap[$category->name] ?? 'fas fa-tags'; // fallback icon
             //     return $category;
             // });
-            $categories = Category::all();
-            // dd($categories);
-            // dd($categories);
+            $categories = Category::select('id', 'name', 'slug', 'icon', 'description')
+            ->where('status', 0)
+            ->orderBy('name')
+            ->get();
 
             return view('home', compact('Products', 'cartProductIds', 'wishlistProductIds', 'query', 'recentViews', 'carouselItems', 'categories'));
 
@@ -390,13 +398,15 @@ class ProductController extends Controller
 
 // Reviews functions end
     
-    public function addTocart($id)
+// Item added To cart or quantity increased
+    public function addTocart($id) 
     {
-        $this->carting();
         try{
+            $this->carting();
             $user = Auth::user();
             
             $Product = Product::find($id);
+            // dd($Product->quantity);
             if (!$Product) {
                 // Handle case when product is not found
                 return redirect()->back()->with('error', 'Product not found.');
@@ -431,6 +441,7 @@ class ProductController extends Controller
         }
 
     }
+    // item quantity decrease
     public function removeTocart($id)
     {
         $user = Auth::user();
@@ -450,7 +461,7 @@ class ProductController extends Controller
             }
                 $cart->quantity -= 1;
                 $cart->save();
-            return redirect()->back()->with('success', 'Item Decreased.');
+            return redirect()->back()->with('success', 'Item quantity Decreased.');
         }
 
     }
@@ -466,7 +477,7 @@ class ProductController extends Controller
         if(isset($cartItems)){
             $cartItems->find($id)->delete();
             session(['key' => $cartItems->count()-1]);
-            return redirect()->back()->with('success', 'Item Decreased.');
+            return redirect()->back()->with('success', 'Item Removed.');
         }
     }
     public function cartView()
@@ -475,24 +486,37 @@ class ProductController extends Controller
         $user = Auth::user();
 
         $carts = Cart::where('user_id', $user->id)
-                    ->with('product.category.charges') // Eager load category and its charges
+                    ->with('product.category.charges')
                     ->get();
 
-        $categoryName = [];
-        $idDetail = [];
         $cartDetails = [];
-
         $totalProductAmount = 0;
         $totalExtraCharges = 0;
+        $hasStockIssue = false;
+        $stockMessages = [];
 
         foreach ($carts as $cart) {
             $product = $cart->product;
             $category = $product->category;
 
+            // Check stock availability
+            $isStockExceeded = false;
+            if ($cart->quantity > $product->quantity) {
+                $isStockExceeded = true;
+                $hasStockIssue = true;
+
+                // Adjust to max available stock
+                $cart->quantity = $product->quantity;
+                $cart->save();
+
+                $stockMessages[] = "Quantity for '{$product->name}' adjusted to available stock ({$product->quantity}).";
+            }
+
             $productAmount = $product->price * $cart->quantity;
             $extraCharge = 0;
             $appliedCharges = [];
 
+            // Extra charges
             if (!$user->is_charge_exempt && $category && $category->charges) {
                 foreach ($category->charges as $charge) {
                     if (!$charge->is_active) continue;
@@ -503,22 +527,18 @@ class ProductController extends Controller
                             $extraCharge += $amount;
                             $appliedCharges['gst'] = $amount;
                             break;
-
                         case 'platform_charge':
                             $extraCharge += $charge->amount;
                             $appliedCharges['platform_charge'] = $charge->amount;
                             break;
-
                         case 'delivery_charge':
                             $extraCharge += $charge->amount;
                             $appliedCharges['delivery_charge'] = $charge->amount;
                             break;
-
                         case 'cod_charge':
                             $extraCharge += $charge->amount;
                             $appliedCharges['cod_charge'] = $charge->amount;
                             break;
-
                         default:
                             $extraCharge += $charge->amount;
                             $appliedCharges[$charge->charge_type] = $charge->amount;
@@ -527,21 +547,18 @@ class ProductController extends Controller
                 }
             }
 
-            $categoryName[] = $category->name ?? 'N/A';
-            $idDetail[] = $product->id;
-
             $cartDetails[] = [
                 'cart_id' => $cart->id,
                 'product_id' => $product->id,
                 'product_name' => $product->name,
                 'image' => $product->image,
                 'qty' => $cart->quantity,
+                'available_stock' => $product->quantity,
                 'base_price' => $product->price,
-                'extra_charges' => $appliedCharges, // show detailed breakdown
+                'extra_charges' => $appliedCharges,
                 'total_with_charges' => $productAmount + $extraCharge,
+                'stock_exceeded' => $isStockExceeded,
             ];
-
-
 
             $totalProductAmount += $productAmount;
             $totalExtraCharges += $extraCharge;
@@ -552,14 +569,30 @@ class ProductController extends Controller
             'total_extra_charges' => $user->is_charge_exempt ? 0 : $totalExtraCharges,
             'grand_total' => $user->is_charge_exempt ? $totalProductAmount : $totalProductAmount + $totalExtraCharges,
             'user_exempt' => $user->is_charge_exempt,
+            'has_stock_issue' => $hasStockIssue,
         ];
 
-        return view('userCart', compact('carts', 'categoryName', 'idDetail', 'cartDetails', 'cartSummary'));
+        return view('userCart', compact('carts', 'cartDetails', 'cartSummary'))
+            ->with('stockMessages', $stockMessages);
     }
+
 
     public function updateAddress()
     {
-        $user = Auth::user();
+        $user = Auth::user(); // Full user object instead of just ID
+
+        $orders = Cart::where('user_id', $user->id)->get();
+        // 1. Quantity Check: ensure no item exceeds product stock
+        foreach ($orders as $order) {
+            $product = Product::find($order->product_id);
+            if (!$product) {
+                return back()->with('error', 'One of the products in your cart is no longer available.');
+            }
+
+            if ($order->quantity > $product->quantity) {
+                return back()->with('error', "Sorry, only {$product->quantity} units of {$product->name} are available in stock.");
+            }
+        }
         $address = Addre::where('user_id', $user->id)->first();
         if(isset($address))
         {
@@ -568,100 +601,137 @@ class ProductController extends Controller
         return view('userAddress');
     }
     public function cartProceed(Request $request)
-{
-    // Validate incoming request
-    $request->validate([
-        'address' => 'required|string|max:255',
-        'pincode' => 'required|string|max:10',
-    ]);
+    {
+        // Validate incoming request
+        $request->validate([
+            'address' => 'required|string|max:255',
+            'pincode' => 'required|string|max:10',
+        ]);
 
-    $user = Auth::user();
+        $user = Auth::user();
 
-    if (!$user) {
-        return redirect()->route('login')->with('error', 'Please log in to continue.');
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Please log in to continue.');
+        }
+
+        // Check if the user already has an address
+        $address = Addre::firstOrNew(['user_id' => $user->id]);
+
+        $address->address = $request->address;
+        $address->pincode = $request->pincode;
+        $address->save();
+
+        return redirect()->route('paymentMethod')->with('success', 'Address saved. Proceed to payment.');
     }
-
-    // Check if the user already has an address
-    $address = Addre::firstOrNew(['user_id' => $user->id]);
-
-    $address->address = $request->address;
-    $address->pincode = $request->pincode;
-    $address->save();
-
-    return redirect()->route('paymentMethod')->with('success', 'Address saved. Proceed to payment.');
-}
 
     public function paymentMethod()
     {
         return view('Order/paymentMethod');
     }
     public function generateUniqueCode($length = 7, $prefix = 'DLS') {
-    $randomLength = $length - strlen($prefix);
+        $randomLength = $length - strlen($prefix);
 
-    do {
-        // Generate random alphanumeric part
-        $randomPart = Str::upper(Str::random($randomLength));
-        $code = $prefix . $randomPart;
+        do {
+            // Generate random alphanumeric part
+            $randomPart = Str::upper(Str::random($randomLength));
+            $code = $prefix . $randomPart;
 
-        // Check uniqueness in DB (example uses "orders" table and "code" column)
-    } while (Payment::where('orderid', $code)->exists());
+            // Check uniqueness in DB (example uses "orders" table and "code" column)
+        } while (Payment::where('orderid', $code)->exists());
 
-    return $code;
-}
-    public function paymentMethodProceed(Request $request){
-        $user = Auth::user(); // Full user object instead of just ID
-
+        return $code;
+    }
+    public function paymentMethodProceed(Request $request)
+    {
+        $user = Auth::user();
         $orders = Cart::where('user_id', $user->id)->get();
         $address = Addre::where('user_id', $user->id)->first();
+
+        if ($orders->isEmpty() || !$address) {
+            return redirect()->route('cartView')->with('error', 'Your cart or address is missing.');
+        }
+
         $orderId = $this->generateUniqueCode();
         $indiaTime = now('Asia/Kolkata');
         $tomorrow = $indiaTime->copy()->addDay();
 
+        // Stock check first
         foreach ($orders as $order) {
             $product = Product::find($order->product_id);
-            
-            if ($product && $address) {
-                $category = $product->category;
-                $charges = $category->charges()->where('is_active', true)->get()->keyBy('charge_type');
-
-                $baseAmount = $product->price * $order->quantity;
-                $extraCharges = 0;
-
-                if (!$user->is_charge_exempt) {
-                    if ($charges->has('gst')) {
-                        $extraCharges += $baseAmount * ($charges['gst']->amount / 100);
-                    }
-                    if ($charges->has('platform_charge')) {
-                        $extraCharges += $charges['platform_charge']->amount;
-                    }
-                    if ($charges->has('delivery_charge')) {
-                        $extraCharges += $charges['delivery_charge']->amount;
-                    }
-                    if ($request->payment_method == 'cod' && $charges->has('cod_charge')) {
-                        $extraCharges += $charges['cod_charge']->amount;
-                    }
-                }
-
-                $totalAmount = $baseAmount + $extraCharges;
-
-                $confirm = new Payment();
-                $confirm->user_id = $user->id;
-                $confirm->product_id = $product->id;
-                $confirm->qty = $order->quantity;
-                $confirm->amount = $totalAmount;
-                $confirm->payment_mode = $request->payment_method;
-                $confirm->order_date = $indiaTime;
-                $confirm->delevery_date = $tomorrow;
-                $confirm->orderid = $orderId;
-                $confirm->save();
+            if (!$product) {
+                return back()->with('error', 'One of the products in your cart is no longer available.');
+            }
+            if ($order->quantity > $product->quantity) {
+                return back()->with('error', "Sorry, only {$product->quantity} units of {$product->name} are available in stock.");
             }
         }
 
-        Cart::where('user_id', $user->id)->delete();
-        $this->carting();
+        // ✅ Transaction Start
+        DB::beginTransaction();
 
-        return redirect()->route('orderNow')->with('success', 'Your Order is Confirmed. Order ID: ' . $orderId);
+        try {
+            foreach ($orders as $order) {
+                $product = Product::find($order->product_id);
 
+                if ($product && $address) {
+                    $category = $product->category;
+                    $charges = $category->charges()->where('is_active', true)->get()->keyBy('charge_type');
+
+                    $baseAmount = $product->price * $order->quantity;
+                    $extraCharges = 0;
+
+                    if (!$user->is_charge_exempt) {
+                        if ($charges->has('gst')) {
+                            $extraCharges += $baseAmount * ($charges['gst']->amount / 100);
+                        }
+                        if ($charges->has('platform_charge')) {
+                            $extraCharges += $charges['platform_charge']->amount;
+                        }
+                        if ($charges->has('delivery_charge')) {
+                            $extraCharges += $charges['delivery_charge']->amount;
+                        }
+                        if ($request->payment_method == 'cod' && $charges->has('cod_charge')) {
+                            $extraCharges += $charges['cod_charge']->amount;
+                        }
+                    }
+
+                    $totalAmount = $baseAmount + $extraCharges;
+
+                    // Save order/payment
+                    $confirm = new Payment();
+                    $confirm->user_id = $user->id;
+                    $confirm->product_id = $product->id;
+                    $confirm->qty = $order->quantity;
+                    $confirm->amount = $totalAmount;
+                    $confirm->payment_mode = $request->payment_method;
+                    $confirm->order_date = $indiaTime;
+                    $confirm->delevery_date = $tomorrow;
+                    $confirm->orderid = $orderId;
+                    $confirm->save();
+
+                    // ✅ Reduce stock
+                    $product->decrement('quantity', $order->quantity);
+                    // Send admin email if quantity is low
+                    if ($product->quantity <= 5) {
+                        $adminEmail = 'hira.lal@nikatby.com'; // replace with your actual admin email
+                        Mail::to($adminEmail)->send(new LowStockAlertMail($product));
+                    }
+                }
+            }
+
+            // Clear cart after successful payment
+            Cart::where('user_id', $user->id)->delete();
+            $this->carting();
+
+            DB::commit();
+            Mail::to($user->email)->send(new OrderConfirmationMail($user, $orderId));
+
+            return redirect()->route('orderNow')->with('success', 'Your Order is Confirmed. Order ID: ' . $orderId);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Order failed. Please try again. ' . $e->getMessage());
+        }
     }
     public function orderNow()
     {

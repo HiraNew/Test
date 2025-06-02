@@ -56,6 +56,7 @@
                 <h5 class="mb-3 fw-bold text-white">Look into Categories</h5>
                 <div class="row row-cols-auto justify-content-center g-3">
                     @foreach($categories->take(7) as $category)
+                    {{-- @dd($category->icon); --}}
                         <div class="col">
                             <a href="{{ route('category.view', $category->slug) }}" class="text-decoration-none text-dark d-flex flex-column align-items-center">
                                 <div class="rounded-circle border bg-light d-flex justify-content-center align-items-center" style="width: 60px; height: 60px;">
@@ -134,11 +135,21 @@
                                     {{ $Product->sdescription ?? 'No description available.' }}
                                 </p>
 
+                                <span class="fw-bold text-primary small">₹{{ number_format($Product->price, 2) }}</span>
                                 <div class="d-flex justify-content-between align-items-center mt-auto">
-                                    <span class="badge bg-{{ $Product->quantity < 3 ? 'danger' : 'success' }} small">
-                                        {{ $Product->quantity > 0 ? 'In Stock' : 'Out of Stock' }}
-                                    </span>
-                                    <span class="fw-bold text-primary small">₹{{ number_format($Product->price, 2) }}</span>
+                                    @if ($Product->quantity < 1)
+                                        <button class="btn btn-secondary btn-sm w-100" disabled>
+                                            <i class="fas fa-ban me-1"></i>Out of Stock
+                                        </button>
+                                    @else
+                                        <button class="btn btn-success btn-sm w-100 addToCart">
+                                           <i class="fas fa-cart-plus me-1"></i>In Stock
+                                        </button>
+                                    @endif
+                                    {{-- <span class="badge bg-{{ $Product->quantity < 1 ? 'danger' : 'success' }} small">
+                                        {{ $Product->quantity > 0 ? 'In Stock :' : 'Out of Stock :' }} {{$Product->quantity}}
+                                    </span> --}}
+                                    
                                 </div>
                             </div>
                         </div>
@@ -222,8 +233,9 @@
 
     {{-- Recently Viewed --}}
     @if($recentViews->isNotEmpty())
-        <div class="row justify-content-center mt-5">
-            <div class="col-12 col-lg-11">
+    <div class="row justify-content-center my-4">
+        <div class="col-12 col-lg-11">
+            <div class="card shadow-sm border-0 p-4 bg-light">
                 <h4 class="mb-3 fw-bold">Recently Viewed Products</h4>
                 <div class="row row-cols-2 row-cols-sm-2 row-cols-md-4 row-cols-xl-5 g-4">
                     @foreach($recentViews as $recent)
@@ -263,7 +275,7 @@
                                     <h6 class="fw-bold">{{ $recent->name }}</h6>
                                     <span class="text-primary fw-bold">₹{{ number_format($recent->price, 2) }}</span>
                                 </div>
-                                <div class="card-footer bg-white border-0 d-flex flex-column gap-2">
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
                                     @if ($inCart)
                                         <a href="{{ route('cartView') }}" class="btn btn-outline-info btn-sm w-100">
                                             <i class="fas fa-shopping-cart me-1"></i>Go to Cart
@@ -285,6 +297,7 @@
                 </div>
             </div>
         </div>
+    </div>
     @endif
 </div>
 

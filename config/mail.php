@@ -35,12 +35,21 @@ return [
 
     'mailers' => [
         'smtp' => [
-            'transport' => 'smtp',
-            'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
-            'port' => env('MAIL_PORT', 587),
-            'encryption' => env('MAIL_ENCRYPTION', 'tls'),
+
+            'host' => env('MAIL_HOST', 'smtp.mailtrap.io'),
+            'port' => env('MAIL_PORT', 2525),
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
+            'encryption' => env('MAIL_ENCRYPTION', null),
+
+
+
+            'transport' => 'smtp',
+            // 'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
+            // 'port' => env('MAIL_PORT', 587),
+            // 'encryption' => env('MAIL_ENCRYPTION', 'tls'),
+            // 'username' => env('MAIL_USERNAME'),
+            // 'password' => env('MAIL_PASSWORD'),
             'timeout' => null,
             'local_domain' => env('MAIL_EHLO_DOMAIN'),
         ],

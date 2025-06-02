@@ -36,6 +36,24 @@
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-10">
+            @if(session('stockMessages'))
+                @foreach(session('stockMessages') as $msg)
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        {{ $msg }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endforeach
+            @endif
+
+            @if(!empty($stockMessages))
+                @foreach($stockMessages as $msg)
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        {{ $msg }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endforeach
+            @endif
+
 
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -73,6 +91,7 @@
                                 
                                 <tbody>
                                     @foreach ($cartDetails as $item)
+                                    {{-- @dd($item['qty']) --}}
                                     {{-- @dd($item); --}}
                                         <tr onclick="showLoaderAndRedirect('{{ url('detail', $item['product_id']) }}')" class="cursor-pointer hover:bg-gray-100 transition">
                                             <td data-label="Image" class="text-center py-2">
@@ -85,7 +104,11 @@
                                                     <span>{{ $item['qty'] }}</span>
                                                     <a href="{{ url('addTocart', $item['product_id']) }}" class="btn btn-sm btn-outline-success">+</a>
                                                 </div>
+                                                @if($item['stock_exceeded'])
+                                                    <div class="text-danger small mt-1">Only {{ $item['available_stock'] }} in stock</div>
+                                                @endif
                                             </td>
+
                                             <td data-label="Item Name" class="text-center py-2">{{ $item['product_name'] }}</td>
                                             <td data-label="Charges" class="text-center py-2">
                                                 @if(!empty($item['extra_charges']))
@@ -147,10 +170,17 @@
 
 
                         <div class="d-flex justify-content-center my-4">
-                            <a href="{{ url('updateAddress') }}" class="btn btn-lg btn-primary px-5 shadow-sm">
-                                Proceed to Checkout
-                            </a>
+                            @if($cartSummary['has_stock_issue'])
+                                <button class="btn btn-lg btn-secondary px-5 shadow-sm" disabled>
+                                    Out Of Stock
+                                </button>
+                            @else
+                                <a href="{{ url('updateAddress') }}" class="btn btn-lg btn-primary px-5 shadow-sm">
+                                    Proceed to Checkout
+                                </a>
+                            @endif
                         </div>
+
                     @endif
                 </div>
             </div>
@@ -175,6 +205,7 @@
             window.location.href = url;
         }, 1500); // 1.5 seconds delay
     }
+    
 </script>
 
 @endsection

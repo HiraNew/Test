@@ -223,6 +223,7 @@
             <div id="productImageCarousel" class="carousel slide" data-bs-ride="carousel">
                 <div class="carousel-inner">
                     @foreach($product->images as $key => $img)
+                    {{-- @dd($img->image) --}}
                         <div class="carousel-item {{ $key == 0 ? 'active' : '' }}">
                             <img src="{{ asset($img->image_path) }}"
                                  class="d-block w-100 rounded border shadow-sm"
@@ -297,12 +298,18 @@
                     <i class="fas fa-shopping-cart me-1"></i>Go to Cart
                 </a>
             @else
-                <form action="{{ url('addTocart', $product->id) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="btn btn-gradient w-100 py-2 fs-6">
-                        <i class="fas fa-cart-plus me-1"></i>Add to Cart
+             @if ($product->quantity > 0)
+                    <form action="{{ url('addTocart', $product->id) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-gradient w-100 py-2 fs-6">
+                            <i class="fas fa-cart-plus me-1"></i>Add to Cart
+                        </button>
+                    </form>
+                @else
+                   <button class="btn btn-secondary btn-sm w-100" disabled>
+                        <i class="fas fa-ban me-1"></i>Out of Stock
                     </button>
-                </form>
+                @endif                
             @endif
         </div>
 
