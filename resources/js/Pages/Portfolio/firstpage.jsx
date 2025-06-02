@@ -224,6 +224,29 @@ const App = () => {
         ))}
       </div>
     </section>
+    <section id="client" className="py-16 px-4 bg-gradient-to-r from-gray-100 to-gray-200">
+      <div className="max-w-7xl mx-auto text-center mb-12">
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Our Valuable Client</h2>
+        <p className="text-lg text-gray-600">We take pride in delivering value to learners and clients.</p>
+      </div>
+
+      <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 max-w-6xl mx-auto">
+        {stats.map((stat, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: stat.delay }}
+            className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center hover:shadow-xl transition"
+          >
+            <div className="mb-4">{stat.icon}</div>
+            <h3 className="text-2xl font-bold text-gray-900">{stat.value}</h3>
+            <p className="text-gray-600 mt-2 text-center">{stat.title}</p>
+          </motion.div>
+        ))}
+      </div>
+    </section>
 
         {/* === Rest of your site content here... === */}
         {/* ABOUT / CONTACT SECTIONS — same as before */}
