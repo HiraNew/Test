@@ -18,6 +18,46 @@
 
 <div class="container-fluid py-4">
 
+    <div class="row justify-content-center mb-4 pb-2">
+        <div class="col-12 col-xl-11 px-0">
+            <div class="d-flex flex-wrap justify-content-between gap-3 px-3 py-2 bg-white rounded shadow-sm">
+                @foreach ($categories as $category)
+                    <div class="category-item text-center position-relative flex-shrink-0">
+
+                        <a href="{{ route('category.view', $category->slug) }}"
+                        class="text-decoration-none text-dark d-flex flex-column align-items-center">
+                            <img src="{{ asset($category->icon) }}" alt="{{ $category->name }}" style="height: 40px;">
+                            <div class="small mt-1 {{ strtolower($category->name) == 'fashion' ? 'text-primary' : '' }}">
+                                <small class="mt-2 text-truncate fw-bold" style="max-width: 70px;">{{ $category->name }}</small>
+                            </div>
+                        </a>
+
+                        @if ($category->subcategories->count())
+                            <!-- Mobile dropdown toggle -->
+                            <div class="dropdown-toggle-btn d-md-none mt-1" onclick="toggleSubDropdown(this)">
+                                <span class="dropdown-arrow">&#x25BC;</span>
+                            </div>
+
+                            <!-- Subcategories dropdown -->
+                            <div class="subcategory-dropdown bg-white border rounded shadow-sm mt-1">
+                                @foreach ($category->subcategories as $sub)
+                                    <a href="{{ route('category.view', $sub->slug) }}"
+                                    class="dropdown-item text-decoration-none text-dark d-block px-3 py-2">
+                                        {{ $sub->name }}
+                                    </a>
+                                @endforeach
+                            </div>
+                        @endif
+
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
+
+
+
     {{-- Carousel --}}
     <div class="row justify-content-center mb-4"> {{-- Added mb-4 --}}
         <div class="col-12 col-xl-11">
@@ -27,11 +67,11 @@
                         @foreach ($carouselItems as $index => $item)
                             <div class="carousel-item @if($index === 0) active @endif">
                                 <img src="{{ url($item->image) }}" class="d-block w-100" alt="{{ $item->caption ?? 'Slide Image' }}" style="height: 300px; object-fit: cover;">
-                                @if(!empty($item->caption))
+                                {{-- @if(!empty($item->caption))
                                     <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
                                         <h5 class="text-light">{{ $item->caption }}</h5>
                                     </div>
-                                @endif
+                                @endif --}}
                             </div>
                         @endforeach
                     </div>
@@ -43,40 +83,6 @@
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Next</span>
                     </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    {{-- Categories --}}
-    <div class="row justify-content-center mt-3 mb-5"> {{-- Added mt-3 --}}
-        <div class="col-auto">
-            <div class="card shadow-sm border-0 p-3 bg-primary text-center">
-                <h5 class="mb-3 fw-bold text-white">Look into Categories</h5>
-                <div class="row row-cols-auto justify-content-center g-3">
-                    @foreach($categories->take(7) as $category)
-                    {{-- @dd($category->icon); --}}
-                        <div class="col">
-                            <a href="{{ route('category.view', $category->slug) }}" class="text-decoration-none text-dark d-flex flex-column align-items-center">
-                                <div class="rounded-circle border bg-light d-flex justify-content-center align-items-center" style="width: 60px; height: 60px;">
-                                    <img src="{{ url($category->icon) }}" alt="{{ $category->name }}" class="img-fluid" style="width: 28px; height: 28px; object-fit: contain;">
-                                </div>
-                                <small class="mt-2 text-truncate fw-bold" style="max-width: 70px;">{{ $category->name }}</small>
-                            </a>
-                        </div>
-                    @endforeach
-
-                    @if($categories->count() > 7)
-                        <div class="col">
-                            <a href="#" class="text-decoration-none text-dark d-flex flex-column align-items-center">
-                                <div class="rounded-circle border bg-light d-flex justify-content-center align-items-center" style="width: 60px; height: 60px;">
-                                    <i class="fas fa-th-large fs-5 text-secondary"></i>
-                                </div>
-                                <small class="mt-2 fw-bold">All</small>
-                            </a>
-                        </div>
-                    @endif
                 </div>
             </div>
         </div>
@@ -228,7 +234,7 @@
             @endif
         </div>
     </div>
-</div>
+ </div>
 
 
     {{-- Recently Viewed --}}
@@ -300,6 +306,8 @@
     </div>
     @endif
 </div>
+@include('layouts.footer')
+
 
 
 {{-- Styles --}}
@@ -395,6 +403,59 @@
     .card-footer {
         padding: 0.5rem 1rem;
     }
+    /* top categories and subcategories */
+    /* Ensure each category item doesn't overflow and has padding */
+
+    /* .category-item {
+    position: relative;
+    padding: 0 10px;
+} */
+
+/* Dropdown */
+ .subcategory-dropdown {
+        display: none;
+        position: absolute;
+        top: 90%;
+        left: 0;
+        z-index: 1000;
+        min-width: 150px;
+    }
+
+    /* Show on hover (non-touch devices only) */
+    @media (hover: hover) and (pointer: fine) {
+        .category-item:hover .subcategory-dropdown {
+            display: block;
+        }
+
+        .dropdown-toggle-btn {
+            display: none !important;
+        }
+    }
+
+    /* For touch devices: only show when active class is toggled */
+    .category-item.show-submenu .subcategory-dropdown {
+        display: block;
+    }
+
+    .dropdown-toggle-btn {
+        cursor: pointer;
+        font-size: 14px;
+        color: #333;
+        user-select: none;
+    }
+
+    .dropdown-arrow {
+        display: inline-block;
+        transition: transform 0.3s;
+    }
+
+    .category-item.show-submenu .dropdown-arrow {
+        transform: rotate(180deg);
+    }
+
+
+
+    
 
 </style>
 
@@ -528,5 +589,32 @@
         }
     });
 });
+// subcategories
+document.querySelectorAll('.position-relative').forEach(function(categoryDiv) {
+        categoryDiv.addEventListener('mouseenter', function() {
+            let dropdown = this.querySelector('.subcategory-dropdown');
+            if (dropdown) dropdown.style.display = 'block';
+        });
+        categoryDiv.addEventListener('mouseleave', function() {
+            let dropdown = this.querySelector('.subcategory-dropdown');
+            if (dropdown) dropdown.style.display = 'none';
+        });
+    });
+     function toggleSubDropdown(btn) {
+        const item = btn.closest('.category-item');
+        item.classList.toggle('show-submenu');
+    }
+
+    // Close dropdowns on outside click (for touch devices)
+    document.addEventListener('click', function (event) {
+        const isToggleBtn = event.target.closest('.dropdown-toggle-btn');
+        const isInsideDropdown = event.target.closest('.category-item');
+
+        if (!isToggleBtn && !isInsideDropdown) {
+            document.querySelectorAll('.category-item.show-submenu')
+                .forEach(el => el.classList.remove('show-submenu'));
+        }
+    });
+
 </script>
 @endsection

@@ -155,6 +155,27 @@
                 font-size: 0.95rem;
             }
         }
+        /* Ensure both mobile and desktop navbars are sticky */
+        .sticky-navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1040;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+
+        /* Prevent body overlap under navbar */
+        body {
+            padding-top: 0px; /* Height of navbar */
+        }
+
+        /* Adjust padding for smaller screen navbar height */
+        @media (max-width: 767.98px) {
+            body {
+                padding-top: 0px; /* Slightly taller mobile navbar */
+            }
+        }
+
 
     </style>
 </head>
@@ -198,7 +219,7 @@
 
 
         {{-- Desktop Navbar --}}
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm desktop-navbar">
+        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm desktop-navbar sticky-navbar">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
                     {{ config('app.name', 'Laravel') }}
@@ -442,5 +463,6 @@
         
         
     </script>
+    @stack('scripts')
 </body>
 </html>

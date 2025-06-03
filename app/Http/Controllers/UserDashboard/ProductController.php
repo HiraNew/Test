@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderConfirmationMail;
+use App\Models\Subcategory;
 
 class ProductController extends Controller
 {
@@ -93,30 +94,61 @@ class ProductController extends Controller
 
     public function categoryView($slug)
     {
-        $categories = Category::where('slug', $slug)->firstOrFail();
-        // dd($categories);
+        // Try to find category by slug
+        $categories = Category::where('slug', $slug)->first();
+        
+        // Try to find subcategory by slug if category not found
+        $subcategory = null;
+        if (!$categories) {
+            $subcategory = Subcategory::where('slug', $slug)->firstOrFail();
+        }
 
-        $Products = Product::with(['tags', 'reviews', 'wishlists'])
-            ->withAvg('reviews', 'rating')
-            ->withCount('reviews')
-            ->where('category_id', $categories->id)
-            ->paginate(20);
+        // Get products based on category or subcategory
+        if ($categories) {
+            $products = Product::with(['tags', 'reviews', 'wishlists'])
+                ->withAvg('reviews', 'rating')
+                ->withCount('reviews')
+                ->where('category_id', $categories->id)
+                ->paginate(20);
+        } else {
+            $products = Product::with(['tags', 'reviews', 'wishlists'])
+                ->withAvg('reviews', 'rating')
+                ->withCount('reviews')
+                ->where('subcategory_id', $subcategory->id)
+                ->paginate(20);
+        }
 
+        // Get cart product IDs if logged in
         $cartProductIds = Auth::check()
             ? Cart::where('user_id', Auth::id())->pluck('product_id')->toArray()
             : [];
 
+        // Get wishlist product IDs if logged in
         $wishlistProductIds = Auth::check()
             ? Wishlist::where('user_id', Auth::id())->pluck('product_id')->toArray()
             : [];
 
-        $categoriesList = Category::select('id', 'name', 'slug', 'icon', 'description')
+        // Get categories list for navigation or sidebar
+        // $categoriesList = Category::select('id', 'name', 'slug', 'icon', 'description')
+        //     ->where('status', 0)
+        //     ->orderBy('name')
+        //     ->get();
+        $categoriesList = Category::with('subcategories')
             ->where('status', 0)
             ->orderBy('name')
-            ->get();
+            ->get();    
 
-        return view('layouts/category-products', compact('Products', 'categories', 'cartProductIds', 'wishlistProductIds', 'categoriesList'));
+        // Pass either category or subcategory to the view
+        return view('layouts.category-products', compact(
+            'products',
+            'categories',
+            'subcategory',
+            'cartProductIds',
+            'wishlistProductIds',
+            'categoriesList'
+        ));
     }
+
 
 
     public function product(Request $request)
@@ -207,29 +239,11 @@ class ProductController extends Controller
                 (object)['image' => 'mango.webp', 'caption' => 'Explore Slide 2'],
                 (object)['image' => 'apple.png'], // No caption
             ];
-            // dd($carouselItems);
-            // $categories = Category::select('id', 'name', 'slug', 'description')
+            // $categories = Category::select('id', 'name', 'slug', 'icon', 'description')
             // ->where('status', 0)
             // ->orderBy('name')
-            // ->get()
-            // ->map(function ($category) {
-            //     // Default icon map by category name (extend as needed)
-            //     $iconMap = [
-            //         'Fruits' => 'fas fa-apple-alt',
-            //         // 'Vegetables' => 'fas fa-carrot',
-            //         // 'Dairy' => 'fas fa-cheese',
-            //         // 'Bakery' => 'fas fa-bread-slice',
-            //         // 'Beverages' => 'fas fa-coffee',
-            //         // 'Snacks' => 'fas fa-cookie-bite',
-            //         // 'Grains' => 'fas fa-seedling',
-            //         // 'Meat' => 'fas fa-drumstick-bite',
-            //         'Clothes' => 'fas fa-tshirt',
-            //     ];
-
-            //     $category->icon = $iconMap[$category->name] ?? 'fas fa-tags'; // fallback icon
-            //     return $category;
-            // });
-            $categories = Category::select('id', 'name', 'slug', 'icon', 'description')
+            // ->get();
+            $categories = Category::with('subcategories')
             ->where('status', 0)
             ->orderBy('name')
             ->get();
