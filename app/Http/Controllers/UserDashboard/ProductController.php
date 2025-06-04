@@ -101,6 +101,7 @@ class ProductController extends Controller
         $subcategory = null;
         if (!$categories) {
             $subcategory = Subcategory::where('slug', $slug)->firstOrFail();
+            // dd($subcategory);
         }
 
         // Get products based on category or subcategory
@@ -116,6 +117,7 @@ class ProductController extends Controller
                 ->withCount('reviews')
                 ->where('subcategory_id', $subcategory->id)
                 ->paginate(20);
+                // dd($products);
         }
 
         // Get cart product IDs if logged in

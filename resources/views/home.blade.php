@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+ @include('components.sidebar')
 
 {{-- SweetAlert2 --}}
 <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
@@ -17,16 +18,16 @@
 @endforeach
 
 <div class="container-fluid py-4">
+   
 
     <div class="row justify-content-center mb-4 pb-2">
         <div class="col-12 col-xl-11 px-0">
-            <div class="d-flex flex-wrap justify-content-between gap-3 px-3 py-2 bg-white rounded shadow-sm">
+            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3 px-3 py-3 bg-white rounded shadow-sm">
                 @foreach ($categories as $category)
-                    <div class="category-item text-center position-relative flex-shrink-0">
-
+                    <div class="col category-item text-center position-relative product-card">
                         <a href="{{ route('category.view', $category->slug) }}"
                         class="text-decoration-none text-dark d-flex flex-column align-items-center">
-                            <img src="{{ asset($category->icon) }}" alt="{{ $category->name }}" style="height: 40px;">
+                        <img src="{{ asset($category->icon) }}" alt="{{ $category->name }}" class="rounded-circle img-fluid mb-1" style="width: 50px; height: 50px; object-fit: cover;">
                             <div class="small mt-1 {{ strtolower($category->name) == 'fashion' ? 'text-primary' : '' }}">
                                 <small class="mt-2 text-truncate fw-bold" style="max-width: 70px;">{{ $category->name }}</small>
                             </div>
@@ -57,11 +58,10 @@
 
 
 
-
     {{-- Carousel --}}
-    <div class="row justify-content-center mb-4"> {{-- Added mb-4 --}}
-        <div class="col-12 col-xl-11">
-            <div class="card shadow-sm border-0 p-4 rounded bg-white">
+   <div class="row justify-content-center mb-4 pb-2">
+        <div class="col-12 col-xl-11 px-0">
+            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3 px-3 py-3 bg-white rounded shadow-sm">
                 <div id="dynamicCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
                     <div class="carousel-inner">
                         @foreach ($carouselItems as $index => $item)
@@ -93,14 +93,14 @@
     <div class="row justify-content-center my-4">
     <div class="col-12 col-lg-11">
         {{-- Outer Card wrapping all product cards --}}
-        <div class="card shadow-sm border-0 p-4 bg-light">
+        {{-- <div class="card shadow-sm border-0 p-4 bg-light"> --}}
             <h4 class="fw-bold mb-4 text-center">Our Products</h4>
 
             {{-- Responsive Product Grid Inside the Card --}}
-            <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3 px-3 py-3 bg-white rounded shadow-sm">
                 @forelse ($Products as $Product)
                     @php $inCart = isset($cartProductIds) && in_array($Product->id, $cartProductIds); @endphp
-                    <div class="col">
+                    <div class="col product-card"  data-price="{{ $Product->price }}">
                         <div class="card h-100 shadow-sm border-0 hover-shadow position-relative" data-bs-toggle="modal" data-bs-target="#quickViewModal{{ $Product->id }}">
                             {{-- Product Image --}}
                             <div class="ratio ratio-4x3 overflow-hidden" role="button" data-bs-toggle="modal" data-bs-target="#quickViewModal{{ $Product->id }}">
@@ -111,6 +111,7 @@
                             <button class="btn btn-light position-absolute top-0 end-0 m-1 wishlist-btn p-1" data-id="{{ $Product->id }}">
                                 <i class="{{ in_array($Product->id, $wishlistProductIds ?? []) ? 'fas' : 'far' }} fa-heart text-danger"></i>
                             </button>
+                            
 
                             {{-- Card Body --}}
                             <div class="card-body py-2 px-3 d-flex flex-column">
@@ -232,7 +233,7 @@
                     {{ $Products->appends(request()->query())->links() }}
                 </div>
             @endif
-        </div>
+        {{-- </div> --}}
     </div>
  </div>
 
@@ -241,9 +242,9 @@
     @if($recentViews->isNotEmpty())
     <div class="row justify-content-center my-4">
         <div class="col-12 col-lg-11">
-            <div class="card shadow-sm border-0 p-4 bg-light">
+            {{-- <div class="card shadow-sm border-0 p-4 bg-light"> --}}
                 <h4 class="mb-3 fw-bold">Recently Viewed Products</h4>
-                <div class="row row-cols-2 row-cols-sm-2 row-cols-md-4 row-cols-xl-5 g-4">
+               <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3 px-3 py-3 bg-white rounded shadow-sm">
                     @foreach($recentViews as $recent)
                         @php $inCart = isset($cartProductIds) && in_array($recent->id, $cartProductIds); @endphp
                         <div class="col">
@@ -301,7 +302,7 @@
                     @endforeach
 
                 </div>
-            </div>
+            {{-- </div> --}}
         </div>
     </div>
     @endif
@@ -452,6 +453,26 @@
     .category-item.show-submenu .dropdown-arrow {
         transform: rotate(180deg);
     }
+    .subcategory-dropdown .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 0px;
+    }
+
+    .subcategory-icon {
+        width: 0px;
+        height: 0px;
+        object-fit: contain;
+        flex-shrink: 0;
+    }
+
+    .subcategory-name {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
 
 
 
@@ -571,12 +592,15 @@
         success: function (response) {
             // Find all wishlist buttons with this product ID
             const allBtns = $(`.wishlist-btn[data-id="${productId}"]`);
-            
-            if (response.status === 'added') {
-                allBtns.find('i').removeClass('far').addClass('fas');
-            } else if (response.status === 'removed') {
-                allBtns.find('i').removeClass('fas').addClass('far');
-            }
+
+            allBtns.each(function () {
+                const icon = $(this).find('i');
+                if (response.status === 'added') {
+                    icon.removeClass('far').addClass('fas').addClass('text-danger');
+                } else if (response.status === 'removed') {
+                    icon.removeClass('fas').addClass('far').removeClass('text-danger');
+                }
+            });
         },
         error: function () {
             Swal.fire({
@@ -589,6 +613,7 @@
         }
     });
 });
+
 // subcategories
 document.querySelectorAll('.position-relative').forEach(function(categoryDiv) {
         categoryDiv.addEventListener('mouseenter', function() {
