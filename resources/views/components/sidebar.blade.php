@@ -60,12 +60,14 @@
 </style>
 
 <!-- Sidebar Triggers -->
-<button id="openSidebarBtn" class="btn btn-outline-secondary d-lg-none mb-2">
-    <i class="fas fa-bars"></i>
-</button>
-<button id="openSidebarBtnLarge" class="btn btn-primary d-none d-lg-inline-block mb-3 px-4 py-2 fw-semibold shadow-sm rounded-pill">
+<button id="openSidebarBtn" class="btn btn-primary d-lg-none mb-3">
     <i class="bi bi-sliders me-2"></i> Apply Filter
 </button>
+<button id="openSidebarBtnLarge"
+    class="btn btn-primary d-none d-lg-inline-block px-4 py-2 fw-semibold shadow-sm rounded-pill mb-4 position-fixed start-0 top-50 translate-middle-y ms-2">
+    <i class="bi bi-sliders me-2"></i> Apply Filter
+</button>
+
 
 <!-- Backdrop -->
 <div id="sidebarBackdrop" class="custom-sidebar-backdrop"></div>

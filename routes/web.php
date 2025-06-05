@@ -3,6 +3,7 @@
 // use App\Http\Controllers\UserDashboard\ProductController;
 
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\UserDashboard\UserWishListController;
 use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
 
@@ -42,7 +43,7 @@ Route::get('/category/{slug}', [App\Http\Controllers\UserDashboard\ProductContro
 Route::middleware('auth')->group(function () {
     // Define your routes that require authentication here
     Route::get('/carting', [App\Http\Controllers\UserDashboard\ProductController::class, 'carting'])->name('carting');
-    
+    Route::get('/wishlist', [UserWishListController::class, 'index'])->name('wishlist.index');
     
     
     Route::match(['get', 'post'],'/addTocart/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'addTocart'])->name('addCart');

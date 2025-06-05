@@ -59,34 +59,36 @@
 
 
     {{-- Carousel --}}
-   <div class="row justify-content-center mb-4 pb-2">
-        <div class="col-12 col-xl-11 px-0">
-            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3 px-3 py-3 bg-white rounded shadow-sm">
-                <div id="dynamicCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
-                    <div class="carousel-inner">
-                        @foreach ($carouselItems as $index => $item)
-                            <div class="carousel-item @if($index === 0) active @endif">
-                                <img src="{{ url($item->image) }}" class="d-block w-100" alt="{{ $item->caption ?? 'Slide Image' }}" style="height: 300px; object-fit: cover;">
-                                {{-- @if(!empty($item->caption))
-                                    <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
-                                        <h5 class="text-light">{{ $item->caption }}</h5>
-                                    </div>
-                                @endif --}}
-                            </div>
-                        @endforeach
-                    </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#dynamicCarousel" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#dynamicCarousel" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    @if (isset($carouselItems))
+    <div class="row justify-content-center mb-4 pb-2">
+         <div class="col-12 col-xl-11 px-0">
+             <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3 px-3 py-3 bg-white rounded shadow-sm">
+                 <div id="dynamicCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
+                     <div class="carousel-inner">
+                         @foreach ($carouselItems as $index => $item)
+                             <div class="carousel-item @if($index === 0) active @endif">
+                                 <img src="{{ url($item->image) }}" class="d-block w-100" alt="{{ $item->caption ?? 'Slide Image' }}" style="height: 300px; object-fit: cover;">
+                                 {{-- @if(!empty($item->caption))
+                                     <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
+                                         <h5 class="text-light">{{ $item->caption }}</h5>
+                                     </div>
+                                 @endif --}}
+                             </div>
+                         @endforeach
+                     </div>
+                     <button class="carousel-control-prev" type="button" data-bs-target="#dynamicCarousel" data-bs-slide="prev">
+                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                         <span class="visually-hidden">Previous</span>
+                     </button>
+                     <button class="carousel-control-next" type="button" data-bs-target="#dynamicCarousel" data-bs-slide="next">
+                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                         <span class="visually-hidden">Next</span>
+                     </button>
+                 </div>
+             </div>
+         </div>
+     </div>
+    @endif
 
 
     {{-- Product Grid --}}

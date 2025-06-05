@@ -199,7 +199,7 @@
                 {{-- Wishlist Icon --}}
                 <div class="text-center flex-shrink-0">
                     {{-- {{ route('wishlist.index') }} --}}
-                    <a href="#" class="d-flex flex-column align-items-center text-decoration-none text-dark">
+                    <a href="{{ route('wishlist.index') }}" class="d-flex flex-column align-items-center text-decoration-none text-dark">
                         <i class="fas fa-heart text-danger" style="font-size: 1rem;"></i>
                         <small style="font-size: 0.65rem;">Wishlist</small>
                     </a>
@@ -267,6 +267,11 @@
                                     <a href="">
                                         <i class="fas fa-user icon"></i>
                                     </a>
+                                </div>
+                                {{-- {{ route('wishlist.index') }} --}}
+                                <div class="icon-container">
+                                    {{-- {{ route('profile') }} --}}
+                                    <a href="{{ route('wishlist.index') }}">Wishlist</a>
                                 </div>
                             </li>
                         {{-- @endauth --}}

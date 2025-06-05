@@ -114,7 +114,7 @@
                             class="wishlist-btn position-absolute top-0 end-0 m-2 btn btn-sm rounded-circle border-0"
                             data-id="{{ $product->id }}"
                             title="{{ $isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist' }}"
-                            style="z-index: 10; background-color: {{ $isWishlisted ? '#dc3545' : 'transparent' }}; color: {{ $isWishlisted ? '#fff' : '#000' }};">
+                            style="z-index: 10; background-color: {{ $isWishlisted ? '#dc3545' : 'white' }}; color: {{ $isWishlisted ? '#fff' : '#000' }};">
                         <i class="{{ $isWishlisted ? 'fas' : 'far' }} fa-heart"></i>
                     </button>
 

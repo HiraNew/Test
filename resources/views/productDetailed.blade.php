@@ -3,6 +3,7 @@
 @section('title', $product->name)
 
 @section('content')
+
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -415,7 +416,9 @@
                                     $userVote = $review->userVote;
                                 @endphp
                                 <div class="review p-3 rounded mb-3 bg-white shadow-sm border {{ $index >= 3 ? 'd-none extra-review' : '' }}" data-index="{{ $index }}">
+                                    @if (isset($review->user->name))                                        
                                     <p class="mb-1"><strong>{{ $review->user->name }}</strong></p>
+                                    @endif
                                     <div class="d-flex align-items-start justify-content-between stars mb-2">
                                         <div class="d-flex align-items-center">
                                             <span class="{{ $review->rating == '1' ? 'badge bg-danger me-2' : 'badge bg-success me-2' }}">{{ $review->rating }}★</span>

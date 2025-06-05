@@ -241,14 +241,13 @@ class ProductController extends Controller
                 (object)['image' => 'mango.webp', 'caption' => 'Explore Slide 2'],
                 (object)['image' => 'apple.png'], // No caption
             ];
-            // $categories = Category::select('id', 'name', 'slug', 'icon', 'description')
-            // ->where('status', 0)
-            // ->orderBy('name')
-            // ->get();
             $categories = Category::with('subcategories')
             ->where('status', 0)
             ->orderBy('name')
             ->get();
+            if(isset($query)){
+                return view('home', compact('Products', 'cartProductIds', 'wishlistProductIds', 'query', 'recentViews', 'categories'));
+            }
 
             return view('home', compact('Products', 'cartProductIds', 'wishlistProductIds', 'query', 'recentViews', 'carouselItems', 'categories'));
 
@@ -644,7 +643,7 @@ class ProductController extends Controller
     {
         return view('Order/paymentMethod');
     }
-    public function generateUniqueCode($length = 7, $prefix = 'DLS') {
+    public function generateUniqueCode($length = 10, $prefix = 'DLS') {
         $randomLength = $length - strlen($prefix);
 
         do {
@@ -730,7 +729,7 @@ class ProductController extends Controller
                     // Send admin email if quantity is low
                     if ($product->quantity <= 5) {
                         $adminEmail = 'hira.lal@nikatby.com'; // replace with your actual admin email
-                        Mail::to($adminEmail)->send(new LowStockAlertMail($product));
+                        // Mail::to($adminEmail)->send(new LowStockAlertMail($product));
                     }
                 }
             }
@@ -740,7 +739,7 @@ class ProductController extends Controller
             $this->carting();
 
             DB::commit();
-            Mail::to($user->email)->send(new OrderConfirmationMail($user, $orderId));
+            // Mail::to($user->email)->send(new OrderConfirmationMail($user, $orderId));
 
             return redirect()->route('orderNow')->with('success', 'Your Order is Confirmed. Order ID: ' . $orderId);
 

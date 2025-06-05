@@ -105,7 +105,7 @@
                                 <td>
                                     @php
                                         $statusClass = match($order->status) {
-                                            'completed' => 'badge bg-success',
+                                            'successful' => 'badge bg-success',
                                             'pending' => 'badge bg-warning text-dark',
                                             'canceled' => 'badge bg-danger',
                                             default => 'badge bg-secondary'
