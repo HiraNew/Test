@@ -433,7 +433,10 @@ class ProductController extends Controller
             
             if($cart)
             {
-                
+                if ($cart->quantity >= $Product->quantity) {
+                    return redirect()->back()->with('error', 'Not enough stock available. Only ' . $Product->quantity . ' in stock.');
+                }
+
                 if($cart->quantity > 9)
                 {
                  return redirect()->back()->with('error','Can,t Add More Than 10 Quantity of Any Item.');
@@ -443,13 +446,15 @@ class ProductController extends Controller
                 return redirect()->back()->with('insert','Total '. $cart->quantity. ' Quantity Added To '. $Product->name);
                 
             }
-         else{
+             // If this is a new item in cart
+        if ($Product->quantity < 1) {
+            return redirect()->back()->with('error', 'This product is currently out of stock.');
+        }
             $cart = new Cart();
             $cart->user_id = $user->id;
             $cart->product_id = $Product->id;
             $cart->save();
             return redirect()->back()->with('insert',' '. $Product->name. ' Added To Your Cart');
-        }
         }
         catch (\Exception $e) {
             return redirect()->back()->with('error', 'An error occurred while adding the product to your cart: ' . $e->getMessage());
@@ -492,7 +497,7 @@ class ProductController extends Controller
         if(isset($cartItems)){
             $cartItems->find($id)->delete();
             session(['key' => $cartItems->count()-1]);
-            return redirect()->back()->with('success', 'Item Removed.');
+            return redirect()->back()->with('error', 'Item Removed.');
         }
     }
     public function cartView()

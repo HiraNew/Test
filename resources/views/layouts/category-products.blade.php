@@ -45,6 +45,23 @@
     .category-item.show-submenu .dropdown-arrow {
         transform: rotate(180deg);
     }
+    .wishlist-btn {
+        width: 34px;
+        height: 34px;
+        background-color: white;
+        color: #000;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    .wishlist-btn.wishlist-active {
+        background-color: #dc3545;
+        color: white;
+    }
+
 </style>
 <div class="container">
     <div class="row justify-content-center mb-4 pb-2">
@@ -111,12 +128,13 @@
                         $isWishlisted = in_array($product->id, $wishlistProductIds);
                     @endphp
                     <button type="button"
-                            class="wishlist-btn position-absolute top-0 end-0 m-2 btn btn-sm rounded-circle border-0"
-                            data-id="{{ $product->id }}"
-                            title="{{ $isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist' }}"
-                            style="z-index: 10; background-color: {{ $isWishlisted ? '#dc3545' : 'white' }}; color: {{ $isWishlisted ? '#fff' : '#000' }};">
+                        class="wishlist-btn position-absolute top-0 end-0 m-2 btn btn-sm rounded-circle border border-light shadow"
+                        data-id="{{ $product->id }}"
+                        title="{{ $isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist' }}"
+                        style="z-index: 10; background-color: white; color: red;">
                         <i class="{{ $isWishlisted ? 'fas' : 'far' }} fa-heart"></i>
                     </button>
+
 
                     <img src="{{ url($product->image) }}" class="card-img-top" alt="{{ $product->name }}"
                     style="height: 180px; object-fit: cover; cursor: pointer;"
@@ -413,18 +431,20 @@ document.querySelectorAll('.position-relative').forEach(function(categoryDiv) {
                if (response.status === 'added') {
                    allBtns.each(function () {
                        $(this)
-                           .css({ 'background-color': '#dc3545', 'color': '#fff' }) // Red background, white icon
-                           .find('i')
-                           .removeClass('far')
-                           .addClass('fas');
+                            .addClass('wishlist-active')
+                            .find('i')
+                            .removeClass('far')
+                            .addClass('fas');
+
                    });
                } else if (response.status === 'removed') {
                    allBtns.each(function () {
                        $(this)
-                           .css({ 'background-color': 'transparent', 'color': '#000' }) // Transparent background, black icon
-                           .find('i')
-                           .removeClass('fas')
-                           .addClass('far');
+                            .removeClass('wishlist-active')
+                            .find('i')
+                            .removeClass('fas')
+                            .addClass('far');
+
                    });
                }
            },

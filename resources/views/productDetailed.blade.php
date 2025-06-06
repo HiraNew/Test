@@ -267,9 +267,47 @@
                                       document.querySelectorAll('#productImageCarousel .carousel-item')[{{ $index }}].classList.add('active');">
                     @endforeach
                 </div>
+                <!-- Color Variants Section -->
+@if(isset($colorVariants) && count($colorVariants) > 0)
+    <div class="mt-4">
+        <h6 class="mb-3">More Colors</h6>
+
+        {{-- Mobile: Horizontal scrollable --}}
+        <div class="d-block d-sm-none">
+            <div class="d-flex overflow-auto flex-nowrap gap-3 px-2">
+                {{-- @foreach($colorVariants as $variant)
+                    <div class="card border shadow-sm" style="min-width: 120px; cursor: pointer;" onclick="window.location.href='{{ route('product.detail', $variant->id) }}'">
+                        <img src="{{ asset($variant->thumbnail ?? 'images/placeholder.png') }}" class="card-img-top" style="height: 80px; object-fit: cover;" alt="{{ $variant->name }}">
+                        <div class="card-body p-2">
+                            <p class="card-text small text-center text-truncate mb-0">{{ $variant->name }}</p>
+                        </div>
+                    </div>
+                @endforeach --}}
+            </div>
+        </div>
+
+        {{-- Desktop & Tablet: Grid layout --}}
+        <div class="d-none d-sm-block">
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+                {{-- @foreach($colorVariants as $variant)
+                    <div class="col">
+                        <div class="card h-100 border shadow-sm" style="cursor: pointer;" onclick="window.location.href='{{ route('product.detail', $variant->id) }}'">
+                            <img src="{{ asset($variant->thumbnail ?? 'images/placeholder.png') }}" class="card-img-top" style="height: 160px; object-fit: cover;" alt="{{ $variant->name }}">
+                            <div class="card-body p-2 text-center">
+                                <p class="card-text small text-truncate mb-0">{{ $variant->name }}</p>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach --}}
             </div>
         </div>
     </div>
+@endif
+
+            </div>
+        </div>
+    </div>
+
 
     <!-- Right Side: Product Info and Specifications -->
     <div class="col-md-6">

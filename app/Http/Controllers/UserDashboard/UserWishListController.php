@@ -7,6 +7,7 @@ use App\Models\Cart;
 use App\Models\Wishlist;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class UserWishListController extends Controller
 {
@@ -29,4 +30,36 @@ class UserWishListController extends Controller
 
             return view('Wishlist.userWishList', compact('wishlists', 'cartProductIds'));
         }
+    public function bulkDelete(Request $request)
+    {
+        $productIds = $request->input('product_ids', []);
+        $user = auth()->user();
+
+        if (!is_array($productIds) || empty($productIds)) {
+            return response()->json(['message' => 'No items selected'], 400);
+        }
+
+        $user->wishlists()->whereIn('product_id', $productIds)->delete();
+
+        return response()->json(['message' => 'Selected items removed from wishlist']);
+    }
+    public function cartBulkDelete(Request $request)
+    {
+        $cartIds = $request->input('cart_ids');
+
+        if (!$cartIds || !is_array($cartIds)) {
+            return response()->json(['message' => 'No items selected.'], 400);
+        }
+
+        $userId = auth()->id();
+
+        DB::table('carts')
+            ->where('user_id', $userId)
+            ->whereIn('id', $cartIds)
+            ->delete();
+
+        return response()->json(['message' => 'Selected items deleted from cart.']);
+    }
+
+
 }

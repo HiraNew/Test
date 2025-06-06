@@ -44,6 +44,8 @@ Route::middleware('auth')->group(function () {
     // Define your routes that require authentication here
     Route::get('/carting', [App\Http\Controllers\UserDashboard\ProductController::class, 'carting'])->name('carting');
     Route::get('/wishlist', [UserWishListController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist/bulk-delete', [UserWishListController::class, 'bulkDelete'])->name('wishlist.bulkDelete');
+    Route::post('/cart/bulk-delete', [UserWishListController::class, 'cartBulkDelete'])->name('cart.bulkDelete');
     
     
     Route::match(['get', 'post'],'/addTocart/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'addTocart'])->name('addCart');
