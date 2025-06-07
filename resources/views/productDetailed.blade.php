@@ -268,41 +268,43 @@
                     @endforeach
                 </div>
                 <!-- Color Variants Section -->
-@if(isset($colorVariants) && count($colorVariants) > 0)
-    <div class="mt-4">
-        <h6 class="mb-3">More Colors</h6>
+                @if(isset($colorVariants) && count($colorVariants) > 0)
+                    <div class="mt-4">
+                        <h6 class="mb-3">More Colors</h6>
 
-        {{-- Mobile: Horizontal scrollable --}}
-        <div class="d-block d-sm-none">
-            <div class="d-flex overflow-auto flex-nowrap gap-3 px-2">
-                {{-- @foreach($colorVariants as $variant)
-                    <div class="card border shadow-sm" style="min-width: 120px; cursor: pointer;" onclick="window.location.href='{{ route('product.detail', $variant->id) }}'">
-                        <img src="{{ asset($variant->thumbnail ?? 'images/placeholder.png') }}" class="card-img-top" style="height: 80px; object-fit: cover;" alt="{{ $variant->name }}">
-                        <div class="card-body p-2">
-                            <p class="card-text small text-center text-truncate mb-0">{{ $variant->name }}</p>
+                        {{-- Mobile: Horizontal scrollable --}}
+                        <div class="d-block d-sm-none">
+                            <div class="d-flex overflow-auto flex-nowrap gap-3 px-2">
+                                @foreach($colorVariants as $variant)
+                                    <div class="card border shadow-sm" style="min-width: 120px; cursor: pointer;" onclick="window.location.href='{{ route('product.detail', $variant->id) }}'">
+                                        <img src="{{ asset($variant->thumbnail ?? 'images/placeholder.png') }}" class="card-img-top" style="height: 80px; object-fit: cover;" alt="{{ $variant->name }}">
+                                        <div class="card-body p-2">
+                                            <p class="card-text small text-center text-truncate mb-0">{{ $variant->name }}</p>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
-                    </div>
-                @endforeach --}}
-            </div>
-        </div>
 
-        {{-- Desktop & Tablet: Grid layout --}}
-        <div class="d-none d-sm-block">
-            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
-                {{-- @foreach($colorVariants as $variant)
-                    <div class="col">
-                        <div class="card h-100 border shadow-sm" style="cursor: pointer;" onclick="window.location.href='{{ route('product.detail', $variant->id) }}'">
-                            <img src="{{ asset($variant->thumbnail ?? 'images/placeholder.png') }}" class="card-img-top" style="height: 160px; object-fit: cover;" alt="{{ $variant->name }}">
-                            <div class="card-body p-2 text-center">
-                                <p class="card-text small text-truncate mb-0">{{ $variant->name }}</p>
+                        {{-- Desktop & Tablet: Grid layout --}}
+                        <div class="d-none d-sm-block">
+                            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+                                @foreach($colorVariants as $variant)
+                                    <div class="col">
+                                        <div class="card h-100 border shadow-sm" style="cursor: pointer;" onclick="window.location.href='{{ route('product.detail', $variant->id) }}'">
+                                            <img src="{{ asset($variant->thumbnail ?? 'images/placeholder.png') }}" class="card-img-top" style="height: 160px; object-fit: cover;" alt="{{ $variant->name }}">
+                                            <div class="card-body p-2 text-center">
+                                                <p class="card-text small text-truncate mb-0">{{ $variant->name }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
                     </div>
-                @endforeach --}}
-            </div>
-        </div>
-    </div>
-@endif
+                @else
+                <p>No Color Varient.</p>
+                @endif
 
             </div>
         </div>
@@ -312,15 +314,27 @@
     <!-- Right Side: Product Info and Specifications -->
     <div class="col-md-6">
         <div class="p-4 rounded shadow-sm bg-light border mb-4">
-            <h2 class="product-title text-primary">{{ $product->name }}</h2>
+            {{-- product-title  --}}
+            <h2 class="text-primary">{{ $product->name }}</h2>
             <p class="card-text">
                         <strong class="badge bg-success me-2">{{ number_format($averageRating, 1) }} ★</strong>                         
                         <span class="badge bg-primary">{{ $product->reviews->count() }} Reviews</span>
                     </p>
             <ul class="list-unstyled mb-4">
-                <li><strong class="text-dark">Seller:</strong> <span class="text-secondary">{{ $product->seller->name ?? 'DLS' }}</span></li>
-                <li><strong class="text-dark">Size:</strong> <span class="text-secondary">{{ $product->size ?? 'N/A' }}</span></li>
-                <li><span class="text-success fs-5">₹{{ number_format($product->price, 2) }}</span></li>
+                <li><strong class="text-dark">Seller:</strong> <span class="text-secondary">{{ $product->extra5 ?? 'DLS' }}</span></li>
+                @if (isset($product->size))
+                <li><strong class="text-dark">Size:</strong> <span class="text-secondary">{{ $product->size ?? 'N/A' }}</span></li>                    
+                @endif
+                @for ($i = 1; $i <= 5; $i++)
+                    @if($product["extra$i"] === "1")
+                        <li> <strong class="text-dark"> Test1: </strong> <span class="text-secondary">{{ $product["extra$i"] }}</span></li>
+                    @elseif($product["extra$i"] === "2")
+                        <li> <strong class="text-dark"> Test2: </strong> <span class="text-secondary"><del> {{  $product["extra$i"] }}</del></span></li>
+                    @elseif($product["extra$i"] === "3")
+                        <li> <strong class="text-dark"> Test3: </strong> <span class="text-secondary">{{ $product["extra$i"] }}</span></li>
+                    @endif
+                @endfor
+                <li><span class="text-success fs-5"> <del>₹{{ number_format($product->extra4 ?? ($product->price * 1.2), 2) }}</del> :  ₹{{ number_format($product->price, 2) }}</span></li>
                 <li><strong class="text-dark">Availability:</strong>
                     <span class="{{ $product->quantity > 0 ? 'text-success' : 'text-danger' }}">
                         {{ $product->quantity > 0 ? 'In Stock' : 'Out of Stock' }}

@@ -9,6 +9,13 @@ class Product extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name', 'slug', 'ldescription', 'sdescription','price', 'quantity', 'image', 'status', 'created_by', 'category_id', 'subcategory_id', // existing fields
+        'color', 'size', 'weight',
+        'extra1', 'extra2', 'extra3', 'extra4', 'extra5',
+    ];
+
+
     // A product can appear in many carts
     public function carts()
     {
