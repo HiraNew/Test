@@ -12,5 +12,10 @@ class SearchLog extends Model
         'user_id',
         'query',
         'results_count',
+        'time_taken',
+        'product_ids', // 👈 add this
+        'device_info',
+        'created_at',
     ];
+
 }

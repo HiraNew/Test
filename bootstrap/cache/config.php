@@ -1,7 +1,7 @@
 <?php return array (
   'app' => 
   array (
-    'name' => 'DLS',
+    'name' => 'Laravel',
     'env' => 'local',
     'debug' => true,
     'url' => 'http://localhost',
@@ -10,7 +10,7 @@
     'locale' => 'en',
     'fallback_locale' => 'en',
     'faker_locale' => 'en_US',
-    'key' => 'base64:HFnfm2BTONJiycLUu17t9XbG0tg2pyYWEUxEU0zNboI=',
+    'key' => 'base64:WXymxo3XCTG6AUk1XlnnvhqyTv2udAZktIFmz7Dm9OE=',
     'cipher' => 'AES-256-CBC',
     'maintenance' => 
     array (
@@ -214,7 +214,7 @@
       'file' => 
       array (
         'driver' => 'file',
-        'path' => 'C:\\Users\\Lenovo\\Desktop\\newecom\\latest 6-june-25\\Test\\storage\\framework/cache/data',
+        'path' => 'C:\\Users\\VXL\\OneDrive\\Desktop\\Personal project h\\Sakrouli_New\\Test\\storage\\framework/cache/data',
       ),
       'memcached' => 
       array (
@@ -387,13 +387,13 @@
       'local' => 
       array (
         'driver' => 'local',
-        'root' => 'C:\\Users\\Lenovo\\Desktop\\newecom\\latest 6-june-25\\Test\\storage\\app',
+        'root' => 'C:\\Users\\VXL\\OneDrive\\Desktop\\Personal project h\\Sakrouli_New\\Test\\storage\\app',
         'throw' => false,
       ),
       'public' => 
       array (
         'driver' => 'local',
-        'root' => 'C:\\Users\\Lenovo\\Desktop\\newecom\\latest 6-june-25\\Test\\storage\\app/public',
+        'root' => 'C:\\Users\\VXL\\OneDrive\\Desktop\\Personal project h\\Sakrouli_New\\Test\\storage\\app/public',
         'url' => 'http://localhost/storage',
         'visibility' => 'public',
         'throw' => false,
@@ -413,7 +413,7 @@
     ),
     'links' => 
     array (
-      'C:\\Users\\Lenovo\\Desktop\\newecom\\latest 6-june-25\\Test\\public\\storage' => 'C:\\Users\\Lenovo\\Desktop\\newecom\\latest 6-june-25\\Test\\storage\\app/public',
+      'C:\\Users\\VXL\\OneDrive\\Desktop\\Personal project h\\Sakrouli_New\\Test\\public\\storage' => 'C:\\Users\\VXL\\OneDrive\\Desktop\\Personal project h\\Sakrouli_New\\Test\\storage\\app/public',
     ),
   ),
   'hashing' => 
@@ -452,13 +452,13 @@
       'single' => 
       array (
         'driver' => 'single',
-        'path' => 'C:\\Users\\Lenovo\\Desktop\\newecom\\latest 6-june-25\\Test\\storage\\logs/laravel.log',
+        'path' => 'C:\\Users\\VXL\\OneDrive\\Desktop\\Personal project h\\Sakrouli_New\\Test\\storage\\logs/laravel.log',
         'level' => 'debug',
       ),
       'daily' => 
       array (
         'driver' => 'daily',
-        'path' => 'C:\\Users\\Lenovo\\Desktop\\newecom\\latest 6-june-25\\Test\\storage\\logs/laravel.log',
+        'path' => 'C:\\Users\\VXL\\OneDrive\\Desktop\\Personal project h\\Sakrouli_New\\Test\\storage\\logs/laravel.log',
         'level' => 'debug',
         'days' => 14,
       ),
@@ -510,7 +510,7 @@
       ),
       'emergency' => 
       array (
-        'path' => 'C:\\Users\\Lenovo\\Desktop\\newecom\\latest 6-june-25\\Test\\storage\\logs/laravel.log',
+        'path' => 'C:\\Users\\VXL\\OneDrive\\Desktop\\Personal project h\\Sakrouli_New\\Test\\storage\\logs/laravel.log',
       ),
     ),
   ),
@@ -576,7 +576,7 @@
       'theme' => 'default',
       'paths' => 
       array (
-        0 => 'C:\\Users\\Lenovo\\Desktop\\newecom\\latest 6-june-25\\Test\\resources\\views/vendor/mail',
+        0 => 'C:\\Users\\VXL\\OneDrive\\Desktop\\Personal project h\\Sakrouli_New\\Test\\resources\\views/vendor/mail',
       ),
     ),
   ),
@@ -683,7 +683,7 @@
     'lifetime' => '120',
     'expire_on_close' => false,
     'encrypt' => false,
-    'files' => 'C:\\Users\\Lenovo\\Desktop\\newecom\\latest 6-june-25\\Test\\storage\\framework/sessions',
+    'files' => 'C:\\Users\\VXL\\OneDrive\\Desktop\\Personal project h\\Sakrouli_New\\Test\\storage\\framework/sessions',
     'connection' => NULL,
     'table' => 'sessions',
     'store' => NULL,
@@ -703,9 +703,9 @@
   array (
     'paths' => 
     array (
-      0 => 'C:\\Users\\Lenovo\\Desktop\\newecom\\latest 6-june-25\\Test\\resources\\views',
+      0 => 'C:\\Users\\VXL\\OneDrive\\Desktop\\Personal project h\\Sakrouli_New\\Test\\resources\\views',
     ),
-    'compiled' => 'C:\\Users\\Lenovo\\Desktop\\newecom\\latest 6-june-25\\Test\\storage\\framework\\views',
+    'compiled' => 'C:\\Users\\VXL\\OneDrive\\Desktop\\Personal project h\\Sakrouli_New\\Test\\storage\\framework\\views',
   ),
   'flare' => 
   array (
@@ -791,7 +791,7 @@
     array (
     ),
     'enable_runnable_solutions' => NULL,
-    'remote_sites_path' => 'C:\\Users\\Lenovo\\Desktop\\newecom\\latest 6-june-25\\Test',
+    'remote_sites_path' => 'C:\\Users\\VXL\\OneDrive\\Desktop\\Personal project h\\Sakrouli_New\\Test',
     'local_sites_path' => '',
     'housekeeping_endpoint_prefix' => '_ignition',
     'settings_file_path' => '',

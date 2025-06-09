@@ -351,7 +351,7 @@
                 @endauth
 
                 {{-- Profile --}}
-                <a href="#" class="icon-container d-flex flex-column align-items-center text-decoration-none text-dark">
+                <a href="{{route('user.account')}}" class="icon-container d-flex flex-column align-items-center text-decoration-none text-dark">
                     <i class="fas fa-user icon text-primary"></i>
                     <small>Account</small>
                 </a>

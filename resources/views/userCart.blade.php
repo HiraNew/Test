@@ -111,8 +111,6 @@
                                 
                                 <tbody>
                                     @foreach ($cartDetails as $item)
-                                    {{-- @dd($item['qty']) --}}
-                                    {{-- @dd($item); --}}
                                         <tr class="cursor-pointer hover:bg-gray-100 transition"
                                             data-product-id="{{ $item['product_id'] }}"
                                             data-url="{{ route('detail', $item['product_id']) }}">
@@ -152,10 +150,7 @@
                                                 ₹{{ number_format($item['total_with_charges'], 2) }}
                                             </td>
                                             <td data-label="Action" class="text-center py-2">
-                                                <a href="{{ url('removeItemTocart', $item['cart_id']) }}" class="btn btn-sm btn-danger" onclick="event.stopPropagation()"><i class="fas fa-trash-alt me-1"></i></a>
-                                                {{-- <button class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 remove-wishlist" data-id="{{ $product->id }}">
-                            <i class="fas fa-trash-alt me-1"></i>
-                        </button> --}}
+                                                <a href="{{ url('removeItemTocart', $item['cart_id']) }}" class="btn btn-sm btn-danger" onclick="event.stopPropagation()"><i class="fas fa-trash-alt me-1"></i>Remove</a>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -163,11 +158,6 @@
 
                             </table>
                         </div>
-
-                        {{-- @php
-    $totalWithGST = ($item->product->category->name === 'Fruits') ? 0 : $total * 1.18;
-@endphp --}}
-
 
                         <div class="bg-light p-4 mt-3 border-top">
                             <h5 class="mb-3 text-center text-primary">Cart Summary</h5>

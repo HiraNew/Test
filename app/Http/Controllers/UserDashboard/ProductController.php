@@ -174,10 +174,14 @@ class ProductController extends Controller
                 $ProductsQuery->where(function ($q) use ($query) {
                     $q->where('name', 'like', '%' . $query . '%')
                     ->orWhere('sdescription', 'like', '%' . $query . '%')
+                    ->orWhere('color', 'like', '%' . $query . '%')
+                    ->orWhere('size', 'like', '%' . $query . '%')
+                    ->orWhere('weight', 'like', '%' . $query . '%')
                     ->orWhereHas('tags', function ($tagQuery) use ($query) {
                         $tagQuery->where('name', 'like', '%' . $query . '%');
                     });
                 });
+
                 // dd($ProductsQuery->get());
             }
 
@@ -191,7 +195,9 @@ class ProductController extends Controller
                     ->limit(4)
                     ->get();
             }
-
+            $matchedProductIds = $Products instanceof \Illuminate\Pagination\LengthAwarePaginator
+            ? $Products->pluck('id')->toArray()
+            : $Products->pluck('id')->toArray();
             // Log the search if query was used
             if ($query) {
                 $duration = round((microtime(true) - $start) * 1000); // in ms
@@ -199,9 +205,10 @@ class ProductController extends Controller
                 SearchLog::create([
                     'user_id' => auth()->id(),
                     'query' => $query,
-                    'duration_ms' => $duration,
+                    'product_ids' => json_encode($matchedProductIds), // Save as JSON
                     'results_count' => $Products->count(),
-                    'ip_address' => $request->ip(),
+                    'time_taken' => $duration,
+                    'device_info' => $request->ip(),
                     'created_at' => now(),
                 ]);
             }
@@ -270,6 +277,17 @@ class ProductController extends Controller
                                     ->toArray();
 
         $product = Product::with(['images', 'reviews.user'])->findOrFail($id);
+        // color varient on detail page
+        $colorVariants = Product::where('name', $product->name)
+        ->where('id', '!=', $product->id)
+        ->select('color', DB::raw('MIN(id) as id')) // Just color & ID
+        ->groupBy('color')
+        ->get()
+        ->map(function ($item) {
+            return Product::find($item->id); // Get full product
+        });
+
+
 
         $userId = auth()->id();
 
@@ -324,7 +342,8 @@ class ProductController extends Controller
             'reviews',
             'inCart',
             'recentlyViewedProducts',
-            'wishlistProductIds'
+            'wishlistProductIds',
+            'colorVariants'
         ));
     }
 

@@ -4,6 +4,13 @@
 
 @section('content')
 
+<!-- GLightbox CSS -->
+<link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet" />
+
+<!-- GLightbox JS (at end of body) -->
+<script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+
+
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -203,6 +210,9 @@
         background-size: 60% 60%;
         background-position: center;
         background-repeat: no-repeat;
+        position: absolute;
+    top: 10%;
+    transform: translateY(-50%);
     }
 
     /* Left arrow icon */
@@ -215,25 +225,57 @@
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M4.646 1.646a.5.5 0 0 1 .708 0l5 5a.5.5 0 0 1 0 .708l-5 5a.5.5 0 0 1-.708-.708L9.293 7 4.646 2.354a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
     }
 
+    .card-variant {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        transition: box-shadow 0.2s ease-in-out;
+    }
+    .card-variant:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .color-badge {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        font-size: 0.7rem;
+        padding: 2px 6px;
+        border-radius: 3px;
+    }
+    .stock-text {
+        font-size: 0.75rem;
+        color: #28a745; /* green */
+    }
+    .stock-text.out-of-stock {
+        color: #dc3545; /* red */
+    }
+    footer {
+    padding-bottom: 5px; /* matches sticky-action-bar height */
+    position: relative;
+    z-index: 0;
+}
+
 </style>
 <div class="container py-5">
     <div class="row">
     <!-- Left Side: Product Image -->
     <div class="col-md-6 mb-4">
         <div class="position-sticky" style="top: 80px; z-index: 1;">
-            <div id="productImageCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div id="productImageCarousel" class="carousel slide position-relative" data-bs-ride="carousel" data-bs-interval="4000" data-bs-touch="true">
                 <div class="carousel-inner">
                     @foreach($product->images as $key => $img)
-                    {{-- @dd($img->image) --}}
                         <div class="carousel-item {{ $key == 0 ? 'active' : '' }}">
-                            <img src="{{ asset($img->image_path) }}"
-                                 class="d-block w-100 rounded border shadow-sm"
-                                 style="max-height: 400px; object-fit: contain;"
-                                 alt="Product Image {{ $key + 1 }}">
+                            <a href="{{ asset($img->image_path) }}" class="glightbox" data-gallery="product-gallery" data-title="Image {{ $key + 1 }}">
+                                <img src="{{ asset($img->image_path) }}"
+                                    class="d-block w-100 rounded border shadow-sm"
+                                    style="max-height: 400px; object-fit: contain;"
+                                    alt="Product Image {{ $key + 1 }}">
+                            </a>
                         </div>
                     @endforeach
                     <!-- Wishlist & Share Buttons -->
-                    <div class="position-absolute top-0 end-0 m-2 d-flex gap-2">
+                     <div class="position-absolute top-0 end-0 m-2 d-flex gap-2 z-3">
                         <button class="btn btn-light border rounded-circle p-2 wishlist-btn" data-id="{{ $product->id }}">
                             <i class="{{ in_array($product->id, $wishlistProductIds ?? []) ? 'fas' : 'far' }} fa-heart text-danger"></i>
                         </button>
@@ -248,16 +290,31 @@
 
                 <!-- Carousel Controls -->
                 @if($product->images->count() > 1)
-                    <button class="carousel-control-prev" type="button" data-bs-target="#productImageCarousel" data-bs-slide="prev">
+                    <button class="carousel-control-prev top-50 translate-middle-y" type="button" data-bs-target="#productImageCarousel" data-bs-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
                     </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#productImageCarousel" data-bs-slide="next">
+                    <button class="carousel-control-next top-50 translate-middle-y" type="button" data-bs-target="#productImageCarousel" data-bs-slide="next">
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
                     </button>
                 @endif
+                <div class="d-flex justify-content-center mt-3 gap-2 flex-wrap">
+                    @foreach($product->images as $key => $img)
+                        <button
+                            type="button"
+                            data-bs-target="#productImageCarousel"
+                            data-bs-slide-to="{{ $key }}"
+                            class="border rounded {{ $key == 0 ? 'border-primary' : 'border-secondary' }}"
+                            style="width: 60px; height: 60px; overflow: hidden; padding: 0;"
+                            aria-label="Slide {{ $key + 1 }}">
+                            <img src="{{ asset($img->image_path) }}" alt="Thumbnail {{ $key + 1 }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        </button>
+                    @endforeach
+                </div>
 
                 <!-- Thumbnails -->
-                <div class="d-flex justify-content-center mt-3 flex-wrap gap-2">
+                {{-- <div class="d-flex justify-content-center mt-3 flex-wrap gap-2">
                     @foreach($product->images as $index => $img)
                         <img src="{{ asset($img->image_path) }}"
                              alt="Thumb"
@@ -266,45 +323,9 @@
                              onclick="document.querySelector('#productImageCarousel .carousel-item.active').classList.remove('active');
                                       document.querySelectorAll('#productImageCarousel .carousel-item')[{{ $index }}].classList.add('active');">
                     @endforeach
-                </div>
+                </div> --}}
                 <!-- Color Variants Section -->
-                @if(isset($colorVariants) && count($colorVariants) > 0)
-                    <div class="mt-4">
-                        <h6 class="mb-3">More Colors</h6>
-
-                        {{-- Mobile: Horizontal scrollable --}}
-                        <div class="d-block d-sm-none">
-                            <div class="d-flex overflow-auto flex-nowrap gap-3 px-2">
-                                @foreach($colorVariants as $variant)
-                                    <div class="card border shadow-sm" style="min-width: 120px; cursor: pointer;" onclick="window.location.href='{{ route('product.detail', $variant->id) }}'">
-                                        <img src="{{ asset($variant->thumbnail ?? 'images/placeholder.png') }}" class="card-img-top" style="height: 80px; object-fit: cover;" alt="{{ $variant->name }}">
-                                        <div class="card-body p-2">
-                                            <p class="card-text small text-center text-truncate mb-0">{{ $variant->name }}</p>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        {{-- Desktop & Tablet: Grid layout --}}
-                        <div class="d-none d-sm-block">
-                            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
-                                @foreach($colorVariants as $variant)
-                                    <div class="col">
-                                        <div class="card h-100 border shadow-sm" style="cursor: pointer;" onclick="window.location.href='{{ route('product.detail', $variant->id) }}'">
-                                            <img src="{{ asset($variant->thumbnail ?? 'images/placeholder.png') }}" class="card-img-top" style="height: 160px; object-fit: cover;" alt="{{ $variant->name }}">
-                                            <div class="card-body p-2 text-center">
-                                                <p class="card-text small text-truncate mb-0">{{ $variant->name }}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                @else
-                <p>No Color Varient.</p>
-                @endif
+               
 
             </div>
         </div>
@@ -339,6 +360,57 @@
                     <span class="{{ $product->quantity > 0 ? 'text-success' : 'text-danger' }}">
                         {{ $product->quantity > 0 ? 'In Stock' : 'Out of Stock' }}
                     </span>
+                </li>
+                <li>
+                    @if(isset($colorVariants) && count($colorVariants) > 0)
+                        <div class="mt-4">
+                            <h6 class="mb-3">More Variants</h6>
+
+                            {{-- Mobile: Horizontal scrollable --}}
+                            <div class="d-block d-sm-none">
+                                <div class="d-flex overflow-auto flex-nowrap gap-3 px-2">
+                                    @foreach($colorVariants as $variant)
+                                        <div class="position-relative card card-variant shadow-sm" style="min-width: 140px; cursor: pointer;" onclick="window.location.href='{{ route('detail', $variant->id) }}'">
+                                            @if (isset($variant->color ))
+                                            <span class="color-badge">{{ ucfirst($variant->color) }}</span>
+                                            @endif
+                                            <img src="{{ url($variant->image ?? 'images/placeholder.png') }}" class="card-img-top border-bottom" style="height: 80px; object-fit: cover;" alt="{{ $variant->name }}">
+                                            <div class="card-body p-2 text-center">
+                                                {{-- <p class="card-text small text-truncate mb-1">{{ $variant->name }}</p> --}}
+                                                <span class="stock-text {{ $variant->quantity == 0 ? 'out-of-stock' : '' }}">
+                                                    {{ $variant->quantity > 0 ? 'In Stock' : 'Out of Stock' }}
+                                                </span> 
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            {{-- Desktop & Tablet: Grid layout --}}
+                            <div class="d-none d-sm-block">
+                                <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+                                    @foreach($colorVariants as $variant)
+                                        <div class="col">
+                                            <div class="position-relative card card-variant h-100 shadow-sm" style="cursor: pointer;" onclick="window.location.href='{{ route('detail', $variant->id) }}'">
+                                                @if (isset($variant->color ))
+                                                    <span class="color-badge">{{ ucfirst($variant->color) }}</span>
+                                                @endif
+                                                <img src="{{ url($variant->image ?? 'images/placeholder.png') }}" class="card-img-top border-bottom" style="height: 160px; object-fit: cover;" alt="{{ $variant->name }}">
+                                                <div class="card-body p-2 text-center">
+                                                    <p class="card-text small text-truncate mb-1">{{ $variant->name }}</p>
+                                                    <span class="stock-text {{ $variant->quantity == 0 ? 'out-of-stock' : '' }}">
+                                                        {{ $variant->quantity > 0 ? 'In Stock' : 'Out of Stock' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                     <p>No Varient Available.</p>
+                    @endif
                 </li>
             </ul>
             <div class="mb-4">
@@ -1080,6 +1152,15 @@ function fallbackCopy(url) {
         });
     }
 }
+
+ document.addEventListener("DOMContentLoaded", function() {
+        const lightbox = GLightbox({
+            selector: '.glightbox',
+            touchNavigation: true,
+            loop: true,
+            zoomable: true,
+        });
+    });
 </script>
 
 
