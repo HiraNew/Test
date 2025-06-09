@@ -56,14 +56,15 @@
     <!-- Profile Section -->
     <div class="profile-card p-3 mb-4 d-flex justify-content-between align-items-center">
         <div>
-            <h5 class="mb-1">Hira Lal</h5>
-            <small class="text-muted fw-semibold">✨ Plus Silver</small><br>
-            <small class="text-muted">valid till August 26, 2025</small>
+            <h5 class="mb-1">{{ $user->name ?? 'Guest' }}</h5>
+            <small class="text-muted fw-semibold">✨ {{ $membership['level'] }}</small><br>
+            <small class="text-muted">valid till {{ $membership['valid_till'] }}</small>
         </div>
         <div class="text-end">
-            <span class="badge bg-warning text-dark rounded-pill px-3 py-2">⚡ 64</span>
+            <span class="badge bg-warning text-dark rounded-pill px-3 py-2">⚡ {{ $membership['points'] }}</span>
         </div>
     </div>
+
 
     <!-- Buttons -->
     <div class="row g-3 text-center mb-4">
@@ -134,7 +135,7 @@
     <div class="card">
         <div class="card-body">
             <h6 class="card-title">Notifications</h6>
-            <a href="#" class="text-decoration-none d-flex justify-content-between align-items-center">
+            <a href="{{route('notificationView')}}" class="text-decoration-none d-flex justify-content-between align-items-center">
                 <div>
                     🔔 Tap for latest updates and offers
                 </div>
