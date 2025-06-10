@@ -30,7 +30,7 @@ class DashboardController extends Controller
     {
         $today = today();
         $now = now();
-        $successful = 'successful';
+        $successful = 'delivered';
         $pending = 'pending';
 
         $stats = [

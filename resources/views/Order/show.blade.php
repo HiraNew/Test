@@ -91,6 +91,7 @@
         <div class="col-12 col-lg-8">
             <div class="card p-4 shadow-sm">
                 <div class="row">
+                    <h2>Order Details - #{{ $payment->product->name }}</h2>
                     @if($payment->product->image)
                         <img src="{{ url($payment->product->image) }}" 
                             alt="{{ $payment->product->name }}" 
@@ -103,9 +104,6 @@
                             style="object-fit: contain;">
                     @endif
                     <div class="col-12 col-lg-8">
-                        
-                        <h2>Order Details - #{{ $payment->product->name }}</h2>
-
                         <p><strong>Amount:</strong> ₹{{ number_format($payment->amount, 2) }}</p>
                         <p><strong>Status:</strong> 
                             <span class="@if($payment->status == 'delivered') text-success
@@ -123,12 +121,12 @@
                         @endif
 
                         {{-- Shipping Address --}}
-                        @if($payment->address)
+                        @if($address)
                             <hr>
                             <h4>Shipping Address</h4>
                             <p>
-                                {{ $payment->address->address_line }}<br>
-                                {{ $payment->address->city }}, {{ $payment->address->state }} - {{ $payment->address->postal_code }}<br>
+                                {{ $address->address }}<br>
+                                {{ $address->pincode }}, {{ $payment->address->state }} - {{ $payment->address->postal_code }}<br>
                                 {{ $payment->address->country }}
                             </p>
                         @endif

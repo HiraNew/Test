@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\UserDashboard;
 
 use App\Http\Controllers\Controller;
+use App\Models\Addre;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -52,8 +53,10 @@ class UserProfileController extends Controller
                         ->orderBy('created_at', 'desc')
                         ->limit(5)
                         ->get();
+        $address = Addre::select('address','pincode')->where('user_id', Auth::id())->get();
+        // dd($address);
 
-        return view('Order.show', compact('payment', 'recentPayments'));
+        return view('Order.show', compact('payment', 'recentPayments', 'address'));
     }
 
 
