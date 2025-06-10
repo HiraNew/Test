@@ -22,6 +22,11 @@ class LoginController extends Controller
         ]);
 
         $user = User::where('number', $request->number)->first();
+        // dd($user->verified);
+        if($user->verified !== 1){
+            Auth::guard('web')->logout();
+            return back()->withErrors(['number' => 'Due to unusual active you are temprarly bolcked.']);
+        }
 
         if (!$user) {
             return back()->withErrors(['number' => 'Mobile number not found.']);

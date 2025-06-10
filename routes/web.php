@@ -48,6 +48,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/wishlist/bulk-delete', [UserWishListController::class, 'bulkDelete'])->name('wishlist.bulkDelete');
     Route::post('/cart/bulk-delete', [UserWishListController::class, 'cartBulkDelete'])->name('cart.bulkDelete');
     Route::get('/userAccount', [UserProfileController::class, 'userAccount'])->name('user.account');
+    Route::get('/payments', [UserProfileController::class, 'index'])->name('payments.index');
+    Route::get('/payments/{payment}', [UserProfileController::class, 'show'])->name('payments.show');
     
     
     Route::match(['get', 'post'],'/addTocart/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'addTocart'])->name('addCart');

@@ -8,19 +8,31 @@ use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Subcategory;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
     public function index()
+    {
+        // Initial load with dashboard data
+        $data = $this->getDashboardData();
+        return view('admin.dashboard.index', $data);
+    }
+
+    public function fetchDashboardData()
+    {
+        $data = $this->getDashboardData();
+        return response()->json($data);
+    }
+
+    private function getDashboardData()
     {
         $today = today();
         $now = now();
         $successful = 'successful';
         $pending = 'pending';
 
-        // Grouped Stats
         $stats = [
             'Users & Vendors' => [
                 ['title' => 'Total Registered Users', 'value' => User::count()],
@@ -30,7 +42,7 @@ class DashboardController extends Controller
             'Catalog' => [
                 ['title' => 'Total Categories', 'value' => Category::count()],
                 ['title' => 'Total Subcategories', 'value' => Subcategory::count()],
-                ['title' => 'Total Products Available', 'value' => Product::where('status', 'available')->count()],
+                ['title' => 'Total Products Available', 'value' => Product::where('status', 'active')->count()],
             ],
             'Revenue (Successful Orders)' => [
                 ['title' => 'Total Revenue', 'value' => Payment::where('status', $successful)->sum('amount')],
@@ -44,8 +56,8 @@ class DashboardController extends Controller
                 ['title' => 'Pending Orders Today', 'value' => Payment::where('status', $pending)->whereDate('created_at', $today)->count()],
             ]
         ];
+        // dd($stats);
 
-        // Chart Data
         $monthlyData = Payment::where('status', $successful)
             ->whereMonth('created_at', $now->month)
             ->selectRaw('DAY(created_at) as day, SUM(amount) as revenue')
@@ -73,26 +85,32 @@ class DashboardController extends Controller
         $dailyRevenue = $dailyData->pluck('revenue');
 
         $recentOrders = Payment::with('user')
-            ->selectRaw('
-                orderid,
-                user_id,
-                MAX(status) as status,
-                MAX(payment_mode) as payment_mode,
-                SUM(amount) as total_amount,
-                COUNT(*) as item_count,
-                MAX(order_date) as order_date
-            ')
-            ->groupBy('orderid', 'user_id')
-            ->orderByDesc('order_date')
-            ->take(10)
-            ->get();
+        ->selectRaw('
+            orderid,
+            user_id,
+            MAX(status) as status,
+            MAX(payment_mode) as payment_mode,
+            SUM(amount) as total_amount,
+            COUNT(*) as item_count,
+            MAX(order_date) as order_date
+        ')
+        ->groupBy('orderid', 'user_id')
+        ->orderByDesc('order_date')
+        ->take(10)
+        ->get();
+    //    dd($recentOrders[0]->user->name);
 
-        return view('admin.dashboard.index', compact(
-            'stats',
-            'monthlyLabels', 'monthlyRevenue',
-            'weeklyLabels', 'weeklyRevenue',
-            'dailyLabels', 'dailyRevenue',
-            'recentOrders'
-        ));
+
+
+        return [
+            'stats' => $stats,
+            'monthlyLabels' => $monthlyLabels,
+            'monthlyRevenue' => $monthlyRevenue,
+            'weeklyLabels' => $weeklyLabels,
+            'weeklyRevenue' => $weeklyRevenue,
+            'dailyLabels' => $dailyLabels,
+            'dailyRevenue' => $dailyRevenue,
+            'recentOrders' => $recentOrders,
+        ];
     }
 }

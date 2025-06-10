@@ -186,7 +186,7 @@
             <div class="d-flex align-items-center w-100 gap-2">
 
                 {{-- Brand --}}
-                <a class="navbar-brand fw-bold text-primary mb-0 me-1 flex-shrink-0" href="{{ url('/') }}" style="font-size: 1rem;">
+                <a class="navbar-brand fw-bold text-primary mb-0 me-1 flex-shrink-0" href="{{ ('products') }}" style="font-size: 1rem;">
                     {{ config('app.name', 'DLS') }}
                 </a>
 

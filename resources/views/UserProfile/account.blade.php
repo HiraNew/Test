@@ -69,26 +69,29 @@
     <!-- Buttons -->
     <div class="row g-3 text-center mb-4">
         <div class="col-6 col-md-3">
-            <div class="feature-btn h-100">
+            <a href="{{ route('payments.index') }}" class="feature-btn h-100 d-block text-decoration-none text-dark">
                 📦<br><strong>Orders</strong>
-            </div>
+            </a>
         </div>
         <div class="col-6 col-md-3">
-            <div class="feature-btn h-100">
+            <a href="{{ route('wishlist.index') }}" class="feature-btn h-100 d-block text-decoration-none text-dark">
                 ❤️<br><strong>Wishlist</strong>
-            </div>
+            </a>
         </div>
         <div class="col-6 col-md-3">
-            <div class="feature-btn h-100">
+            {{-- {{ route('coupons.index') }} --}}
+            <a href="#" class="feature-btn h-100 d-block text-decoration-none text-dark">
                 🎟️<br><strong>Coupons</strong>
-            </div>
+            </a>
         </div>
         <div class="col-6 col-md-3">
-            <div class="feature-btn h-100">
+            {{-- {{ route('help.index') }} --}}
+            <a href="#" class="feature-btn h-100 d-block text-decoration-none text-dark">
                 🎧<br><strong>Help Center</strong>
-            </div>
+            </a>
         </div>
     </div>
+
 
     <!-- Finance Options -->
     <div class="card mb-3">
@@ -98,8 +101,8 @@
                 <li class="mb-2">
                     <a href="#" class="text-decoration-none d-flex justify-content-between align-items-start">
                         <div>
-                            <strong>Flipkart Personal Loan</strong><br>
-                            <small class="text-muted">Pre-approved loan up to ₹10,00,000</small>
+                            <strong>Dls Personal Loan</strong><br>
+                            <small class="text-muted">Pre-approved loan up to ₹100,000</small>
                         </div>
                         ➡️
                     </a>
@@ -107,7 +110,7 @@
                 <li>
                     <a href="#" class="text-decoration-none d-flex justify-content-between align-items-start">
                         <div>
-                            <strong>Flipkart Axis Bank Credit Card</strong><br>
+                            <strong>Dls Axis Bank Credit Card</strong><br>
                             <small class="text-muted">Get ₹1,000 + ₹500 Gift Voucher, Offer Ending Soon!</small>
                         </div>
                         ➡️
@@ -145,31 +148,3 @@
     </div>
 </div>
 @endsection
-
-<!-- Bottom Navigation -->
-{{-- <nav class="bottom-nav d-flex justify-content-around py-2">
-    <a href="#">
-        <div>🏠</div>
-        <div>Home</div>
-    </a>
-    <a href="#">
-        <div>🎮</div>
-        <div>Play</div>
-    </a>
-    <a href="#">
-        <div>📂</div>
-        <div>Categories</div>
-    </a>
-    <a href="#">
-        <div>👤</div>
-        <div>Account</div>
-    </a>
-    <a href="#" class="position-relative">
-        <div>🛒</div>
-        <div>Cart</div>
-        <span class="badge bg-danger badge-cart">20</span>
-    </a>
-</nav>
-
-</body>
-</html> --}}
