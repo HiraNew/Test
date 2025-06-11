@@ -33,5 +33,6 @@
     @else
         <p>No orders found.</p>
     @endif
+    
 </div>
 @endsection

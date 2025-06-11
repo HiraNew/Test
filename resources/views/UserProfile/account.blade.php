@@ -146,5 +146,84 @@
             </a>
         </div>
     </div>
+    @if($recentViews->count())
+            <div class="mt-5">
+                <h5 class="fw-semibold mb-3">Recently Viewed</h5>
+
+                <div class="position-relative">
+                    <!-- Left Scroll Button -->
+                    <button class="scroll-btn left position-absolute top-50 start-0 translate-middle-y btn btn-light shadow-sm" style="z-index: 10;" onclick="scrollRecently(-1)">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+
+                    <!-- Scrollable Container -->
+                    <div id="recent-scroll" class="d-flex overflow-auto px-2 py-1" style="gap: 10px; scroll-behavior: smooth;">
+                        @foreach($recentViews as $recent)
+                            <a href="{{ url('detail', $recent->id) }}" class="text-decoration-none">
+                                <div class="card border-0 shadow-sm" style="min-width: 140px; max-width: 140px; font-size: 0.85rem;">
+                                    <button class="btn btn-light position-absolute top-0 end-0 m-1 wishlist-btn p-1" data-id="{{ $recent->id }}">
+                                <i class="{{ in_array($recent->id, $wishlistProductIds ?? []) ? 'fas' : 'far' }} fa-heart text-danger"></i>
+                            </button>
+                                    <img src="{{ asset($recent->image ?? $recent->images->first()->image_path ?? 'placeholder.jpg') }}"
+                                        alt="{{ $recent->name }}"
+                                        class="card-img-top" style="height: 100px; object-fit: contain;">
+                                    <div class="card-body p-2">
+                                        <h6 class="card-title text-truncate mb-1" title="{{ $recent->name }}">{{ $recent->name }}</h6>
+                                        <p class="text-success fw-bold mb-1">₹{{ number_format($recent->price, 0) }}</p>
+
+                                        @if($recent->averageRating > 0)
+                                            <div class="d-flex align-items-center">
+                                                @php
+                                                    $avgRating = round($recent->averageRating, 1);
+                                                    $fullStars = floor($avgRating);
+                                                    $hasHalfStar = ($avgRating - $fullStars) >= 0.25 && ($avgRating - $fullStars) < 0.75;
+                                                    $emptyStars = 5 - $fullStars - ($hasHalfStar ? 1 : 0);
+                                                @endphp
+
+                                                {{-- Full Stars --}}
+                                                @for ($i = 0; $i < $fullStars; $i++)
+                                                    <i class="fa fa-star text-success"></i>
+                                                @endfor
+
+                                                {{-- Half Star --}}
+                                                @if ($hasHalfStar)
+                                                    <i class="fa fa-star-half-alt text-success"></i>
+                                                @endif
+
+                                                {{-- Empty Stars --}}
+                                                @for ($i = 0; $i < $emptyStars; $i++)
+                                                    <i class="far fa-star text-muted"></i>
+                                                @endfor
+
+                                                <small class="ms-1 text-muted">({{ number_format($recent->averageRating, 1) }})</small>
+                                            </div>
+                                        @else
+                                            <small class="text-muted">No ratings yet</small>
+                                        @endif
+
+                                    </div>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+
+                    <!-- Right Scroll Button -->
+                    <button class="scroll-btn right position-absolute top-50 end-0 translate-middle-y btn btn-light shadow-sm" style="z-index: 10;" onclick="scrollRecently(1)">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        @endif
 </div>
+<script>
+    function scrollRecently(direction) {
+        const container = document.getElementById('recent-scroll');
+        const scrollAmount = 200;
+        container.scrollBy({
+            left: direction * scrollAmount,
+            behavior: 'smooth'
+        });
+    }
+
+</script>
 @endsection

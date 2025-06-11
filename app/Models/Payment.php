@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Payment extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'is_canceled',
+        'status',
+    ];
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -16,6 +20,11 @@ class Payment extends Model
     {
         return $this->belongsTo(Product::class, 'product_id');
     }
+    public function address()
+    {
+        return $this->hasOne(Addre::class, 'payment_id', 'id');
+    }
+
     
 
 

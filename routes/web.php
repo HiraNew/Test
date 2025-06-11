@@ -50,6 +50,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/userAccount', [UserProfileController::class, 'userAccount'])->name('user.account');
     Route::get('/payments', [UserProfileController::class, 'index'])->name('payments.index');
     Route::get('/payments/{payment}', [UserProfileController::class, 'show'])->name('payments.show');
+    // update address start
+    Route::get('/states/{countryId}', [UserProfileController::class, 'getStates']);
+    Route::get('/cities/{stateId}', [UserProfileController::class, 'getCities']);
+    Route::put('/address/update/{payment}', [UserProfileController::class, 'update'])->name('address.update');
+    Route::put('/order/cancel/{payment}', [UserProfileController::class, 'cancel'])->name('order.cancel');
+    // Update address end
     
     
     Route::match(['get', 'post'],'/addTocart/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'addTocart'])->name('addCart');

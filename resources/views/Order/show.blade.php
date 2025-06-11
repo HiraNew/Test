@@ -4,130 +4,250 @@
 <style>
     /* Container for tracker */
     .tracker {
-        display: flex;
-        justify-content: space-between;
         position: relative;
-        margin: 30px 0;
-        padding: 0 15px;
-        flex-wrap: nowrap; /* keep in one line */
-        overflow-x: auto; /* allow horizontal scroll on small */
-        -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
+        padding-left: 40px;
+        margin-top: 20px;
     }
 
-    /* Hide scrollbar for Chrome, Safari and Opera */
-    .tracker::-webkit-scrollbar {
-        display: none;
-    }
-    /* Hide scrollbar for IE, Edge and Firefox */
-    .tracker {
-        -ms-overflow-style: none;  /* IE and Edge */
-        scrollbar-width: none;  /* Firefox */
-    }
-
-    /* Line connecting steps */
     .tracker::before {
         content: '';
         position: absolute;
-        top: 50%;
-        left: 40px; /* shift from left to avoid overlap with circle */
-        right: 40px; /* shift from right */
-        height: 4px;
-        background: #e9ecef;
-        transform: translateY(-50%);
+        top: 0;
+        bottom: 0;
+        left: 24px;
+        width: 2px;
+        background-color: #ccc;
         z-index: 0;
     }
 
-    /* Each step */
     .tracker-step {
+        display: flex;
+        align-items: center;
         position: relative;
+        margin-bottom: 30px;
         z-index: 1;
-        background: #e9ecef;
-        color: #6c757d;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        text-align: center;
-        line-height: 40px;
-        font-weight: 600;
-        user-select: none;
-        cursor: default;
-        flex-shrink: 0;
-        margin-right: 60px; /* space between steps */
-        transition: background-color 0.3s, color 0.3s;
     }
 
-    /* Remove margin-right on last step */
     .tracker-step:last-child {
-        margin-right: 0;
+        margin-bottom: 0;
     }
 
-    /* Completed step */
-    .tracker-step.completed {
-        background: #198754;
+    .step-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: #ccc;
         color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        position: absolute;
+        left: 10px;
+        top: 0;
+        z-index: 2;
     }
 
-    /* Current step */
-    .tracker-step.current {
-        background: #ffc107;
-        color: black;
-        font-weight: 700;
-        box-shadow: 0 0 10px #ffc107aa;
+    .step-label {
+        margin-left: 40px;
+        font-size: 14px;
     }
 
-    /* Step label text */
-    .tracker-label {
-        margin-top: 8px;
-        font-size: 0.8rem;
-        max-width: 70px;
-        word-wrap: break-word;
-        white-space: normal;
+    .completed .step-icon {
+        background-color: green;
     }
+
+    .current .step-icon {
+        background-color: orange;
+        animation: blink 1s step-end infinite;
+    }
+
+    /* @keyframes blink {
+        50% {
+            opacity: 0;
+        }
+    } */
+
+    /* Add small dot between steps */
+    .tracker-step::after {
+        content: '';
+        position: absolute;
+        left: 23px;
+        top: 30px;
+        height: calc(100% - 30px);
+        width: 4px;
+        background-color: #ccc;
+        z-index: 0;
+    }
+
+    .tracker-step:last-child::after {
+        content: none;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 768px) {
+        .step-label {
+            font-size: 12px;
+        }
+
+        .step-icon {
+            width: 24px;
+            height: 24px;
+            font-size: 13px;
+            left: 5px;
+        }
+
+        .tracker::before {
+            left: 17px;
+        }
+
+        .tracker-step::after {
+            left: 17px;
+        }
+
+        .step-label {
+            margin-left: 35px;
+        }
+    }
+    .modal-content {
+        border-radius: 10px;
+        padding: 20px;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        color: #343a40;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #495057;
+    }
+    @media (min-width: 992px) {
+        .tracker {
+            padding-left: 50px;
+        }
+
+        .tracker-step {
+            margin-bottom: 40px;
+        }
+
+        .step-icon {
+            width: 36px;
+            height: 36px;
+            font-size: 18px;
+        }
+
+        .step-label {
+            font-size: 16px;
+            margin-left: 50px;
+        }
+    }
+        .container {
+        max-width: 1140px;
+    }
+    .card {
+        background-color: #ffffff;
+        border-radius: 1rem;
+        border: none;
+    }
+
+
 
 </style>
+    @php
+    $returnDays = $payment->product->extra1 ?? 0;
+    $eligibleDate = $payment->created_at->copy()->addDays($returnDays);
+    if ($payment->staus !== 'pending') {
+        $isReturnEligible = '';
+    }
+    else {
+       $isReturnEligible = now()->lte($eligibleDate) && is_null($payment->return_period);
+    }
+    @endphp
 
 <div class="container my-5">
-    <div class="row gap-4">
-        <div class="col-12 col-lg-8">
-            <div class="card p-4 shadow-sm">
+    <div class="row justify-content-center">
+     <div class="col-12 col-md-10 col-lg-8 col-xl-7">
+            <p><strong>Order ID - </strong> {{ $payment->orderid }}</p>
+            <div class="card p-4 shadow-sm bg-white rounded-4 border-0">
                 <div class="row">
                     <h2>Order Details - #{{ $payment->product->name }}</h2>
                     @if($payment->product->image)
                         <img src="{{ url($payment->product->image) }}" 
                             alt="{{ $payment->product->name }}" 
-                            class="img-fluid h-100 w-100" 
-                            style="object-fit: contain;">
+                            class="img-fluid" 
+                            style="max-height: 400px; object-fit: contain;">
                     @else
                         <img src="{{ asset('images/default-product.png') }}" 
                             alt="No Image" 
                             class="img-fluid h-100 w-100" 
                             style="object-fit: contain;">
                     @endif
-                    <div class="col-12 col-lg-8">
-                        <p><strong>Amount:</strong> ₹{{ number_format($payment->amount, 2) }}</p>
-                        <p><strong>Status:</strong> 
+                    <div class="col-lg-8">
+                        <hr>
+                        <h4>Price Details</h4>
+
+                        <div class="mb-2 d-flex justify-content-between">
+                            <span><strong>Amount:</strong></span>
+                            <span>₹{{ number_format($payment->amount, 2) }}</span>
+                        </div>
+
+                        <div class="mb-2 d-flex justify-content-between">
+                            <span><strong>Status:</strong></span>
                             <span class="@if($payment->status == 'delivered') text-success
                                         @elseif($payment->status == 'cancelled') text-danger
                                         @else text-warning
                                         @endif">
                                 {{ ucfirst($payment->status) }}
                             </span>
-                        </p>
-                        <p><strong>Order Date :</strong> {{ $payment->created_at->format('d M Y, h:i A') }}</p>
-                        <p><strong>Mode of payment : </strong> {{ $payment->payment_mode ? 'Cash on delivery' : 'Online Payment' }}</p>
-                        <p><strong>Order Id : </strong> {{ $payment->orderid }}</p>
-                        @if ($payment->status === 'shipped')
-                            <span class="btn btn-success mb-3">Contact Agent: {{ $payment->agent ?? 'Wait For Delivery Person.' }}</span>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <span>Shipping Charges</span>
+                            <span>₹0</span>
+                        </div>
+
+                        <div class="mb-2 d-flex justify-content-between">
+                            <span><strong>Order Date:</strong></span>
+                            <span>{{ $payment->created_at->setTimezone('Asia/Kolkata')->format('d M Y, h:i A') }}</span>
+                        </div>
+
+                        <div class="mb-2 d-flex justify-content-between">
+                            <span><strong>Mode of Payment:</strong></span>
+                            <span>{{ $payment->payment_mode ? 'Cash on delivery' : 'Online Payment' }}</span>
+                        </div>
+
+                        @if ($payment->status === 'delivered' && $eligibleDate)
+                            <div class="mb-2 d-flex justify-content-between">
+                                <span><strong>Return Policy Ends:</strong></span>
+                                <span>{{ $eligibleDate->setTimezone('Asia/Kolkata')->format('d M Y, h:i A') }}</span>
+                            </div>
                         @endif
+
+                        <hr class="my-2">
+
+                        <div class="d-flex justify-content-between fw-bold">
+                            <span>Total Amount</span>
+                            <span>₹{{ number_format($payment->amount, 2) }}</span>
+                        </div>
+                        
+
+                        @if ($payment->status === 'shipped')
+                            <div class="mt-3">
+                                <span class="btn btn-success w-100">Contact Agent: {{ $payment->agent ?? 'Wait For Delivery Person.' }}</span>
+                            </div>
+                        @endif
+
 
                         {{-- Shipping Address --}}
                         @if($address)
+                        {{-- @dd($address) --}}
                             <hr>
                             <h4>Shipping Address</h4>
                             <p>
-                                {{ $address->address }}<br>
-                                {{ $address->pincode }}, {{ $payment->address->state }} - {{ $payment->address->postal_code }}<br>
-                                {{ $payment->address->country }}
+                                {{-- {{ $address[0]['address'] }}<br>
+                                {{ $address[0]['pincode'] }} --}}
                             </p>
                         @endif
 
@@ -144,158 +264,252 @@
                             @foreach($statuses as $index => $status)
                                 @php
                                     $class = '';
-                                    if ($index < $currentIndex) {
-                                        $class = 'completed';
-                                    } elseif ($index == $currentIndex) {
-                                        $class = 'current';
-                                    }
+                                    if ($index < $currentIndex) $class = 'completed';
+                                    elseif ($index == $currentIndex) $class = 'current';
                                 @endphp
-                                <div class="text-center">
-                                    <div class="tracker-step {{ $class }}">
-                                        {{ $index + 1 }}
+                                <div class="tracker-step {{ $class }}">
+                                    <div class="step-icon">
+                                        @if($class == 'completed')
+                                            <i class="fas fa-check"></i>
+                                        @else
+                                            {{ $index + 1 }}
+                                        @endif
                                     </div>
-                                    <div class="tracker-label">{{ ucfirst($status) }}</div>
+                                    <div class="step-label">{{ ucfirst($status) }}</div>
                                 </div>
                             @endforeach
                         </div>
 
-                        {{-- Action buttons --}}
-                        @if($payment->status !== 'delivered' && $payment->status !== 'cancelled')
-                        <div class="d-flex justify-content-between mt-4">
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editAddressModal">Edit Address</button>
-                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">Cancel Order</button>
+
                         </div>
+                        @if($payment->status !== 'delivered' || $payment->status !== 'cancelled' || $payment->status !== 'shipped')
+                            <div class="d-flex justify-content-between mt-4">
+                                <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editAddressModal">Edit Address?</button>
+                                
+                                @if($isReturnEligible === '' || $payment->status !== 'cancelled' && $payment->status === 'shipped')
+                                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">Cancel Order?</button>
+                                @endif
+                            </div>
                         @endif
+
                         @if($payment->status === 'delivered' || $payment->status === 'cancelled')
                         <div class="d-flex justify-content-center mt-4">
                             <a href="{{ route('detail', $payment->product->id) }}">
-                                <button class="btn btn-primary">Order Again?</button>
+                                <button class="btn btn-success">Order Again?</button>
                             </a>
                         </div>
                         @endif
+                        <div class="d-flex justify-content-center mt-4">
+                            <a href="{{ route('detail', $payment->product->id) }}">
+                                Help?
+                            </a>
+                        </div>
+                        
                     </div>
                 </div>
+                
             </div>
-
+               @if (isset($payment->is_canceled))
+                            <div class="d-flex justify-content-between">
+                                <h4>Cancel by you.</h4>
+                            <span>Cancelation Reason :</span>
+                            <span>{{$payment->is_canceled}}</span>
+                        </div>
+                        @endif
         </div>
 
-        <div class="col-12 col-lg-4">
-            <div class="card p-4 shadow-sm">
-                <h4>Recent Orders</h4>
-                <ul class="list-group">
-                    @forelse($recentPayments as $recent)
-                        <li class="list-group-item">
-                            <a href="{{ route('payments.show', $recent->id) }}">
-                                Order #{{ $recent->product->name }} - ₹{{ number_format($recent->amount, 2) }}<br>
-                                <small class="text-muted">{{ $recent->created_at->format('d M Y') }}</small>
-                            </a>
-                        </li>
-                    @empty
-                        <li class="list-group-item">No recent orders.</li>
-                    @endforelse
-                </ul>
-            </div>
-        </div>
     </div>
 </div>
 
 {{-- Edit Address Modal --}}
-<div class="modal fade" id="editAddressModal" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    {{-- {{ route('payments.updateAddress', $payment->id) }} --}}
-    <form action="#" method="POST" class="modal-content">
-        @csrf
-        @method('PUT')
+<!-- Address Update Modal -->
+    <div class="modal fade" id="editAddressModal" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg"> <!-- Wider modal for better layout -->
+            <form action="{{ route('address.update', $payment->id) }}" method="POST" class="modal-content p-3">
+                @csrf
+                @method('PUT')
 
-      <div class="modal-header">
-        <h5 class="modal-title" id="editAddressModalLabel">Edit Shipping Address</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editAddressModalLabel">Edit Shipping Address</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
 
-        <div class="mb-3">
-            <label for="address_line_modal" class="form-label">Address Line</label>
-            <input type="text" class="form-control" id="address_line_modal" name="address_line" value="{{ old('address_line', $payment->address->address_line ?? '') }}" required>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <!-- Address Line -->
+                        <div class="col-12">
+                            <label for="address_line_modal" class="form-label">Address Line</label>
+                            <input type="text" class="form-control" id="address_line_modal" name="address_line"
+                                value="{{ old('address_line', $payment->address->address_line ?? '') }}" required>
+                        </div>
+
+                        <!-- Country, State, City -->
+                        <div class="col-md-4">
+                            <label for="country" class="form-label">Country</label>
+                            <select id="country" name="country" class="form-select" required>
+                                <option value="">Select Country</option>
+                                @foreach($countries as $id => $name)
+                                    <option value="{{ $id }}"
+                                        {{ old('country', $payment->address->country ?? '') == $id ? 'selected' : '' }}>
+                                        {{ $name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="state" class="form-label">State</label>
+                            <select id="state" name="state" class="form-select" required>
+                                <option value="">Select State</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="city" class="form-label">City</label>
+                            <select id="city" name="city" class="form-select" required>
+                                <option value="">Select City</option>
+                            </select>
+                        </div>
+
+                        <!-- Postal and Pincode -->
+                        <div class="col-md-6">
+                            <label for="postal_code" class="form-label">Postal Code</label>
+                            <input type="text" class="form-control" id="postal_code" name="postal_code"
+                                value="{{ old('postal_code', $payment->address->postal_code ?? '') }}" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="pincode" class="form-label">Pincode</label>
+                            <input type="text" class="form-control" id="pincode" name="pincode"
+                                value="{{ old('pincode', $payment->address->pincode ?? '') }}" required>
+                        </div>
+
+                        <!-- Mobile Numbers -->
+                        <div class="col-md-6">
+                            <label for="mobile_number" class="form-label">Mobile Number</label>
+                            <input type="text" class="form-control" id="mobile_number" name="mobile_number"
+                                value="{{ old('mobile_number', $payment->address->mobile_number ?? '') }}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="alt_mobile_number" class="form-label">Alt. Mobile Number</label>
+                            <input type="text" class="form-control" id="alt_mobile_number" name="alt_mobile_number"
+                                value="{{ old('alt_mobile_number', $payment->address->alt_mobile_number ?? '') }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer mt-3">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Update Address</button>
+                </div>
+            </form>
         </div>
+    </div>
 
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="city_modal" class="form-label">City</label>
-                <input type="text" class="form-control" id="city_modal" name="city" value="{{ old('city', $payment->address->city ?? '') }}" required>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="state_modal" class="form-label">State</label>
-                <input type="text" class="form-control" id="state_modal" name="state" value="{{ old('state', $payment->address->state ?? '') }}" required>
-            </div>
+
+<!-- Cancel Order Modal -->
+    <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form action="{{ route('order.cancel', $payment->id) }}" method="POST" class="modal-content" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                @csrf
+                @method('PUT')
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelOrderModalLabel">Cancel Order - Reason</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <p>Please select a reason for cancellation:</p>
+                    <div class="form-check">
+                    <input class="form-check-input" type="radio" name="cancel_reason" id="reason1" value="Found a better price elsewhere" required>
+                    <label class="form-check-label" for="reason1">
+                        Found a better price elsewhere
+                    </label>
+                    </div>
+                    <div class="form-check">
+                    <input class="form-check-input" type="radio" name="cancel_reason" id="reason2" value="Ordered by mistake" required>
+                    <label class="form-check-label" for="reason2">
+                        Ordered by mistake
+                    </label>
+                    </div>
+                    <div class="form-check">
+                    <input class="form-check-input" type="radio" name="cancel_reason" id="reason3" value="Shipping is too slow" required>
+                    <label class="form-check-label" for="reason3">
+                        Shipping is too slow
+                    </label>
+                    </div>
+                    <div class="form-check">
+                    <input class="form-check-input" type="radio" name="cancel_reason" id="reason4" value="Other reasons" required>
+                    <label class="form-check-label" for="reason4">
+                        Other reasons
+                    </div>
+                    <div id="otherReasonInput" class="mt-2" style="display: none;">
+                        <label for="other_reason_text" class="form-label">Please specify:</label>
+                        <input type="text" class="form-control" id="other_reason_text" name="other_reason_text" placeholder="Please enter reason for cancellation.">
+                    </label>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger">Confirm Cancel</button>
+                </div>
+            </form>
         </div>
+    </div>
 
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="postal_code_modal" class="form-label">Postal Code</label>
-                <input type="text" class="form-control" id="postal_code_modal" name="postal_code" value="{{ old('postal_code', $payment->address->postal_code ?? '') }}" required>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="country_modal" class="form-label">Country</label>
-                <input type="text" class="form-control" id="country_modal" name="country" value="{{ old('country', $payment->address->country ?? '') }}" required>
-            </div>
-        </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const otherRadio = document.getElementById('reason4');
+    const otherInput = document.getElementById('otherReasonInput');
+    const allRadios = document.querySelectorAll('input[name="cancel_reason"]');
 
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">Update Address</button>
-      </div>
-    </form>
-  </div>
-</div>
+    function toggleOtherInput() {
+        if (otherRadio.checked) {
+            otherInput.style.display = 'block';
+            document.getElementById('other_reason_text').setAttribute('required', 'required');
+        } else {
+            otherInput.style.display = 'none';
+            document.getElementById('other_reason_text').removeAttribute('required');
+        }
+    }
 
-{{-- Cancel Order Modal --}}
-<div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    {{-- {{ route('payments.cancel', $payment->id) }} --}}
-    <form action="#" method="POST" class="modal-content" onsubmit="return confirm('Are you sure you want to cancel this order?');">
-        @csrf
-        @method('PUT')
+    allRadios.forEach(radio => radio.addEventListener('change', toggleOtherInput));
+    toggleOtherInput(); // run on load
+});
 
-      <div class="modal-header">
-        <h5 class="modal-title" id="cancelOrderModalLabel">Cancel Order - Reason</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
 
-        <p>Please select a reason for cancellation:</p>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="cancel_reason" id="reason1" value="Found a better price elsewhere" required>
-          <label class="form-check-label" for="reason1">
-            Found a better price elsewhere
-          </label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="cancel_reason" id="reason2" value="Ordered by mistake" required>
-          <label class="form-check-label" for="reason2">
-            Ordered by mistake
-          </label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="cancel_reason" id="reason3" value="Shipping is too slow" required>
-          <label class="form-check-label" for="reason3">
-            Shipping is too slow
-          </label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="cancel_reason" id="reason4" value="Other reasons" required>
-          <label class="form-check-label" for="reason4">
-            Other reasons
-          </label>
-        </div>
+    document.getElementById('country').addEventListener('change', function() {
+        let countryId = this.value;
+        if (countryId) {
+            fetch(`/states/${countryId}`)
+                .then(response => response.json())
+                .then(data => {
+                    let stateSelect = document.getElementById('state');
+                    stateSelect.innerHTML = '<option value="">Select State</option>';
+                    for (let id in data) {
+                        stateSelect.innerHTML += `<option value="${id}">${data[id]}</option>`;
+                    }
+                });
+        }
+    });
 
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-danger">Confirm Cancel</button>
-      </div>
-    </form>
-  </div>
-</div>
+    document.getElementById('state').addEventListener('change', function() {
+        let stateId = this.value;
+        if (stateId) {
+            fetch(`/cities/${stateId}`)
+                .then(response => response.json())
+                .then(data => {
+                    let citySelect = document.getElementById('city');
+                    citySelect.innerHTML = '<option value="">Select City</option>';
+                    for (let id in data) {
+                        citySelect.innerHTML += `<option value="${id}">${data[id]}</option>`;
+                    }
+                });
+        }
+    });
+</script>
+
 
 @endsection

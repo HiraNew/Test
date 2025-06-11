@@ -47,6 +47,18 @@ class Product extends Model
     {
         return $this->belongsToMany(User::class, 'wishlists');
     }
+    // Accessor for average rating
+    public function getAverageRatingAttribute()
+    {
+        return $this->reviews_avg_rating;
+    }
+
+    // Accessor for wishlist count
+    public function getWishlistCountAttribute()
+    {
+        return $this->wishlists_count ?? 0;
+    }
+
 
 
 
