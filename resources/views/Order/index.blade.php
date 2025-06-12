@@ -28,7 +28,7 @@
         </div>
 
         <div class="mt-4">
-            {{ $payments->links() }}
+          Showing  {{ $payments->count() }} on page {{ $payments->links() }}
         </div>
     @else
         <p>No orders found.</p>

@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/cities/{stateId}', [UserProfileController::class, 'getCities']);
     Route::put('/address/update/{payment}', [UserProfileController::class, 'update'])->name('address.update');
     Route::put('/order/cancel/{payment}', [UserProfileController::class, 'cancel'])->name('order.cancel');
+    Route::get('/villages/{cityId}', [UserProfileController::class, 'getVillages']);
     // Update address end
     
     

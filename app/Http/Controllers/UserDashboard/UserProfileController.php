@@ -11,7 +11,9 @@ use App\Models\Payment;
 use App\Models\Product;
 use App\Models\RecentView;
 use App\Models\State;
+use App\Models\Village;
 use App\Models\Wishlist;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,6 +23,8 @@ class UserProfileController extends Controller
     {
         // Assuming you have user authentication
         $user = Auth::user();
+        $nowKolkata = Carbon::now('Asia/Kolkata');
+        $nowKolkata->format('d M Y, h:i A');
 
         // Sample data — replace these with real queries if needed
         $membership = [
@@ -45,7 +49,7 @@ class UserProfileController extends Controller
                 foreach ($Products as $product) {
                     RecentView::updateOrCreate(
                         ['user_id' => Auth::id(), 'product_id' => $product->id],
-                        ['viewed_at' => now()]
+                        ['viewed_at' =>  $nowKolkata->format('d M Y, h:i A')]
                     );
                 }
 
@@ -91,8 +95,24 @@ class UserProfileController extends Controller
             ->limit(5)
             ->get();
 
-        $address = Addre::where('user_id', Auth::id())->first();
+            // dd($recentPayments);
 
+       $userId = Auth::id();
+
+        $address = Addre::with(['country', 'state', 'city', 'village'])
+            ->where('payment_id', $paymentId)
+            ->first();
+
+        // Fallback to user_id if no address found for payment_id
+        if (!$address) {
+            $address = Addre::with(['country', 'state', 'city', 'village'])
+                ->where('user_id', $userId)
+                ->first();
+        }
+
+        if (!$address) {
+            return back()->with('error', 'No address found for this payment or user.');
+        }
         $productReturnDays = $payment->product->extra1 ?? 0;
         $deliveryDate = $payment->delivery_date ? \Carbon\Carbon::parse($payment->delivery_date) : null;
         $eligibleDate = $deliveryDate ? $deliveryDate->copy()->addDays($productReturnDays) : null;
@@ -113,7 +133,7 @@ class UserProfileController extends Controller
 
     public function update(Request $request, $paymentId)
     {
-        // dd($request->all());
+        
         $request->validate([
             'address_line' => 'required|string|max:255',
             'city' => 'required|string|max:100',
@@ -122,26 +142,25 @@ class UserProfileController extends Controller
             'country' => 'required|string|max:100',
             'mobile_number' => 'string|max:15',
             'alt_mobile_number' => 'nullable|string|max:15',
+            'village' => 'required|string|max:100',
         ]);
 
         $payment = Payment::with('address')->findOrFail($paymentId);
 
         $address = $payment->address;
-
-        if (!$address) {
-            // Optionally create a new address if not exists
-            $address = new Addre();
-            $address->user_id = Auth::id();
-            $address->payment_id = $paymentId;
-        }
+        $id = Auth::id();
+        $address = Addre::firstOrNew(['user_id' => $id]);
+        $address->user_id = $id;
+        $address->payment_id = $paymentId;
         $address->address = $request->address_line;
-        $address->city = $request->city;
-        $address->state = $request->state;
+        $address->city_id = $request->city;          // Use city_id, not city
+        $address->state_id = $request->state;        // Use state_id
+        $address->country_id = $request->country;    // Use country_id
         $address->postal_code = $request->postal_code;
-        $address->country = $request->country;
         $address->mobile_number = $request->mobile_number;
         $address->alt_mobile_number = $request->alt_mobile_number;
         $address->save();
+
 
 
         return back()->with('success', 'Address updated successfully.');
@@ -179,6 +198,14 @@ class UserProfileController extends Controller
         $cities = City::where('state_id', $stateId)->pluck('name', 'id');
         return response()->json($cities);
     }
+    // In your controller
+
+    public function getVillages($cityId)
+    {
+        $villages = Village::where('city_id', $cityId)->pluck('name', 'id');
+        return response()->json($villages);
+    }
+
 
 
 

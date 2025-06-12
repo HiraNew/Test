@@ -114,7 +114,6 @@
                             </tr>
                         @endforeach
                     </tbody>
-
                 </table>
             </div>
         </div>
@@ -232,7 +231,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         loadDashboardData();               // initial fetch
-        setInterval(loadDashboardData, 5000); // every 30 seconds
+        setInterval(loadDashboardData, 50000000); // every 30 seconds
 
         // Initialize Bootstrap tooltips
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));

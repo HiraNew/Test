@@ -22,7 +22,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderConfirmationMail;
+use App\Models\City;
+use App\Models\Country;
+use App\Models\State;
 use App\Models\Subcategory;
+use App\Models\Village;
 
 class ProductController extends Controller
 {
@@ -633,31 +637,69 @@ class ProductController extends Controller
             }
         }
         $address = Addre::where('user_id', $user->id)->first();
-        if(isset($address))
-        {
-            return view('userAddress',compact('address'));
-        }
-        return view('userAddress');
+        // dd($address);
+        $countries = Country::all();
+        $states = State::all();
+        $cities = City::all();
+        $villages = Village::all();
+        // if(isset($address))
+        // {
+        //     return view('userAddress',compact('address'));
+        // }
+        return view('userAddress',compact('address','countries','states','cities','villages'));
     }
     public function cartProceed(Request $request)
     {
-        // Validate incoming request
         $request->validate([
             'address' => 'required|string|max:255',
             'pincode' => 'required|string|max:10',
+            'country' => 'nullable|string',
+            'state' => 'nullable|string',
+            'city' => 'nullable|string',
+            'village' => 'nullable|string',
+            'postal_code' => 'nullable|string|max:20',
+            'mobile_number' => 'required|digits:10',
+            'alt_mobile_number' => 'nullable|digits:10',
+            'landmark' => 'nullable|string|max:255',
         ]);
 
         $user = Auth::user();
-
         if (!$user) {
             return redirect()->route('login')->with('error', 'Please log in to continue.');
         }
 
-        // Check if the user already has an address
-        $address = Addre::firstOrNew(['user_id' => $user->id]);
+        // Handle dropdown or manual country
+        $countryId = $request->country !== 'manual' ? $request->country : Country::firstOrCreate(
+            ['name' => $request->country_manual]
+        )->id;
 
+        $stateId = $request->state !== 'manual' ? $request->state : State::firstOrCreate(
+            ['name' => $request->state_manual]
+        )->id;
+
+        $cityId = $request->city !== 'manual' ? $request->city : City::firstOrCreate(
+            ['name' => $request->city_manual]
+        )->id;
+
+        $villageId = $request->village !== 'manual' ? $request->village : Village::firstOrCreate(
+            ['name' => $request->village_manual]
+        )->id;
+
+        // Save or update user's address
+        $address = new Addre();
+        
         $address->address = $request->address;
         $address->pincode = $request->pincode;
+        $address->postal_code = $request->postal_code;
+        $address->mobile_number = $request->mobile_number;
+        $address->alt_mobile_number = $request->alt_mobile_number;
+        $address->landmark = $request->landmark;
+        $address->country_id = $countryId;
+        $address->state_id = $stateId;
+        $address->city_id = $cityId;
+        $address->village_id = $villageId;
+        $address->user_id = $user->id;
+
         $address->save();
 
         return redirect()->route('paymentMethod')->with('success', 'Address saved. Proceed to payment.');

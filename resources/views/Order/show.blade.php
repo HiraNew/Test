@@ -150,7 +150,34 @@
         background-color: #ffffff;
         border-radius: 1rem;
         border: none;
+        padding: 2rem;
     }
+
+    /* For large screens: flex row layout */
+    @media (min-width: 992px) {
+        .card .row {
+            display: flex;
+            flex-direction: row;
+            gap: 2rem;
+        }
+
+        .card .row > div:first-child {
+            flex: 1; /* image column */
+            max-width: 40%;
+        }
+
+        .card .row > div:last-child {
+            flex: 2; /* content column */
+        }
+
+        .card img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+    }
+
 
 
 
@@ -158,33 +185,31 @@
     @php
     $returnDays = $payment->product->extra1 ?? 0;
     $eligibleDate = $payment->created_at->copy()->addDays($returnDays);
-    if ($payment->staus !== 'pending') {
-        $isReturnEligible = '';
-    }
-    else {
-       $isReturnEligible = now()->lte($eligibleDate) && is_null($payment->return_period);
-    }
+    $isReturnEligible = now()->lte($eligibleDate) && is_null($payment->return_period);
     @endphp
 
 <div class="container my-5">
-    <div class="row justify-content-center">
-     <div class="col-12 col-md-10 col-lg-8 col-xl-7">
+    <div class="row">
+        <div class="col-12">
             <p><strong>Order ID - </strong> {{ $payment->orderid }}</p>
             <div class="card p-4 shadow-sm bg-white rounded-4 border-0">
                 <div class="row">
                     <h2>Order Details - #{{ $payment->product->name }}</h2>
-                    @if($payment->product->image)
-                        <img src="{{ url($payment->product->image) }}" 
-                            alt="{{ $payment->product->name }}" 
-                            class="img-fluid" 
-                            style="max-height: 400px; object-fit: contain;">
-                    @else
-                        <img src="{{ asset('images/default-product.png') }}" 
-                            alt="No Image" 
-                            class="img-fluid h-100 w-100" 
-                            style="object-fit: contain;">
-                    @endif
+                   <div class="col-12 col-lg-5">
+                        @if($payment->product->image)
+                            <img src="{{ url($payment->product->image) }}" 
+                                alt="{{ $payment->product->name }}" 
+                                class="img-fluid w-100"
+                                style="object-fit: contain; max-height: 400px;">
+                        @else
+                            <img src="{{ asset('images/default-product.png') }}" 
+                                alt="No Image" 
+                                class="img-fluid w-100"
+                                style="object-fit: contain; max-height: 400px;">
+                        @endif
+                    </div>
                     <div class="col-lg-8">
+                    <div class="col-12 col-lg-7">
                         <hr>
                         <h4>Price Details</h4>
 
@@ -238,18 +263,42 @@
                                 <span class="btn btn-success w-100">Contact Agent: {{ $payment->agent ?? 'Wait For Delivery Person.' }}</span>
                             </div>
                         @endif
-
-
-                        {{-- Shipping Address --}}
                         @if($address)
-                        {{-- @dd($address) --}}
                             <hr>
-                            <h4>Shipping Address</h4>
-                            <p>
-                                {{-- {{ $address[0]['address'] }}<br>
-                                {{ $address[0]['pincode'] }} --}}
-                            </p>
+                            <h4 class="fw-bold mb-3"><i class="fas fa-shipping-fast me-2 text-primary"></i>Shipping Address</h4>
+                            <div class="ps-3">
+                                <p class="mb-1"><strong>Address:</strong> {{ $address->address }}</p>
+
+                                @if($address->village?->name)
+                                    <p class="mb-1"><strong>Village:</strong> {{ $address->village->name }}</p>
+                                @endif
+
+                                @if($address->city?->name)
+                                    <p class="mb-1"><strong>City:</strong> {{ $address->city->name }}</p>
+                                @endif
+
+                                @if($address->state?->name)
+                                    <p class="mb-1"><strong>State:</strong> {{ $address->state->name }}</p>
+                                @endif
+
+                                @if($address->country?->name)
+                                    <p class="mb-1"><strong>Country:</strong> {{ $address->country->name }}</p>
+                                @endif
+
+                                @if(!empty($address->landmark))
+                                    <p class="mb-1"><strong>Landmark:</strong> {{ $address->landmark }}</p>
+                                @endif
+
+                                <p class="mb-1"><strong>Mobile Number:</strong> {{ $address->mobile_number }}</p>
+
+                                @if(!empty($address->alt_mobile_number))
+                                    <p class="mb-1"><strong>Alternate Mobile No:</strong> {{ $address->alt_mobile_number }}</p>
+                                @endif
+
+                                <p class="mb-1"><strong>Pincode:</strong> {{ $address->pincode }}</p>
+                            </div>
                         @endif
+
 
                         <hr>
 
@@ -282,15 +331,14 @@
 
 
                         </div>
-                        @if($payment->status !== 'delivered' || $payment->status !== 'cancelled' || $payment->status !== 'shipped')
+                        @if(in_array($payment->status, ['pending', 'shipped']) || ($payment->status === 'delivered' && $isReturnEligible))
                             <div class="d-flex justify-content-between mt-4">
                                 <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editAddressModal">Edit Address?</button>
                                 
-                                @if($isReturnEligible === '' || $payment->status !== 'cancelled' && $payment->status === 'shipped')
-                                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">Cancel Order?</button>
-                                @endif
+                                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">Cancel Order?</button>
                             </div>
                         @endif
+
 
                         @if($payment->status === 'delivered' || $payment->status === 'cancelled')
                         <div class="d-flex justify-content-center mt-4">
@@ -370,6 +418,15 @@
                                 <option value="">Select City</option>
                             </select>
                         </div>
+                        <!-- In your Blade view -->
+
+                        <div class="col-md-4">
+                            <label for="village" class="form-label">Village</label>
+                            <select id="village" name="village" class="form-select" required>
+                                <option value="">Select Village</option>
+                            </select>
+                        </div>
+
 
                         <!-- Postal and Pincode -->
                         <div class="col-md-6">
@@ -509,6 +566,21 @@
                 });
         }
     });
+    document.getElementById('city').addEventListener('change', function() {
+        let cityId = this.value;
+        if (cityId) {
+            fetch(`/villages/${cityId}`)
+                .then(response => response.json())
+                .then(data => {
+                    let villageSelect = document.getElementById('village');
+                    villageSelect.innerHTML = '<option value="">Select Village</option>';
+                    for (let id in data) {
+                        villageSelect.innerHTML += `<option value="${id}">${data[id]}</option>`;
+                    }
+                });
+        }
+    });
+
 </script>
 
 

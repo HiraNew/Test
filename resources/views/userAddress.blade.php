@@ -31,30 +31,86 @@
                                 <div class="invalid-feedback">Please enter a valid pincode.</div>
                             </div>
 
+                            @php
+                                $selectedCountry = old('country', $address->country_id ?? '');
+                                $selectedState = old('state', $address->state_id ?? '');
+                                $selectedCity = old('city', $address->city_id ?? '');
+                                $selectedVillage = old('village', $address->village_id ?? '');
+                            @endphp
+
+                            {{-- Country Dropdown + Manual --}}
                             <div class="form-floating mb-3">
-                                <select class="form-select" id="state" name="state" required>
-                                    <option value="" disabled {{ empty($address->state) ? 'selected' : '' }}>Choose your state</option>
-                                    <option value="Maharashtra" {{ ($address->state ?? '') == 'Maharashtra' ? 'selected' : '' }}>Maharashtra</option>
-                                    <option value="Tamil Nadu" {{ ($address->state ?? '') == 'Tamil Nadu' ? 'selected' : '' }}>Tamil Nadu</option>
-                                    <option value="Karnataka" {{ ($address->state ?? '') == 'Karnataka' ? 'selected' : '' }}>Karnataka</option>
-                                    <option value="Delhi" {{ ($address->state ?? '') == 'Delhi' ? 'selected' : '' }}>Delhi</option>
+                                <select class="form-select" id="country" name="country" onchange="toggleManualInput(this, 'country')" required>
+                                    <option value="" disabled {{ !$selectedCountry ? 'selected' : '' }}>Choose your country</option>
+                                    @foreach ($countries as $country)
+                                        <option value="{{ $country->id }}" {{ $selectedCountry == $country->id ? 'selected' : '' }}>{{ $country->name }}</option>
+                                    @endforeach
+                                    <option value="manual">Other (Type manually)</option>
                                 </select>
-                                <label for="state"><i class="fas fa-flag me-2"></i>State</label>
-                                <div class="invalid-feedback">Please select your state.</div>
+                                <input type="text" class="form-control mt-2 d-none" id="country_manual" name="country_manual" placeholder="Enter country manually">
+                                <label for="country">🌍 Country</label>
+                            </div>
+
+                            {{-- State Dropdown + Manual --}}
+                            <div class="form-floating mb-3">
+                                <select class="form-select" id="state" name="state" onchange="toggleManualInput(this, 'state')" required>
+                                    <option value="" disabled {{ !$selectedState ? 'selected' : '' }}>Choose your state</option>
+                                    @foreach ($states as $state)
+                                        <option value="{{ $state->id }}" {{ $selectedState == $state->id ? 'selected' : '' }}>{{ $state->name }}</option>
+                                    @endforeach
+                                    <option value="manual">Other (Type manually)</option>
+                                </select>
+                                <input type="text" class="form-control mt-2 d-none" id="state_manual" name="state_manual" placeholder="Enter state manually">
+                                <label for="state">🏳️ State</label>
+                            </div>
+
+                            {{-- City Dropdown + Manual --}}
+                            <div class="form-floating mb-3">
+                                <select class="form-select" id="city" name="city" onchange="toggleManualInput(this, 'city')" required>
+                                    <option value="" disabled {{ !$selectedCity ? 'selected' : '' }}>Choose your city</option>
+                                    @foreach ($cities as $city)
+                                        <option value="{{ $city->id }}" {{ $selectedCity == $city->id ? 'selected' : '' }}>{{ $city->name }}</option>
+                                    @endforeach
+                                    <option value="manual">Other (Type manually)</option>
+                                </select>
+                                <input type="text" class="form-control mt-2 d-none" id="city_manual" name="city_manual" placeholder="Enter city manually">
+                                <label for="city">🏙️ City</label>
+                            </div>
+
+                            {{-- Village Dropdown + Manual --}}
+                            <div class="form-floating mb-3">
+                                <select class="form-select" id="village" name="village" onchange="toggleManualInput(this, 'village')" required>
+                                    <option value="" disabled {{ !$selectedVillage ? 'selected' : '' }}>Choose your village</option>
+                                    @foreach ($villages as $village)
+                                        <option value="{{ $village->id }}" {{ $selectedVillage == $village->id ? 'selected' : '' }}>{{ $village->name }}</option>
+                                    @endforeach
+                                    <option value="manual">Other (Type manually)</option>
+                                </select>
+                                <input type="text" class="form-control mt-2 d-none" id="village_manual" name="village_manual" placeholder="Enter village manually">
+                                <label for="village">🏡 Village</label>
+                            </div>
+
+
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="postal_code" name="postal_code"
+                                    value="{{ $address->postal_code ?? '' }}" placeholder="Postal Code" required>
+                                <label for="postal_code"><i class="fas fa-envelope me-2"></i>Postal Code</label>
+                                <div class="invalid-feedback">Please enter your postal code.</div>
                             </div>
 
                             <div class="form-floating mb-3">
-                                <select class="form-select" id="city" name="city" required>
-                                    <option value="" disabled {{ empty($address->city) ? 'selected' : '' }}>Choose your city</option>
-                                    <option value="Delhi" {{ ($address->city ?? '') == 'Delhi' ? 'selected' : '' }}>Delhi</option>
-                                    <option value="Mumbai" {{ ($address->city ?? '') == 'Mumbai' ? 'selected' : '' }}>Mumbai</option>
-                                    <option value="Bengaluru" {{ ($address->city ?? '') == 'Bengaluru' ? 'selected' : '' }}>Bengaluru</option>
-                                    <option value="Chennai" {{ ($address->city ?? '') == 'Chennai' ? 'selected' : '' }}>Chennai</option>
-                                </select>
-                                <label for="city"><i class="fas fa-city me-2"></i>City</label>
-                                <div class="invalid-feedback">Please select your city.</div>
+                                <input type="tel" class="form-control" id="mobile_number" name="mobile_number"
+                                    value="{{ $address->mobile_number ?? '' }}" placeholder="Mobile Number" required pattern="[0-9]{10}">
+                                <label for="mobile_number"><i class="fas fa-phone me-2"></i>Mobile Number</label>
+                                <div class="invalid-feedback">Please enter a valid 10-digit mobile number.</div>
                             </div>
 
+                            <div class="form-floating mb-3">
+                                <input type="tel" class="form-control" id="alt_mobile_number" name="alt_mobile_number"
+                                    value="{{ $address->alt_mobile_number ?? '' }}" placeholder="Alternate Mobile Number" pattern="[0-9]{10}">
+                                <label for="alt_mobile_number"><i class="fas fa-phone-alt me-2"></i>Alternate Mobile Number (optional)</label>
+                                <div class="invalid-feedback">Please enter a valid 10-digit alternate mobile number.</div>
+                            </div>
 
                             <div class="form-floating mb-3">
                                 <input type="text" class="form-control" id="landmark" name="landmark"
@@ -64,7 +120,7 @@
                         </fieldset>
 
                         <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm">
-                            <i class="fas fa-check-circle me-2"></i>Address
+                            <i class="fas fa-check-circle me-2"></i>Confirm Address
                         </button>
                     </form>
                 </div>
@@ -89,5 +145,15 @@
             }, false)
         })
     })()
+     function toggleManualInput(selectElem, type) {
+        const manualInput = document.getElementById(type + '_manual');
+        if (selectElem.value === 'manual') {
+            manualInput.classList.remove('d-none');
+            manualInput.required = true;
+        } else {
+            manualInput.classList.add('d-none');
+            manualInput.required = false;
+        }
+    }
 </script>
 @endsection
