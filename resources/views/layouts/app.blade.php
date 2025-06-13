@@ -187,7 +187,7 @@
 
                 {{-- Brand --}}
                 <a class="navbar-brand fw-bold text-primary mb-0 me-1 flex-shrink-0" href="{{ ('products') }}" style="font-size: 1rem;">
-                    {{ config('app.name', 'DLS') }}
+                    {{ config('app.name', 'E-SAKROULI') }}
                 </a>
 
                 {{-- Searchbar (smaller) --}}

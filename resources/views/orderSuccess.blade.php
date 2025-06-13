@@ -8,7 +8,7 @@
             <i class="fas fa-check-circle" style="font-size: 14.5rem; color: #28a745;"></i>
         </div>
         <strong>🎉 {{ session('success') }}</strong>
-        <a href="#" class="btn btn-outline-light btn-sm mt-3 px-4 py-2 rounded-pill shadow-sm">
+        <a href="{{route('payments.index')}}" class="btn btn-outline-light btn-sm mt-3 px-4 py-2 rounded-pill shadow-sm">
             🚚 Track Your Order
         </a>
     </div>
@@ -23,7 +23,7 @@
 
     // Redirect after 6 seconds
     setTimeout(() => {
-        window.location.href = "{{ route('products') }}";
+        window.location.href = "{{ route('payments.index') }}";
     }, 6000);
 </script>
 @endif

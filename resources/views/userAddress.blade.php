@@ -4,7 +4,12 @@
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-
+@if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
             <div class="card shadow border-0">
                 <div class="card-header bg-primary text-white fw-semibold fs-5">
                     <i class="fas fa-map-marker-alt me-2"></i>Delivery Address Details
@@ -45,10 +50,10 @@
                                     @foreach ($countries as $country)
                                         <option value="{{ $country->id }}" {{ $selectedCountry == $country->id ? 'selected' : '' }}>{{ $country->name }}</option>
                                     @endforeach
-                                    <option value="manual">Other (Type manually)</option>
+                                    {{-- <option value="manual">Other (Type manually)</option> --}}
                                 </select>
-                                <input type="text" class="form-control mt-2 d-none" id="country_manual" name="country_manual" placeholder="Enter country manually">
-                                <label for="country">🌍 Country</label>
+                                {{-- <input type="text" class="form-control mt-2 d-none" id="country_manual" name="country_manual" placeholder="Enter country manually">
+                                <label for="country">🌍 Country</label> --}}
                             </div>
 
                             {{-- State Dropdown + Manual --}}
@@ -58,10 +63,10 @@
                                     @foreach ($states as $state)
                                         <option value="{{ $state->id }}" {{ $selectedState == $state->id ? 'selected' : '' }}>{{ $state->name }}</option>
                                     @endforeach
-                                    <option value="manual">Other (Type manually)</option>
+                                    {{-- <option value="manual">Other (Type manually)</option> --}}
                                 </select>
-                                <input type="text" class="form-control mt-2 d-none" id="state_manual" name="state_manual" placeholder="Enter state manually">
-                                <label for="state">🏳️ State</label>
+                                {{-- <input type="text" class="form-control mt-2 d-none" id="state_manual" name="state_manual" placeholder="Enter state manually">
+                                <label for="state">🏳️ State</label> --}}
                             </div>
 
                             {{-- City Dropdown + Manual --}}
@@ -71,10 +76,10 @@
                                     @foreach ($cities as $city)
                                         <option value="{{ $city->id }}" {{ $selectedCity == $city->id ? 'selected' : '' }}>{{ $city->name }}</option>
                                     @endforeach
-                                    <option value="manual">Other (Type manually)</option>
+                                    {{-- <option value="manual">Other (Type manually)</option> --}}
                                 </select>
-                                <input type="text" class="form-control mt-2 d-none" id="city_manual" name="city_manual" placeholder="Enter city manually">
-                                <label for="city">🏙️ City</label>
+                                {{-- <input type="text" class="form-control mt-2 d-none" id="city_manual" name="city_manual" placeholder="Enter city manually">
+                                <label for="city">🏙️ City</label> --}}
                             </div>
 
                             {{-- Village Dropdown + Manual --}}
@@ -84,10 +89,10 @@
                                     @foreach ($villages as $village)
                                         <option value="{{ $village->id }}" {{ $selectedVillage == $village->id ? 'selected' : '' }}>{{ $village->name }}</option>
                                     @endforeach
-                                    <option value="manual">Other (Type manually)</option>
+                                    {{-- <option value="manual">Other (Type manually)</option> --}}
                                 </select>
-                                <input type="text" class="form-control mt-2 d-none" id="village_manual" name="village_manual" placeholder="Enter village manually">
-                                <label for="village">🏡 Village</label>
+                                {{-- <input type="text" class="form-control mt-2 d-none" id="village_manual" name="village_manual" placeholder="Enter village manually">
+                                <label for="village">🏡 Village</label> --}}
                             </div>
 
 
@@ -145,15 +150,15 @@
             }, false)
         })
     })()
-     function toggleManualInput(selectElem, type) {
-        const manualInput = document.getElementById(type + '_manual');
-        if (selectElem.value === 'manual') {
-            manualInput.classList.remove('d-none');
-            manualInput.required = true;
-        } else {
-            manualInput.classList.add('d-none');
-            manualInput.required = false;
-        }
-    }
+    //  function toggleManualInput(selectElem, type) {
+    //     const manualInput = document.getElementById(type + '_manual');
+    //     if (selectElem.value === 'manual') {
+    //         manualInput.classList.remove('d-none');
+    //         manualInput.required = true;
+    //     } else {
+    //         manualInput.classList.add('d-none');
+    //         manualInput.required = false;
+    //     }
+    // }
 </script>
 @endsection

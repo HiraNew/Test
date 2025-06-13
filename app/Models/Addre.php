@@ -14,14 +14,15 @@ class Addre extends Model
         'address',
         'pincode',
         'status',
-        'city',
-        'state',
-        'country',
+        'city_id',
+        'state_id',
+        'country_id',
+        'village_id',
         'mobile_number',
         'alt_mobile_number',
         'postal_code',
         'payment_id',
-        // 'village' // Include if column exists
+        'landmark', // Include if column exists
     ];
      // Country relationship
      // Country relationship

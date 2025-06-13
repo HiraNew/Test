@@ -178,6 +178,26 @@
         }
     }
 
+    .out-for-delivery-alert {
+        display: inline-block;
+        margin: 0 10px;
+        vertical-align: middle;
+        color: #ffa500; /* orange for visibility */
+        font-size: 16px;
+    }
+
+    .out-for-delivery-alert i {
+        animation: pulse 1.5s infinite;
+    }
+
+    /* Optional animation for subtle attention */
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.8; }
+        50% { transform: scale(1.2); opacity: 1; }
+        100% { transform: scale(1); opacity: 0.8; }
+    }
+
+
 
 
 
@@ -260,9 +280,19 @@
 
                         @if ($payment->status === 'shipped')
                             <div class="mt-3">
-                                <span class="btn btn-success w-100">Contact Agent: {{ $payment->agent ?? 'Wait For Delivery Person.' }}</span>
+                                @if (!empty($payment->feild1))
+                                    <a href="tel:{{ $payment->feild1 }}">
+                                        <b class="btn btn-success w-0">Call : </b> 
+                                    </a>
+                                    {{ $payment->feild1 }}
+                                @else
+                                    <span class="btn btn-secondary w-100" disabled>
+                                        Wait For Delivery Person
+                                    </span>
+                                @endif
                             </div>
                         @endif
+
                         @if($address)
                             <hr>
                             <h4 class="fw-bold mb-3"><i class="fas fa-shipping-fast me-2 text-primary"></i>Shipping Address</h4>
@@ -316,6 +346,7 @@
                                     if ($index < $currentIndex) $class = 'completed';
                                     elseif ($index == $currentIndex) $class = 'current';
                                 @endphp
+
                                 <div class="tracker-step {{ $class }}">
                                     <div class="step-icon">
                                         @if($class == 'completed')
@@ -326,32 +357,48 @@
                                     </div>
                                     <div class="step-label">{{ ucfirst($status) }}</div>
                                 </div>
+
+                                {{-- Insert minimal "Out for Delivery" icon between shipped and delivered --}}
+                                @if($status === 'shipped' && $payment->status !== 'delivered' && $payment->status !== 'cancelled')
+                                    <div class="out-for-delivery-alert">
+                                        <i class="fas fa-truck-moving" title="Your item is out for delivery"> </i> out for delivery
+                                    </div>
+                                @endif
                             @endforeach
                         </div>
 
 
-                        </div>
-                        @if(in_array($payment->status, ['pending', 'shipped']) || ($payment->status === 'delivered' && $isReturnEligible))
-                            <div class="d-flex justify-content-between mt-4">
+                        {{-- Action Buttons Based on Status --}}
+                        <div class="d-flex justify-content-between mt-4">
+                            @if(in_array($payment->status, ['pending', 'confirmed']))
+                                {{-- Edit and Cancel available --}}
                                 <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editAddressModal">Edit Address?</button>
-                                
                                 <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">Cancel Order?</button>
+
+                            @elseif($payment->status === 'shipped')
+                                {{-- Only Cancel available --}}
+                                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">Cancel Order?</button>
+
+                            @elseif($payment->status === 'delivered' && $isReturnEligible)
+                                {{-- Only Return available --}}
+                                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">Return Order?</button>
+                            @endif
+                        </div>
+
+                        {{-- Reorder Button --}}
+                        @if(in_array($payment->status, ['delivered', 'cancelled']))
+                            <div class="d-flex justify-content-center mt-4">
+                                <a href="{{ route('detail', $payment->product->id) }}">
+                                    <button class="btn btn-success">Order Again?</button>
+                                </a>
                             </div>
                         @endif
 
+                        {{-- Help Link --}}
+                        <div class="d-flex justify-content-center mt-4">
+                            <a href="{{ route('detail', $payment->product->id) }}">Help?</a>
+                        </div>
 
-                        @if($payment->status === 'delivered' || $payment->status === 'cancelled')
-                        <div class="d-flex justify-content-center mt-4">
-                            <a href="{{ route('detail', $payment->product->id) }}">
-                                <button class="btn btn-success">Order Again?</button>
-                            </a>
-                        </div>
-                        @endif
-                        <div class="d-flex justify-content-center mt-4">
-                            <a href="{{ route('detail', $payment->product->id) }}">
-                                Help?
-                            </a>
-                        </div>
                         
                     </div>
                 </div>
@@ -453,6 +500,11 @@
                             <input type="text" class="form-control" id="alt_mobile_number" name="alt_mobile_number"
                                 value="{{ old('alt_mobile_number', $payment->address->alt_mobile_number ?? '') }}">
                         </div>
+                         <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="landmark" name="landmark"
+                                    value="{{ $address->landmark ?? '' }}" placeholder="Landmark">
+                                <label for="landmark"><i class="fas fa-location-arrow me-2"></i>Landmark (optional)</label>
+                            </div>
                     </div>
                 </div>
 
@@ -510,7 +562,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-danger">Confirm Cancel</button>
+                    <button type="submit" class="btn btn-danger">Confirm</button>
                 </div>
             </form>
         </div>

@@ -133,6 +133,17 @@ class UserProfileController extends Controller
 
     public function update(Request $request, $paymentId)
     {
+        // dd($request->landmark);
+        // 'address' => 'required|string|max:255',
+        //     'pincode' => 'required|string|max:10',
+        //     'country' => 'nullable|string',
+        //     'state' => 'nullable|string',
+        //     'city' => 'nullable|string',
+        //     'village' => 'nullable|string',
+        //     'postal_code' => 'nullable|string|max:20',
+        //     'mobile_number' => 'required|digits:10',
+        //     'alt_mobile_number' => 'nullable|digits:10',
+        //     'landmark' => 'nullable|string|max:255',
         
         $request->validate([
             'address_line' => 'required|string|max:255',
@@ -143,6 +154,7 @@ class UserProfileController extends Controller
             'mobile_number' => 'string|max:15',
             'alt_mobile_number' => 'nullable|string|max:15',
             'village' => 'required|string|max:100',
+            'landmark' => 'nullable|string|max:255',
         ]);
 
         $payment = Payment::with('address')->findOrFail($paymentId);
@@ -159,6 +171,7 @@ class UserProfileController extends Controller
         $address->postal_code = $request->postal_code;
         $address->mobile_number = $request->mobile_number;
         $address->alt_mobile_number = $request->alt_mobile_number;
+        $address->landmark = $request->landmark;
         $address->save();
 
 

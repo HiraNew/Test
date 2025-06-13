@@ -27,6 +27,7 @@ use App\Models\Country;
 use App\Models\State;
 use App\Models\Subcategory;
 use App\Models\Village;
+use Illuminate\Support\Facades\Session;
 
 class ProductController extends Controller
 {
@@ -650,7 +651,7 @@ class ProductController extends Controller
     }
     public function cartProceed(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'address' => 'required|string|max:255',
             'pincode' => 'required|string|max:10',
             'country' => 'nullable|string',
@@ -668,39 +669,44 @@ class ProductController extends Controller
             return redirect()->route('login')->with('error', 'Please log in to continue.');
         }
 
+        session(['temp_address' => $validated,
+        'temp_address_time' => now()
+        ]);
+       
+
         // Handle dropdown or manual country
-        $countryId = $request->country !== 'manual' ? $request->country : Country::firstOrCreate(
-            ['name' => $request->country_manual]
-        )->id;
+        // $countryId = $request->country !== 'manual' ? $request->country : Country::firstOrCreate(
+        //     ['name' => $request->country_manual]
+        // )->id;
 
-        $stateId = $request->state !== 'manual' ? $request->state : State::firstOrCreate(
-            ['name' => $request->state_manual]
-        )->id;
+        // $stateId = $request->state !== 'manual' ? $request->state : State::firstOrCreate(
+        //     ['name' => $request->state_manual]
+        // )->id;
 
-        $cityId = $request->city !== 'manual' ? $request->city : City::firstOrCreate(
-            ['name' => $request->city_manual]
-        )->id;
+        // $cityId = $request->city !== 'manual' ? $request->city : City::firstOrCreate(
+        //     ['name' => $request->city_manual]
+        // )->id;
 
-        $villageId = $request->village !== 'manual' ? $request->village : Village::firstOrCreate(
-            ['name' => $request->village_manual]
-        )->id;
+        // $villageId = $request->village !== 'manual' ? $request->village : Village::firstOrCreate(
+        //     ['name' => $request->village_manual]
+        // )->id;
 
         // Save or update user's address
-        $address = new Addre();
+        // $address = new Addre();
         
-        $address->address = $request->address;
-        $address->pincode = $request->pincode;
-        $address->postal_code = $request->postal_code;
-        $address->mobile_number = $request->mobile_number;
-        $address->alt_mobile_number = $request->alt_mobile_number;
-        $address->landmark = $request->landmark;
-        $address->country_id = $countryId;
-        $address->state_id = $stateId;
-        $address->city_id = $cityId;
-        $address->village_id = $villageId;
-        $address->user_id = $user->id;
+        // $address->address = $request->address;
+        // $address->pincode = $request->pincode;
+        // $address->postal_code = $request->postal_code;
+        // $address->mobile_number = $request->mobile_number;
+        // $address->alt_mobile_number = $request->alt_mobile_number;
+        // $address->landmark = $request->landmark;
+        // $address->country_id = $countryId;
+        // $address->state_id = $stateId;
+        // $address->city_id = $cityId;
+        // $address->village_id = $villageId;
+        // $address->user_id = $user->id;
 
-        $address->save();
+        // $address->save();
 
         return redirect()->route('paymentMethod')->with('success', 'Address saved. Proceed to payment.');
     }
@@ -726,9 +732,9 @@ class ProductController extends Controller
     {
         $user = Auth::user();
         $orders = Cart::where('user_id', $user->id)->get();
-        $address = Addre::where('user_id', $user->id)->first();
+        // $address = Addre::where('user_id', $user->id)->first();
 
-        if ($orders->isEmpty() || !$address) {
+        if ($orders->isEmpty()) {
             return redirect()->route('cartView')->with('error', 'Your cart or address is missing.');
         }
 
@@ -754,7 +760,7 @@ class ProductController extends Controller
             foreach ($orders as $order) {
                 $product = Product::find($order->product_id);
 
-                if ($product && $address) {
+                if ($product) {
                     $category = $product->category;
                     $charges = $category->charges()->where('is_active', true)->get()->keyBy('charge_type');
 
@@ -777,7 +783,21 @@ class ProductController extends Controller
                     }
 
                     $totalAmount = $baseAmount + $extraCharges;
-
+                    $addressData = Session::get('temp_address');
+                    
+  // $address->address = $request->address;
+        // $address->pincode = $request->pincode;
+        // $address->postal_code = $request->postal_code;
+        // $address->mobile_number = $request->mobile_number;
+        // $address->alt_mobile_number = $request->alt_mobile_number;
+        // $address->landmark = $request->landmark;
+        // $address->country_id = $countryId;
+        // $address->state_id = $stateId;
+        // $address->city_id = $cityId;
+        // $address->village_id = $villageId;
+        // $address->user_id = $user->id;
+//  $addressData = Session::get('temp_address');
+//         dd($addressData);
                     // Save order/payment
                     $confirm = new Payment();
                     $confirm->user_id = $user->id;
@@ -789,6 +809,31 @@ class ProductController extends Controller
                     $confirm->delevery_date = $tomorrow;
                     $confirm->orderid = $orderId;
                     $confirm->save();
+
+                    $createdAt = session('temp_address_time');
+
+                    if ($createdAt && now()->diffInMinutes($createdAt) > 1) {
+                        Session::forget('temp_address');
+                        Session::forget('temp_address_time');
+                        return redirect()->route('updateAddress')->with('error', 'Session expired. Please re-enter your address.');
+                    }
+
+
+                    // for address 
+                    Addre::create([
+                            'user_id' => $user->id,
+                            'address' => $addressData['address'],
+                            'pincode' => $addressData['pincode'],
+                            'postal_code' => $addressData['postal_code'],
+                            'mobile_number' => $addressData['mobile_number'],
+                            'alt_mobile_number' =>$addressData['alt_mobile_number'],
+                            'landmark' => $addressData['landmark'],
+                            'country_id' => $addressData['country'],
+                            'state_id' => $addressData['state'],
+                            'city_id' => $addressData['city'],
+                            'village_id' => $addressData['village'],
+                            'payment_id' => $confirm->id,
+                        ]);
 
                     // ✅ Reduce stock
                     $product->decrement('quantity', $order->quantity);
@@ -805,6 +850,7 @@ class ProductController extends Controller
             $this->carting();
 
             DB::commit();
+            Session::forget('temp_address');
             // Mail::to($user->email)->send(new OrderConfirmationMail($user, $orderId));
 
             return redirect()->route('orderNow')->with('success', 'Your Order is Confirmed. Order ID: ' . $orderId);
