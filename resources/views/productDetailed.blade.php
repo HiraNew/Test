@@ -255,7 +255,6 @@
     position: relative;
     z-index: 0;
 }
-
 </style>
 <div class="container py-5">
     <div class="row">
@@ -312,21 +311,6 @@
                         </button>
                     @endforeach
                 </div>
-
-                <!-- Thumbnails -->
-                {{-- <div class="d-flex justify-content-center mt-3 flex-wrap gap-2">
-                    @foreach($product->images as $index => $img)
-                        <img src="{{ asset($img->image_path) }}"
-                             alt="Thumb"
-                             class="img-thumbnail"
-                             style="width: 60px; height: 60px; object-fit: cover; cursor: pointer;"
-                             onclick="document.querySelector('#productImageCarousel .carousel-item.active').classList.remove('active');
-                                      document.querySelectorAll('#productImageCarousel .carousel-item')[{{ $index }}].classList.add('active');">
-                    @endforeach
-                </div> --}}
-                <!-- Color Variants Section -->
-               
-
             </div>
         </div>
     </div>
@@ -725,12 +709,9 @@
             </button>
         </div>
     </div>
-@endif
-
-
-
-
+ @endif
  </div>
+ @include('components.footer')
  {{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> --}}
  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -1162,9 +1143,4 @@ function fallbackCopy(url) {
         });
     });
 </script>
-
-
-
-
-
 @endsection

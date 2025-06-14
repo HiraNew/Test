@@ -309,7 +309,7 @@
     </div>
     @endif
 </div>
-@include('layouts.footer')
+@include('components.footer')
 
 
 
