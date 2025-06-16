@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\ProductApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+Route::get('/product', [ProductApiController::class, 'productApi']);
 Route::get('/react', [App\Http\Controllers\TestApiController::class, 'indexs']);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

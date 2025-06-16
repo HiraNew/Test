@@ -3,6 +3,7 @@
 // use App\Http\Controllers\UserDashboard\ProductController;
 
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Partner\DeliveryPartnarController;
 use App\Http\Controllers\UserDashboard\UserProfileController;
 use App\Http\Controllers\UserDashboard\UserWishListController;
 use App\Http\Controllers\WishlistController;
@@ -86,3 +87,7 @@ Route::middleware('auth')->group(function () {
 
     
 });
+
+// Route::middleware('auth')->group(function () {
+  Route::get('/partner', [DeliveryPartnarController::class, 'RegistrationForm']);
+// });
