@@ -24,10 +24,12 @@ class Payment extends Model
     {
         return $this->hasOne(Addre::class, 'payment_id', 'id');
     }
+    // In Payment.php
     public function partner()
     {
-        return $this->belongsTo(Partner::class);
+        return $this->belongsTo(\App\Models\Partner::class, 'delivery_partner_id');
     }
+
 
 
     

@@ -27,10 +27,16 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-        \App\Models\Admin::factory()->create([
-            'name' => 'Administrator',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('Admin'),
+        // \App\Models\Admin::factory()->create([
+        //     'name' => 'Administrator',
+        //     'email' => 'admin@example.com',
+        //     'password' => Hash::make('Admin'),
+        // ]);
+        \App\Models\Partner::create([
+            'name' => 'Delivery Bhai',
+            'email' => 'delivery@gmail.com',
+            'mobile' => '6203728749',
+            'password' => Hash::make('Delivery'),
         ]);
     }
 }

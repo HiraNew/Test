@@ -89,5 +89,17 @@ Route::middleware('auth')->group(function () {
 });
 
 // Route::middleware('auth')->group(function () {
-  Route::get('/partner', [DeliveryPartnarController::class, 'RegistrationForm']);
+Route::prefix('partner')->name('partner.')->group(function () {
+    Route::get('/login', [DeliveryPartnarController::class, 'getPartnerLoginForm'])->name('login');
+    Route::post('/login', [DeliveryPartnarController::class, 'login'])->name('login.submit');
+    Route::middleware('auth:partner')->group(function () {
+      Route::get('/delivery', [DeliveryPartnarController::class, 'getListOfProductForDelivered'])->name('delivery');
+      Route::post('/send-otp', [DeliveryPartnarController::class, 'sendOtp'])->name('send.otp');
+      Route::post('/verify-otp', [DeliveryPartnarController::class, 'verifyOtp'])->name('verify.otp');
+      Route::post('/logout', [DeliveryPartnarController::class, 'partnerLogout'])->name('logout');
+    });
+
+    
+});
+
 // });

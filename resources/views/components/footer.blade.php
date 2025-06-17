@@ -71,7 +71,7 @@
                 <small>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</small>
             </div>
             <div class="text-center pb-3">
-                <a href="#" class="footer-link">Join Us</a>
+                <a href="{{route('partner.login')}}" class="footer-link">Join Us</a>
             </div>
 
         </div>
