@@ -33,10 +33,10 @@ class DatabaseSeeder extends Seeder
         //     'password' => Hash::make('Admin'),
         // ]);
         \App\Models\Partner::create([
-            'name' => 'Delivery Bhai',
-            'email' => 'delivery@gmail.com',
-            'mobile' => '6203728749',
-            'password' => Hash::make('Delivery'),
+            'name' => 'Delivery1',
+            'email' => 'delivery1@gmail.com',
+            'mobile' => '6203728750',
+            'password' => Hash::make('Delivery1'),
         ]);
     }
 }
