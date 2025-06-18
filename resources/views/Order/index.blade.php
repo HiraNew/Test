@@ -35,4 +35,12 @@
     @endif
     
 </div>
+<script>
+     window.addEventListener("pageshow", function (event) {
+        // If coming back from back/forward browser button, force reload
+        if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+            window.location.reload();
+        }
+    });
+</script>
 @endsection

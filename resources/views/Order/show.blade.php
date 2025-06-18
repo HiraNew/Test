@@ -359,7 +359,7 @@
                                 </div>
 
                                 {{-- Insert minimal "Out for Delivery" icon between shipped and delivered --}}
-                                @if($status === 'shipped' && $payment->status !== 'delivered' && $payment->status !== 'cancelled')
+                                @if($status === 'shipped' && $payment->status !== 'delivered' && $payment->status !== 'cancelled' && $payment->status !== 'pending')
                                     <div class="out-for-delivery-alert">
                                         <i class="fas fa-truck-moving" title="Your item is out for delivery"> </i> out for delivery
                                     </div>
@@ -630,6 +630,13 @@
                         villageSelect.innerHTML += `<option value="${id}">${data[id]}</option>`;
                     }
                 });
+        }
+    });
+
+     window.addEventListener("pageshow", function (event) {
+        // If coming back from back/forward browser button, force reload
+        if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+            window.location.reload();
         }
     });
 

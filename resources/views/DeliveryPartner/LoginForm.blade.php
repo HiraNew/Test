@@ -58,7 +58,10 @@
         <div class="col-md-6">
             <div class="card shadow p-4">
                 <h3 class="text-center mb-4">Login as Delivery Partner</h3>
-
+                 @if(session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                @endif
+                
                 @if(session('error'))
                     <div class="alert alert-danger">{{ session('error') }}</div>
                 @endif

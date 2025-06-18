@@ -101,5 +101,9 @@ Route::prefix('partner')->name('partner.')->group(function () {
 
     
 });
+// web.php
+Route::get('/share-location/{orderid}', [DeliveryPartnarController::class, 'showForm'])->name('location.form');
+Route::post('/submit-location', [DeliveryPartnarController::class, 'store'])->name('location.store');
+
 
 // });

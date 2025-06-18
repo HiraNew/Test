@@ -55,12 +55,24 @@
             <button type="submit" class="btn btn-danger">Logout</button>
         </form>
 
+        <!-- Placeholder for alert -->
+        <div id="otpAlertContainer"></div>
+
+
         @if(session('success'))
-                    <div class="alert alert-success">{{ session('success') }}</div>
-                @endif
-                @if(session('error'))
-                    <div class="alert alert-danger">{{ session('error') }}</div>
-                @endif
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
 
         <!-- Tabs -->
         <ul class="nav nav-tabs" id="partnerTab" role="tablist">
@@ -85,26 +97,62 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Order ID</th>
-                                {{-- <th>Product</th> --}}
-                                {{-- <th>Qty</th> --}}
-                                <th>Customer</th>
+                                {{-- <th>Customer</th> --}}
                                 <th>Address</th>
+                                {{-- <th>Item Count</th> --}}
+                                {{-- <th>Products</th> --}}
                             </tr>
                         </thead>
+
                         <tbody>
-                            @forelse($assigned as $order)
-                            <tr>
-                                <td>{{ $order->orderid }}</td>
-                                {{-- <td>{{ $order->product->name }}</td> --}}
-                                {{-- <td>{{ $order->qty }}</td> --}}
-                                <td>{{ $order->user->name }}</td>
-                                <td>{{ $order->address->address }},{{$order->address->mobile_number}}, {{$order->address->alt_mobile_number}}, {{$order->address->pincode}} , {{$order->address->postal_code}}, {{$order->address->landmark}}</td>
-                            </tr>
+                            @forelse($assigned as $orderid => $items)
+                                @php
+                                    $first = $items->first();
+                                    $productNames = $items->pluck('product.name')->unique()->implode(', ');
+                                    $itemCount = $items->count();
+                                    // $link = " Please visit : 127.0.0.1:8000";
+                                    // $whatsappNumber = preg_replace('/\D/', '', $first->address->mobile_number); // remove non-digits
+                                    // $waLink = "https://wa.me/91{$whatsappNumber}?text=" . urlencode("Hi, I am your delivery partner from DLS, Your Item with orderid ".$orderid." Will be delivered today by 8:00 pm ". " Please share your current location ". $link);
+
+                                    $locationLink = route('location.form', ['orderid' => $orderid]);
+                                    $message = "*Hi, I am your delivery partner from DLS*.\n\n*Please click the link below to share your location*:\n\n$locationLink";
+                                    $waLink = "https://wa.me/91{$first->address->mobile_number}?text=" . urlencode($message);
+                                @endphp
+                                <tr>
+                                    <td>{{ $orderid }} , ({{ $first->qty }}), ({{$first->amount}})</td>
+                                    {{-- <td>{{ $first->user->name }}</td> --}}
+                                    <td>
+                                        {{ $first->address->address }},
+                                        {{ $first->address->mobile_number }},
+                                        {{ $first->address->alt_mobile_number }},
+                                        {{ $first->address->pincode ?? $first->address->postal_code }},
+                                        {{-- {{ $first->address->postal_code }}, --}}
+                                        {{ $first->address->landmark }}
+                                        @if(!$first->feild5 && !$first->feild6)
+                                        <a href="{{ $waLink }}" target="_blank" class="btn btn-sm btn-success">
+                                            <i class="bi bi-whatsapp"></i> Ask for Location
+                                        </a>
+                                        @endif
+                                        @if($first->feild5 && $first->feild6)
+                                            <a href="https://www.google.com/maps/search/?api=1&query={{ $first->feild5 }},{{ $first->feild6 }}"
+                                            target="_blank" class="btn btn-sm btn-outline-info">
+                                            📍View Location
+                                            </a>
+                                        @endif
+                                        {{-- <a href="{{ $waLink }}" target="_blank" class="btn btn-sm btn-success">
+                                            <i class="bi bi-whatsapp"></i> Chat on WhatsApp
+                                        </a> --}}
+                                    </td>
+                                    
+                                    {{-- <td>{{ $itemCount }}</td> --}}
+                                    {{-- <td>{{ $productNames }}</td> --}}
+                                </tr>
                             @empty
-                            <tr>
-                                <td colspan="5" class="text-center">No assigned products.</td>
-                            </tr>
+                                <tr>
+                                    <td colspan="5" class="text-center">No assigned products.</td>
+                                </tr>
                             @endforelse
+
                         </tbody>
                     </table>
                 </div>
@@ -117,7 +165,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Order ID</th>
-                                <th>Product</th>
+                                <th>Quantity</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -125,10 +173,17 @@
                             @forelse($orders as $order)
                             <tr>
                                 <td>{{ $order->orderid }}</td>
-                                <td>{{ $order->product->name }}</td>
+                                <td>{{ $order->qty }} , ({{$order->amount}})</td>
                                 <td>
                                     @if($order->status === 'delivered')
+                                        @php
+                                             $deliveredAt = \Carbon\Carbon::parse($order->feild4, 'Asia/Kolkata');
+                                        @endphp
+
                                         <span class="badge badge-status badge-delivered">Delivered</span>
+                                        on {{ $deliveredAt->format('l, d-m-Y h:i A') }}
+                                        <small class="text-muted">({{ $deliveredAt->diffForHumans() }})</small>
+
                                     @else
                                         <span class="badge badge-status badge-pending">Pending</span>
                                     @endif
@@ -151,9 +206,13 @@
                     @csrf
                     <div class="mb-3">
                         <label for="order_id" class="form-label">Order ID</label>
-                        <input type="text" name="order_id" id="order_id" class="form-control" maxlength="10" required>
+                        <input type="text" name="order_id" id="order_id" class="form-control" value="{{ session('order_id', old('order_id')) }}" maxlength="10" required>
                         <div class="text-end mt-1">
-                            <button type="button" id="sendOtpBtn" class="btn btn-sm btn-outline-primary" disabled>Send OTP</button>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button type="button" id="sendOtpBtn" class="btn btn-sm btn-outline-primary" disabled>Send OTP</button>
+                                <span id="otpTimer" class="ms-2 text-muted small"></span>
+                            </div>
+
                         </div>
                     </div>
 
@@ -175,6 +234,19 @@
     const sendOtpBtn = document.getElementById('sendOtpBtn');
     const otpInput = document.getElementById('otpCheck');
     const submitBtn = document.getElementById('submitOtpBtn');
+     const otpSentAt = @json(session('otp_sent_at')); // UNIX timestamp
+    const otpTimerSpan = document.getElementById('otpTimer');
+
+    const otpWasSent = @json(session('otp_sent', false));
+
+    if (orderInput.value.length === 10) {
+        sendOtpBtn.disabled = false;
+    }
+
+    if (otpWasSent) {
+        otpInput.disabled = false;
+        submitBtn.disabled = false;
+    }
 
     orderInput.addEventListener('keyup', () => {
         if (orderInput.value.length === 10) {
@@ -204,7 +276,9 @@
         .then(data => {
             console.log('OTP Response:', data);
             if (data.success === true) {
-                alert(data.message);
+                document.getElementById('otpAlertContainer').innerHTML = `
+                    <div class="alert alert-info">OTP has been sent. Please enter it below.</div>
+                `;
                 otpInput.disabled = false;
                 submitBtn.disabled = false;
             } else {
@@ -216,6 +290,42 @@
             alert('Something went wrong while sending the OTP.');
         });
     });
+
+
+
+    function startOtpTimer(sentAtTimestamp) {
+        const expireAfterSeconds = 10 * 60; // 10 minutes
+        const endTime = sentAtTimestamp + expireAfterSeconds;
+
+        const timer = setInterval(() => {
+            const now = Math.floor(Date.now() / 1000);
+            const remaining = endTime - now;
+
+            if (remaining <= 0) {
+                clearInterval(timer);
+                otpTimerSpan.textContent = 'OTP expired';
+                otpInput.disabled = true;
+                submitBtn.disabled = true;
+                return;
+            }
+
+            const minutes = Math.floor(remaining / 60);
+            const seconds = remaining % 60;
+            otpTimerSpan.textContent = `OTP valid for ${minutes}:${seconds.toString().padStart(2, '0')} mins`;
+        }, 1000);
+    }
+
+    if (otpWasSent && otpSentAt) {
+        startOtpTimer(otpSentAt);
+    }
+
+    window.addEventListener("pageshow", function (event) {
+        // If coming back from back/forward browser button, force reload
+        if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+            window.location.reload();
+        }
+    });
 </script>
+
 
 @endsection

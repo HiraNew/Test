@@ -40,19 +40,42 @@ class DeliveryPartnarController extends Controller
     }
     public function getListOfProductForDelivered()
     {
-       $partner = Auth::guard('partner')->user();
+        $partner = Auth::guard('partner')->user();
 
-        $assigned = Payment::with(['product','user','address'])
+        // Get all shipped orders
+        $rawAssigned = Payment::with(['product', 'user', 'address'])
             ->where('delivery_partner_id', $partner->id)
             ->where('status', 'shipped')
             ->get();
-            // dd($assigned->user);
 
+        // Group by orderid
+        $assigned = $rawAssigned->groupBy('orderid');
+
+        // Fetch all orders for status tab (unmodified)
         $orders = Payment::with('product')
             ->where('delivery_partner_id', $partner->id)
+            ->whereIn('status', ['delivered', 'shipped'])
             ->get();
+
+
         return view('DeliveryPartner.index', compact('assigned', 'orders'));
     }
+
+    // public function getListOfProductForDelivered()
+    // {
+    //    $partner = Auth::guard('partner')->user();
+
+    //     $assigned = Payment::with(['product','user','address'])
+    //         ->where('delivery_partner_id', $partner->id)
+    //         ->where('status', 'shipped')
+    //         ->get();
+    //         // dd($assigned->user);
+
+    //     $orders = Payment::with('product')
+    //         ->where('delivery_partner_id', $partner->id)
+    //         ->get();
+    //     return view('DeliveryPartner.index', compact('assigned', 'orders'));
+    // }
     public function sendOtp(Request $request)
     {
         $request->validate([
@@ -97,6 +120,14 @@ class DeliveryPartnarController extends Controller
 
         // TODO: Send OTP via SMS/Email
 
+        session([
+            'otp_sent' => true,
+            'otp_sent_at' => now('Asia/Kolkata')->timestamp, // current UNIX time
+            'order_id' => $request->order_id
+        ]);
+
+
+
         return response()->json([
             'success' => true,
             'message' => 'OTP sent successfully.'
@@ -108,9 +139,13 @@ class DeliveryPartnarController extends Controller
     public function verifyOtp(Request $request)
     {
         $request->validate([
-            'order_id' => 'required|string|max:10',
+            'order_id' => 'required|max:10',
             'otp' => 'required|digits:6'
+        ], [
+            'otp.required' => 'Please enter the OTP.',
+            'otp.digits' => 'OTP must be 6 digits.'
         ]);
+
 
         $orderId = $request->order_id;
         $inputOtp = $request->otp;
@@ -135,7 +170,7 @@ class DeliveryPartnarController extends Controller
                 ->where('delivery_partner_id', Auth::guard('partner')->id())
                 ->update([
                     'status' => 'delivered',
-                    'feild4' => now(), // Optional: track delivery time
+                    'feild4' => now('Asia/Kolkata'), // Optional: track delivery time
                 ]);
 
             // Optionally clear OTP after verification
@@ -145,6 +180,8 @@ class DeliveryPartnarController extends Controller
             //         'otp' => null,
             //         'otp_expires_at' => null
             //     ]);
+            // After successful OTP verification and marking delivered
+             session()->forget(['otp_sent', 'otp_sent_at', 'order_id']);
 
             return redirect()->back()->with('success', 'OTP verified. All items marked as delivered.');
         }
@@ -160,6 +197,31 @@ class DeliveryPartnarController extends Controller
         request()->session()->regenerateToken();
 
         return redirect()->route('partner.login')->with('success', 'Logged out successfully.');
+    }
+
+
+    public function showForm($orderid)
+    {
+        return view('location.share', compact('orderid'));
+    }
+
+    public function store(Request $request)
+    {
+        
+        $request->validate([
+            'orderid' => 'required',
+            'lat' => 'required',
+            'lng' => 'required',
+        ]);
+
+        $payment = Payment::where('orderid', $request->orderid)->first();
+        if ($payment) {
+            $payment->feild5 = $request->lat;
+            $payment->feild6 = $request->lng;
+            $payment->save();
+        }
+
+        return redirect()->back()->with('success', 'Thank you! Your location has been shared.');
     }
 
 

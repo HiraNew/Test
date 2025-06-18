@@ -738,7 +738,7 @@ class ProductController extends Controller
             return redirect()->route('cartView')->with('error', 'Your cart or address is missing.');
         }
 
-        $orderId = $this->generateUniqueCode();
+        // $orderId = $this->generateUniqueCode();
         $indiaTime = now('Asia/Kolkata');
         $tomorrow = $indiaTime->copy()->addDay();
 
@@ -784,20 +784,7 @@ class ProductController extends Controller
 
                     $totalAmount = $baseAmount + $extraCharges;
                     $addressData = Session::get('temp_address');
-                    
-  // $address->address = $request->address;
-        // $address->pincode = $request->pincode;
-        // $address->postal_code = $request->postal_code;
-        // $address->mobile_number = $request->mobile_number;
-        // $address->alt_mobile_number = $request->alt_mobile_number;
-        // $address->landmark = $request->landmark;
-        // $address->country_id = $countryId;
-        // $address->state_id = $stateId;
-        // $address->city_id = $cityId;
-        // $address->village_id = $villageId;
-        // $address->user_id = $user->id;
-//  $addressData = Session::get('temp_address');
-//         dd($addressData);
+
                     // Save order/payment
                     $confirm = new Payment();
                     $confirm->user_id = $user->id;
@@ -807,7 +794,7 @@ class ProductController extends Controller
                     $confirm->payment_mode = $request->payment_method;
                     $confirm->order_date = $indiaTime;
                     $confirm->delevery_date = $tomorrow;
-                    $confirm->orderid = $orderId;
+                    $confirm->orderid = $this->generateUniqueCode(); //even multiple order same time time order will have diffrent orderid one orderid for one order only.
                     $confirm->save();
 
                     $createdAt = session('temp_address_time');
@@ -853,7 +840,7 @@ class ProductController extends Controller
             Session::forget('temp_address');
             // Mail::to($user->email)->send(new OrderConfirmationMail($user, $orderId));
 
-            return redirect()->route('orderNow')->with('success', 'Your Order is Confirmed. Order ID: ' . $orderId);
+            return redirect()->route('orderNow')->with('success', 'Your Order is Confirmed');
 
         } catch (\Exception $e) {
             DB::rollback();
