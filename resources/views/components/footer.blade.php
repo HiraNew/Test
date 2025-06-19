@@ -73,6 +73,9 @@
             <div class="text-center pb-3">
                 <a href="{{route('partner.login')}}" class="footer-link">Join Us</a>
             </div>
+            <div class="text-center pb-3">
+                <a href="{{route('vendor.login')}}" class="footer-link">Join As Seller</a>
+            </div>
 
         </div>
     </div>

@@ -59,6 +59,12 @@ class Product extends Model
         return $this->wishlists_count ?? 0;
     }
 
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class);
+    }
+
+
 
 
 

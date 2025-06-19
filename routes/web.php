@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Partner\DeliveryPartnarController;
 use App\Http\Controllers\UserDashboard\UserProfileController;
 use App\Http\Controllers\UserDashboard\UserWishListController;
+use App\Http\Controllers\Vendor\VendorController;
 use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
 
@@ -88,7 +89,7 @@ Route::middleware('auth')->group(function () {
     
 });
 
-// Route::middleware('auth')->group(function () {
+// Delivery Partner related route start
 Route::prefix('partner')->name('partner.')->group(function () {
     Route::get('/login', [DeliveryPartnarController::class, 'getPartnerLoginForm'])->name('login');
     Route::post('/login', [DeliveryPartnarController::class, 'login'])->name('login.submit');
@@ -101,9 +102,16 @@ Route::prefix('partner')->name('partner.')->group(function () {
 
     
 });
-// web.php
 Route::get('/share-location/{orderid}', [DeliveryPartnarController::class, 'showForm'])->name('location.form');
 Route::post('/submit-location', [DeliveryPartnarController::class, 'store'])->name('location.store');
 
+// Delivery partner related route end
 
-// });
+Route::prefix('vendor')->name('vendor.')->group(function () {
+  Route::get('/login', [VendorController::class, 'getVendorLoginForm'])->name('login');
+  Route::post('/login', [VendorController::class, 'login'])->name('login.submit');
+  Route::middleware('auth:vendor')->group(function () {
+    Route::get('/vendorDashboard', [VendorController::class, 'vendorDashboard'])->name('dashboard');
+    Route::post('/logout', [VendorController::class, 'vendorLogout'])->name('logout');
+  });
+});

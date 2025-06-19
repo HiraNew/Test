@@ -32,11 +32,18 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'admin@example.com',
         //     'password' => Hash::make('Admin'),
         // ]);
-        \App\Models\Partner::create([
-            'name' => 'Delivery1',
-            'email' => 'delivery1@gmail.com',
-            'mobile' => '6203728750',
-            'password' => Hash::make('Delivery1'),
+        // \App\Models\Partner::create([
+        //     'name' => 'Delivery1',
+        //     'email' => 'delivery1@gmail.com',
+        //     'mobile' => '6203728750',
+        //     'password' => Hash::make('Delivery1'),
+        // ]);
+
+        \App\Models\Vendor::create([
+            'name' => 'Vendor',
+            'email' => 'vendor@gmail.com',
+            'mobile' => '6203728749',
+            'password' => Hash::make('Vendor'),
         ]);
     }
 }
