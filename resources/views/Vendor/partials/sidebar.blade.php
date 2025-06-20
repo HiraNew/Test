@@ -10,7 +10,7 @@
     <i class="bi bi-speedometer2 me-2"></i> Dashboard
 </a>
 {{-- {{ route('vendor.products.index') }} --}}
-<a href="#">
+<a href="{{url('/vendor/products')}}">
     <i class="bi bi-box-seam me-2"></i> Products
     @if($newProductNotifications > 0)
         <span class="badge bg-danger float-end">{{ $newProductNotifications }}</span>

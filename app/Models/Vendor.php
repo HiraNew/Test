@@ -22,5 +22,6 @@ class Vendor extends Authenticatable
     {
         return $this->hasMany(Product::class);
     }
+    
 
 }

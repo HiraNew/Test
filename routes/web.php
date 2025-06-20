@@ -7,6 +7,7 @@ use App\Http\Controllers\Partner\DeliveryPartnarController;
 use App\Http\Controllers\UserDashboard\UserProfileController;
 use App\Http\Controllers\UserDashboard\UserWishListController;
 use App\Http\Controllers\Vendor\VendorController;
+use App\Http\Controllers\Vendor\VendorProductController;
 use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
 
@@ -113,5 +114,9 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
   Route::middleware('auth:vendor')->group(function () {
     Route::get('/vendorDashboard', [VendorController::class, 'vendorDashboard'])->name('dashboard');
     Route::post('/logout', [VendorController::class, 'vendorLogout'])->name('logout');
+    // Vendor Product Controller start
+    Route::resource('products', VendorProductController::class);
+    Route::patch('products/{product}/toggle-status', [VendorProductController::class, 'toggleStatus'])->name('products.toggleStatus');
+    // Vendor Product controller end
   });
 });

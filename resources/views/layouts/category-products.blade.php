@@ -72,6 +72,7 @@
                         <div class="d-flex flex-column align-items-center">
                             <a href="{{ route('category.view', $category->slug) }}"
                             class="text-decoration-none">
+                            
                                 <img src="{{ asset($category->icon) }}"
                                     alt="{{ $category->name }}"
                                     class="rounded-circle img-fluid mb-1"
@@ -136,7 +137,7 @@
                     </button>
 
 
-                    <img src="{{ url($product->image) }}" class="card-img-top" alt="{{ $product->name }}"
+                    <img src="{{ asset('storage/'.$product->image) }}" class="card-img-top" alt="{{ $product->name }}"
                     style="height: 180px; object-fit: cover; cursor: pointer;"
                     data-bs-toggle="modal" data-bs-target="#quickViewModal{{ $product->id }}">
 
@@ -213,7 +214,7 @@
 
             <div class="modal-body row">
                 <div class="col-md-6">
-                    <img src="{{ url($product->image) }}" alt="{{ $product->name }}" class="img-fluid rounded w-100">
+                    <img src="{{asset('storage/'.$product->image) }}" alt="{{ $product->name }}" class="img-fluid rounded w-100">
                 </div>
 
                 <div class="col-md-6">

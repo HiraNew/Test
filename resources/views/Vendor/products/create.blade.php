@@ -1,0 +1,141 @@
+@extends('layouts.vendor')
+
+@section('title', 'Add New Product')
+
+@section('content')
+<div class="container py-4">
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    @if (session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    <h3 class="mb-4">Add New Product</h3>
+
+    <form action="{{ route('vendor.products.store') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Product Name</label>
+                <input type="text" name="name" class="form-control" required value="{{ old('name') }}">
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Slug</label>
+                <input type="text" name="slug" class="form-control" value="{{ old('slug') }}" required>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Category</label>
+                <select name="category_id" class="form-select" required>
+                    <option value="">-- Select Category --</option>
+                    @foreach ($categories as $category)
+                        <option value="{{ $category->id }} {{ old('category_id') == $category->id ? 'selected' : '' }}">{{ $category->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Sub-Category</label>
+                <select name="subcategory_id" class="form-select" required>
+                    <option value="">-- Select Sub-Category --</option>
+                    @foreach ($subcategories as $subcategory)
+                        <option value="{{ $subcategory->id }} {{ old('subcategory_id') == $subcategory->id ? 'selected' : '' }}">{{ $subcategory->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Price ($)</label>
+                <input type="number" name="price" class="form-control" step="0.01" required value="{{ old('price') }}">
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Quantity</label>
+                <input type="number" name="quantity" class="form-control" min="0" required value="{{ old('quantity') }}">
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Select One Image</label>
+                <input type="file" name="image" class="form-control" accept="image/*" value="{{ old('image') }}" required>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Choose Multiple Image For This Item</label>
+                <input type="file" name="extra_images[]" class="form-control" accept="image/*" multiple>
+            </div>
+
+
+            <div class="col-md-6">
+                <label class="form-label">Product Return Days <small>(1–10)</small></label>
+                <input type="number" name="extra1" class="form-control" min="1" max="10" value="{{ old('extra1') }}">
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Size</label>
+                <input type="text" name="size" class="form-control" value="{{ old('size') }}">
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Color</label>
+                <input type="text" name="color" class="form-control" value="{{ old('color') }}">
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Weight</label>
+                <input type="text" name="weight" class="form-control" value="{{ old('weight') }}">
+            </div>
+
+            <div class="col-12">
+                <label class="form-label">Short Description</label>
+                <textarea name="sdescription" class="form-control" rows="3" required>{{ old('sdescription') }}</textarea>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label">Long Description</label>
+                <textarea name="ldescription" class="form-control" rows="5" required>{{ old('ldescription') }}</textarea>
+            </div>
+
+            <div class="col-12">
+                <hr>
+                <h5>Optional Fields</h5>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Optional Field 1</label>
+                <input type="text" name="feild1" class="form-control" value="{{ old('feild1') }}">
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Optional Field 2</label>
+                <input type="text" name="feild2" class="form-control" value="{{ old('v') }}">
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Optional Field 3</label>
+                <input type="text" name="feild3" class="form-control" value="{{ old('feild3') }}">
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Optional Field 4</label>
+                <input type="text" name="feild4" class="form-control" value="{{ old('feild4') }}">
+            </div>
+
+            <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-primary w-100">Create Product</button>
+            </div>
+        </div>
+    </form>
+</div>
+@endsection

@@ -8,6 +8,7 @@ use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Subcategory;
 use App\Models\User;
+use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -37,12 +38,19 @@ class DashboardController extends Controller
             'Users & Vendors' => [
                 ['title' => 'Total Registered Users', 'value' => User::count()],
                 ['title' => 'Total Logged-in Users', 'value' => User::where('status', 1)->count()],
-                ['title' => 'Total Vendors', 'value' => User::where('role', 'vendor')->count()],
+                ['title' => 'Total Vendors', 'value' => Vendor::count()],
             ],
             'Catalog' => [
                 ['title' => 'Total Categories', 'value' => Category::count()],
                 ['title' => 'Total Subcategories', 'value' => Subcategory::count()],
                 ['title' => 'Total Products Available', 'value' => Product::where('status', 'active')->count()],
+                [
+                    'title' => 'Live Vendor Product Available',
+                    'value' => Product::where('status', 'active')
+                                ->whereNotNull('vendor_id')
+                                ->count(),
+                ]
+
             ],
             'Revenue (Successful Orders)' => [
                 ['title' => 'Total Revenue', 'value' => Payment::where('status', $successful)->sum('amount')],

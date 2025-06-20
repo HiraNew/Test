@@ -40,10 +40,10 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         \App\Models\Vendor::create([
-            'name' => 'Vendor',
-            'email' => 'vendor@gmail.com',
-            'mobile' => '6203728749',
-            'password' => Hash::make('Vendor'),
+            'name' => 'Vendor1',
+            'email' => 'vendor1@gmail.com',
+            'mobile' => '6203728750',
+            'password' => Hash::make('Vendor1'),
         ]);
     }
 }

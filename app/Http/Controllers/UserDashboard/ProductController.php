@@ -172,7 +172,8 @@ class ProductController extends Controller
             // Start with base query
             $ProductsQuery = Product::with(['tags', 'reviews', 'wishlists'])
                 ->withAvg('reviews', 'rating')
-                ->withCount('reviews');
+                ->withCount('reviews')
+                ->where('status', 'active');
                 // dd($ProductsQuery->get());
 
             if ($query) {

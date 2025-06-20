@@ -33,8 +33,8 @@
         <div class="col-md-2 sidebar">
             @include('Vendor.partials.sidebar')
         </div>
-        @else
-            <h5>Not Loggedin Yet.</h5>
+        {{-- @else
+            <h5>Not Loggedin Yet.</h5> --}}
         @endif
         <div class="col-md-10 p-4">
             @yield('content')

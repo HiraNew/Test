@@ -38,7 +38,7 @@
                 <!-- Desktop View -->
                 <div class="card shadow-sm position-relative d-none d-md-block h-100">
                      <input type="checkbox" class="form-check-input position-absolute top-0 start-100 m-2 wishlist-checkbox" value="{{ $product->id }}">
-                    <img src="{{ url($product->image) }}" class="card-img-top" alt="{{ $product->name }}" style="height: 220px; object-fit: cover;">
+                    <img src="{{ asset('storage/' . $product->image) }}" class="card-img-top" alt="{{ $product->name }}" style="height: 220px; object-fit: cover;">
                     <div class="position-absolute top-0 start-0 p-2">
                         <i class="fas fa-heart text-danger fs-4"></i>
                     </div>

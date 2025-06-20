@@ -265,8 +265,9 @@
                 <div class="carousel-inner">
                     @foreach($product->images as $key => $img)
                         <div class="carousel-item {{ $key == 0 ? 'active' : '' }}">
-                            <a href="{{ asset($img->image_path) }}" class="glightbox" data-gallery="product-gallery" data-title="Image {{ $key + 1 }}">
-                                <img src="{{ asset($img->image_path) }}"
+                            {{-- {{ asset('storage/' . $recent->image) }} --}}
+                            <a href="{{ asset('storage/'.$img->image_path) }}" class="glightbox" data-gallery="product-gallery" data-title="Image {{ $key + 1 }}">
+                                <img src="{{ asset('storage/'.$img->image_path) }}"
                                     class="d-block w-100 rounded border shadow-sm"
                                     style="max-height: 400px; object-fit: contain;"
                                     alt="Product Image {{ $key + 1 }}">
@@ -307,7 +308,7 @@
                             class="border rounded {{ $key == 0 ? 'border-primary' : 'border-secondary' }}"
                             style="width: 60px; height: 60px; overflow: hidden; padding: 0;"
                             aria-label="Slide {{ $key + 1 }}">
-                            <img src="{{ asset($img->image_path) }}" alt="Thumbnail {{ $key + 1 }}" style="width: 100%; height: 100%; object-fit: cover;">
+                            <img src="{{ asset('storage/'.$img->image_path) }}" alt="Thumbnail {{ $key + 1 }}" style="width: 100%; height: 100%; object-fit: cover;">
                         </button>
                     @endforeach
                 </div>
@@ -358,7 +359,7 @@
                                             @if (isset($variant->color ))
                                             <span class="color-badge">{{ ucfirst($variant->color) }}</span>
                                             @endif
-                                            <img src="{{ url($variant->image ?? 'images/placeholder.png') }}" class="card-img-top border-bottom" style="height: 80px; object-fit: cover;" alt="{{ $variant->name }}">
+                                            <img src="{{ asset('storage/'.$variant->image ?? 'images/placeholder.png') }}" class="card-img-top border-bottom" style="height: 80px; object-fit: cover;" alt="{{ $variant->name }}">
                                             <div class="card-body p-2 text-center">
                                                 {{-- <p class="card-text small text-truncate mb-1">{{ $variant->name }}</p> --}}
                                                 <span class="stock-text {{ $variant->quantity == 0 ? 'out-of-stock' : '' }}">
@@ -379,7 +380,7 @@
                                                 @if (isset($variant->color ))
                                                     <span class="color-badge">{{ ucfirst($variant->color) }}</span>
                                                 @endif
-                                                <img src="{{ url($variant->image ?? 'images/placeholder.png') }}" class="card-img-top border-bottom" style="height: 160px; object-fit: cover;" alt="{{ $variant->name }}">
+                                                <img src="{{ asset('storage/'.$variant->image ?? 'images/placeholder.png') }}" class="card-img-top border-bottom" style="height: 160px; object-fit: cover;" alt="{{ $variant->name }}">
                                                 <div class="card-body p-2 text-center">
                                                     <p class="card-text small text-truncate mb-1">{{ $variant->name }}</p>
                                                     <span class="stock-text {{ $variant->quantity == 0 ? 'out-of-stock' : '' }}">
@@ -596,7 +597,7 @@
                 @foreach($relatedProducts as $related)
                     <a href="{{ url('detail', $related->id) }}" class="card-link-wrapper">
                         <div class="card mx-2" style="min-width: 250px;">
-                            <img src="{{ asset($related->image) }}" alt="{{ $related->name }}" class="card-img-top">
+                            <img src="{{ asset('storage/' . $related->image) }}" alt="{{ $related->name }}" class="card-img-top">
                             <div class="card-body">
                                 <h5 class="card-title">{{ $related->name }}</h5>
                                 <p class="card-text">₹{{ number_format($related->price, 2) }}</p>
@@ -661,7 +662,8 @@
                 @foreach($recentlyViewedProducts as $recent)
                     <a href="{{ url('detail', $recent->id) }}" class="card-link-wrapper">
                         <div class="card mx-2" style="min-width: 250px;">
-                            <img src="{{ asset($recent->image ?? $recent->images->first()->image_path ?? 'placeholder.jpg') }}" alt="{{ $recent->name }}" class="card-img-top">
+                            {{-- {{ asset('storage/' . $recent->image) }} --}}
+                            <img src="{{ asset('storage/' . $recent->image ?? $recent->images->first()->image_path ?? 'placeholder.jpg') }}" alt="{{ $recent->name }}" class="card-img-top">
                             <div class="card-body">
                                 <h5 class="card-title">{{ $recent->name }}</h5>
                                 <p class="card-text">₹{{ number_format($recent->price, 2) }}</p>

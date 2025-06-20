@@ -106,7 +106,7 @@
                         <div class="card h-100 shadow-sm border-0 hover-shadow position-relative" data-bs-toggle="modal" data-bs-target="#quickViewModal{{ $Product->id }}">
                             {{-- Product Image --}}
                             <div class="ratio ratio-4x3 overflow-hidden" role="button" data-bs-toggle="modal" data-bs-target="#quickViewModal{{ $Product->id }}">
-                                <img src="{{ url($Product->image) }}" loading="lazy" class="img-fluid product-image zoom-hover" alt="{{ $Product->name }}">
+                                <img src="{{ asset('storage/' . $Product->image) }}" loading="lazy" class="img-fluid product-image zoom-hover" alt="{{ $Product->name }}">
                             </div>
 
                             {{-- Wishlist Icon --}}
@@ -176,7 +176,7 @@
                                 <div class="modal-body row">
                                     <div class="col-md-6 position-relative">
                                         <div class="ratio ratio-4x3 overflow-hidden rounded">
-                                            <img src="{{ url($Product->image) }}" class="img-fluid w-100 h-100 object-fit-cover" alt="{{ $Product->name }}">
+                                            <img src="{{ asset('storage/' . $Product->image) }}" class="img-fluid w-100 h-100 object-fit-cover" alt="{{ $Product->name }}">
                                         </div>
                                         <button class="btn btn-light position-absolute top-0 end-0 m-2 wishlist-btn p-1" data-id="{{ $Product->id }}" style="z-index: 10;">
                                             <i class="{{ in_array($Product->id, $wishlistProductIds ?? []) ? 'fas' : 'far' }} fa-heart text-danger"></i>
@@ -253,7 +253,7 @@
                             <div class="card h-100 shadow-sm border-0 hover-shadow">
                                 <a href="{{ url('detail', $recent->id) }}">
                                     <div class="ratio ratio-4x3 overflow-hidden">
-                                        <img src="{{ url($recent->image) }}" loading="lazy" class="img-fluid product-image zoom-hover" alt="{{ $recent->name }}">
+                                        <img src="{{ asset('storage/' . $recent->image) }}" loading="lazy" class="img-fluid product-image zoom-hover" alt="{{ $recent->name }}">
                                     </div>
                                 </a>
                                 <button class="btn btn-light position-absolute top-0 end-0 m-2 wishlist-btn" data-id="{{ $recent->id }}">

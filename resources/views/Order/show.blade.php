@@ -217,7 +217,8 @@
                     <h2>Order Details - #{{ $payment->product->name }}</h2>
                    <div class="col-12 col-lg-5">
                         @if($payment->product->image)
-                            <img src="{{ url($payment->product->image) }}" 
+                        {{-- {{ asset('storage/' . $recent->image) }} --}}
+                            <img src="{{ asset('storage/' .$payment->product->image) }}" 
                                 alt="{{ $payment->product->name }}" 
                                 class="img-fluid w-100"
                                 style="object-fit: contain; max-height: 400px;">
