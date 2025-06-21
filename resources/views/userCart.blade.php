@@ -120,7 +120,7 @@
                                         </td>
 
                                             <td data-label="Image" class="text-center py-2">
-                                                <img src="{{ asset($item['image']) }}" alt="{{ $item['product_name'] }}" width="60" class="w-40 sm:w-20 md:w-16 h-auto mx-auto rounded shadow-md">
+                                                <img src="{{ asset('storage/'.$item['image']) }}" alt="{{ $item['product_name'] }}" width="60" class="w-40 sm:w-20 md:w-16 h-auto mx-auto rounded shadow-md">
                                             </td>
                                             <td data-label="Price" class="text-center py-2">₹{{ $item['base_price'] }}</td>
                                             <td data-label="Quantity" class="text-center py-2">

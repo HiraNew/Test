@@ -116,7 +116,10 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
     Route::post('/logout', [VendorController::class, 'vendorLogout'])->name('logout');
     // Vendor Product Controller start
     Route::resource('products', VendorProductController::class);
+    // Route::delete('/extra-images/{image}', [VendorProductController::class, 'deleteExtraImage'])->name('extra-images.destroy');
     Route::patch('products/{product}/toggle-status', [VendorProductController::class, 'toggleStatus'])->name('products.toggleStatus');
     // Vendor Product controller end
   });
 });
+Route::delete('vendor/products/images/{image}', [VendorProductController::class, 'deleteExtraImage'])
+    ->name('vendor.products.images.destroy');

@@ -22,12 +22,15 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderConfirmationMail;
+use App\Models\Admin;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\State;
 use App\Models\Subcategory;
 use App\Models\Village;
 use Illuminate\Support\Facades\Session;
+use App\Notifications\OrderPlacedNotification;
+use App\Notifications\LowStockNotification;
 
 class ProductController extends Controller
 {
@@ -826,20 +829,24 @@ class ProductController extends Controller
                     // ✅ Reduce stock
                     $product->decrement('quantity', $order->quantity);
                     // Send admin email if quantity is low
-                    if ($product->quantity <= 5) {
-                        $adminEmail = 'hira.lal@nikatby.com'; // replace with your actual admin email
-                        // Mail::to($adminEmail)->send(new LowStockAlertMail($product));
-                    }
+                    // if ($product->quantity <= 5) {
+                    //     $admin = new Admin();
+                    //     $admin->email = 'lalh38023@gmail.com';
+                    //     Mail::to($adminEmail)->send(new LowStockAlertMail($product));
+                    //     $admin->notify(new LowStockNotification($product));
+                    // }
                 }
+                // Notify user for there order.
+                // $user->notify(new OrderPlacedNotification($confirm)); 
+                // Mail::to($user->email)->send(new OrderConfirmationMail($user, $orderId));
             }
 
             // Clear cart after successful payment
             Cart::where('user_id', $user->id)->delete();
             $this->carting();
-
-            DB::commit();
             Session::forget('temp_address');
-            // Mail::to($user->email)->send(new OrderConfirmationMail($user, $orderId));
+            DB::commit();           
+            
 
             return redirect()->route('orderNow')->with('success', 'Your Order is Confirmed');
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
@@ -63,6 +64,23 @@ class Product extends Model
     {
         return $this->belongsTo(Vendor::class);
     }
+
+    protected static function booted()
+    {
+        static::deleting(function ($product) {
+            if ($product->image && Storage::disk('public')->exists($product->image)) {
+                Storage::disk('public')->delete($product->image);
+            }
+
+            foreach ($product->images as $image) {
+                if (Storage::disk('public')->exists($image->image_path)) {
+                    Storage::disk('public')->delete($image->image_path);
+                }
+                $image->delete();
+            }
+        });
+    }
+
 
 
 

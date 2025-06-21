@@ -17,6 +17,11 @@ class Admin extends Authenticatable
      * @var array<int, string>'
      * 
      */
+    public $email;
+    public function routeNotificationForMail($notification)
+    {
+        return $this->email;
+    }
     protected $table = 'admins';
     protected $fillable = [
         'name',

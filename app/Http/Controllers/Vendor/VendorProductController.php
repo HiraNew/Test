@@ -7,8 +7,10 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\Subcategory;
+use App\View\Components\ProductCard;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class VendorProductController extends Controller
 {
@@ -32,7 +34,8 @@ class VendorProductController extends Controller
     {
         $categories = Category::all();
         $subcategories = Subcategory::all();
-        return view('vendor.products.create',compact('categories','subcategories'));
+        $product = new Product(); // empty product object for create form
+        return view('vendor.products.create',compact('product', 'categories', 'subcategories'));
     }
     public function store(Request $request)
     {
@@ -90,8 +93,13 @@ class VendorProductController extends Controller
 
     public function edit(Product $product)
     {
-        $this->authorize('update', $product); // Optional
-        return view('vendor.products.edit', compact('product'));
+          $this->authorize('update', $product); // optional
+
+            $categories = Category::all();
+            $extraImages = ProductImage::where('product_id',$product->id)->get();
+            // dd($extraImages);
+            $subcategories = Subcategory::all();
+        return view('vendor.products.create', compact('product', 'categories', 'subcategories','extraImages'));
     }
 
     public function update(Request $request, Product $product)
@@ -100,9 +108,23 @@ class VendorProductController extends Controller
 
         $data = $request->validate([
             'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:products,slug,' . $product->id,
             'price' => 'required|numeric',
             'image' => 'nullable|image|mimes:jpeg,png,jpg',
-            'description' => 'nullable|string',
+            'extra_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'category_id' => 'required|exists:categories,id',
+            'subcategory_id' => 'required|exists:subcategories,id',
+            'sdescription' => 'required|string',
+            'ldescription' => 'required|string',
+            'quantity' => 'required|integer|min:0',
+            'extra1' => 'nullable|integer|max:10',
+            'feild1' => 'nullable|string',
+            'feild2' => 'nullable|string',
+            'feild3' => 'nullable|string',
+            'feild4' => 'nullable|string',
+            'size' => 'nullable|string',
+            'color' => 'nullable|string',
+            'weight' => 'nullable|string',
         ]);
 
         if ($request->hasFile('image')) {
@@ -111,14 +133,46 @@ class VendorProductController extends Controller
 
         $product->update($data);
 
+        if ($request->hasFile('extra_images')) {
+            foreach ($request->file('extra_images') as $file) {
+                $path = $file->store('product_images', 'public');
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'image_path' => $path,
+                ]);
+            }
+        }
+
         return redirect()->route('vendor.products.index')->with('success', 'Product updated successfully!');
     }
 
     public function destroy(Product $product)
     {
         $this->authorize('delete', $product);
+        // ProductCard
         $product->delete();
         return back()->with('success', 'Product deleted.');
     }
+
+    public function deleteExtraImage(ProductImage $image)
+    {
+        $vendor = auth()->guard('vendor')->user();
+
+        // Ensure the image belongs to a product of this vendor
+        if ($image->product->vendor_id !== $vendor->id) {
+            abort(403, 'Unauthorized');
+        }
+
+        // Delete image file from storage
+        if (Storage::disk('public')->exists($image->image_path)) {
+            Storage::disk('public')->delete($image->image_path);
+        }
+
+        // Delete image record from database
+        $image->delete();
+
+        return back()->with('success', 'Image deleted successfully.');
+    }
+
 
 }
