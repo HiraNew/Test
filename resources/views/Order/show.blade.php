@@ -214,6 +214,7 @@
             <p><strong>Order ID - </strong> {{ $payment->orderid }}</p>
             <div class="card p-4 shadow-sm bg-white rounded-4 border-0">
                 <div class="row">
+                    
                     <h2>Order Details - #{{ $payment->product->name }}</h2>
                    <div class="col-12 col-lg-5">
                         @if($payment->product->image)
@@ -233,7 +234,8 @@
                     <div class="col-12 col-lg-7">
                         <hr>
                         <h4>Price Details</h4>
-
+{{-- <h4>Price Details</h4> --}}
+                        <small>({{ $payment->qty }} Quantity of {{ $payment->product->name }})</small>
                         <div class="mb-2 d-flex justify-content-between">
                             <span><strong>Amount:</strong></span>
                             <span>₹{{ number_format($payment->amount, 2) }}</span>
