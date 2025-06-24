@@ -118,6 +118,9 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
     Route::resource('products', VendorProductController::class);
     // Route::delete('/extra-images/{image}', [VendorProductController::class, 'deleteExtraImage'])->name('extra-images.destroy');
     Route::patch('products/{product}/toggle-status', [VendorProductController::class, 'toggleStatus'])->name('products.toggleStatus');
+    Route::get('orders', [VendorProductController::class, 'vendorOrderList'])->name('orders.index');
+    Route::post('orders/confirm/{id}', [VendorProductController::class, 'confirm'])->name('orders.confirm');
+    Route::post('orders/ship', [VendorProductController::class, 'ship'])->name('orders.ship');
     // Vendor Product controller end
   });
 });

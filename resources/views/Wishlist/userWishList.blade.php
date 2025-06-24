@@ -27,6 +27,7 @@
         </div>
 
     @forelse($wishlists as $item)
+    {{-- @dd($item->product->image) --}}
         @if($item->product)
             @php
                 $product = $item->product;
@@ -84,7 +85,7 @@
                         </button>
 
                         <div class="d-flex align-items-center">
-                            <img src="{{ url($product->image) }}" alt="{{ $product->name }}" class="img-fluid rounded me-3" style="width: 100px; height: 100px; object-fit: cover;">
+                            <img src="{{asset('storage/' .$product->image) }}" alt="{{ $product->name }}" class="img-fluid rounded me-3" style="width: 100px; height: 100px; object-fit: cover;">
                             <div>
                                 <h6 class="mb-1 text-truncate" title="{{ $product->name }}">{{ $product->name }}</h6>
                                 <p class="text-muted mb-1">₹{{ number_format($product->price, 2) }}</p>

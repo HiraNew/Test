@@ -362,7 +362,7 @@
                                 </div>
 
                                 {{-- Insert minimal "Out for Delivery" icon between shipped and delivered --}}
-                                @if($status === 'shipped' && $payment->status !== 'delivered' && $payment->status !== 'cancelled' && $payment->status !== 'pending')
+                                @if($status === 'shipped' && $payment->status !== 'delivered' && $payment->status !== 'cancelled' && $payment->status !== 'pending' && $payment->status !== 'confirmed')
                                     <div class="out-for-delivery-alert">
                                         <i class="fas fa-truck-moving" title="Your item is out for delivery"> </i> out for delivery
                                     </div>

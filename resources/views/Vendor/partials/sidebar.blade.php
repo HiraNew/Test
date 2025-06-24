@@ -17,7 +17,7 @@
     @endif
 </a>
 {{-- {{ route('vendor.orders.index') }} --}}
-<a href="#">
+<a href="{{ route('vendor.orders.index') }}">
     <i class="bi bi-bag-check me-2"></i> Orders
     @if($newOrderNotifications > 0)
         <span class="badge bg-danger float-end">{{ $newOrderNotifications }}</span>

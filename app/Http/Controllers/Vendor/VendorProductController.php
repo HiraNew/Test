@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Vendor;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Partner;
+use App\Models\Payment;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\Subcategory;
@@ -70,6 +72,7 @@ class VendorProductController extends Controller
         $data['status'] = 'inactive';
         $data['created_by'] = $vendor->id;
         $data['extra1'] = $request->extra1 ?? 0;
+        $data['extra5'] = $vendor->name;
         $data['feild1'] = $request->feild1 ?? null;
         $data['feild2'] = $request->feild2 ?? null;
         $data['feild3'] = $request->feild3 ?? null;
@@ -173,6 +176,58 @@ class VendorProductController extends Controller
 
         return back()->with('success', 'Image deleted successfully.');
     }
+
+
+    // Manging availabe order for vendor start
+    public function vendorOrderList()
+    {
+        $vendor = auth('vendor')->user();
+
+        $orders = Payment::with('product')
+            ->where('vendor_id', $vendor->id)
+            ->latest()
+            ->get();
+        $deliveryPartners = Partner::all();
+        return view('Vendor.orders.index', compact('orders', 'deliveryPartners'));
+    }
+
+    public function confirm($id)
+    {
+        $payment = Payment::where('vendor_id', auth('vendor')->id())->findOrFail($id);
+        $payment->update(['status' => 'confirmed']);
+
+        return back()->with('success', 'Order confirmed.');
+    }
+
+    public function ship(Request $request)
+    {
+        
+        $request->validate([
+            'payment_id' => 'required|exists:payments,id',
+            'delivery_partner_id' => 'required|exists:partners,id',
+            'feild1' => [
+                'required',
+                'string',
+                'regex:/^[0-9+\-\s]+$/',
+                'max:20'
+            ],
+
+        ]);
+
+
+        $payment = Payment::where('id', $request->payment_id)
+        ->where('vendor_id', auth('vendor')->id())
+        ->where('status', 'confirmed')
+        ->firstOrFail();
+        $payment->update([
+            'status' => 'shipped',
+            'delivery_partner_id' => $request->delivery_partner_id,
+            'feild1' => $request->feild1,
+        ]);
+
+        return redirect()->route('vendor.orders.index')->with('success', 'Order marked as shipped.');
+    }
+    // Managign available order for vendor end
 
 
 }

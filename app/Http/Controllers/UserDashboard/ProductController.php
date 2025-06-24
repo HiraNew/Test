@@ -118,12 +118,14 @@ class ProductController extends Controller
                 ->withAvg('reviews', 'rating')
                 ->withCount('reviews')
                 ->where('category_id', $categories->id)
+                ->where('status', 'active')
                 ->paginate(20);
         } else {
             $products = Product::with(['tags', 'reviews', 'wishlists'])
                 ->withAvg('reviews', 'rating')
                 ->withCount('reviews')
                 ->where('subcategory_id', $subcategory->id)
+                ->where('status', 'active')
                 ->paginate(20);
                 // dd($products);
         }
@@ -285,7 +287,7 @@ class ProductController extends Controller
                                     ->pluck('product_id')
                                     ->toArray();
 
-        $product = Product::with(['images', 'reviews.user'])->findOrFail($id);
+        $product = Product::with(['images', 'reviews.user'])->where('status', 'active')->findOrFail($id);
         // color varient on detail page
         $colorVariants = Product::where('name', $product->name)
         ->where('id', '!=', $product->id)
@@ -761,6 +763,17 @@ class ProductController extends Controller
         DB::beginTransaction();
 
         try {
+
+
+            $addressData = Session::get('temp_address');
+            $createdAt = session('temp_address_time');
+
+            if (!$addressData || !$createdAt || now()->diffInMinutes($createdAt) > 1) {
+                Session::forget('temp_address');
+                Session::forget('temp_address_time');
+                return redirect()->route('updateAddress')->with('error', 'Session expired. Please re-enter your address.');
+            }
+
             foreach ($orders as $order) {
                 $product = Product::find($order->product_id);
 
@@ -787,27 +800,28 @@ class ProductController extends Controller
                     }
 
                     $totalAmount = $baseAmount + $extraCharges;
-                    $addressData = Session::get('temp_address');
+                    // $addressData = Session::get('temp_address');
 
                     // Save order/payment
                     $confirm = new Payment();
                     $confirm->user_id = $user->id;
                     $confirm->product_id = $product->id;
+                    $confirm->vendor_id = $product->vendor_id; // ✅ May be null
                     $confirm->qty = $order->quantity;
                     $confirm->amount = $totalAmount;
                     $confirm->payment_mode = $request->payment_method;
                     $confirm->order_date = $indiaTime;
                     $confirm->delevery_date = $tomorrow;
-                    $confirm->orderid = $this->generateUniqueCode(); //even multiple order same time time order will have diffrent orderid one orderid for one order only.
+                    $confirm->orderid = $this->generateUniqueCode();
                     $confirm->save();
 
-                    $createdAt = session('temp_address_time');
+                    // $createdAt = session('temp_address_time');
 
-                    if ($createdAt && now()->diffInMinutes($createdAt) > 1) {
-                        Session::forget('temp_address');
-                        Session::forget('temp_address_time');
-                        return redirect()->route('updateAddress')->with('error', 'Session expired. Please re-enter your address.');
-                    }
+                    // if ($createdAt && now()->diffInMinutes($createdAt) > 1) {
+                    //     Session::forget('temp_address');
+                    //     Session::forget('temp_address_time');
+                    //     return redirect()->route('updateAddress')->with('error', 'Session expired. Please re-enter your address.');
+                    // }
 
 
                     // for address 
@@ -845,6 +859,7 @@ class ProductController extends Controller
             Cart::where('user_id', $user->id)->delete();
             $this->carting();
             Session::forget('temp_address');
+            Session::forget('temp_address_time');
             DB::commit();           
             
 
