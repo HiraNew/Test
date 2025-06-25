@@ -11,6 +11,8 @@ class Payment extends Model
     protected $fillable = [
         'is_canceled',
         'status',
+        'delivery_partner_id', 
+        'feild1',
     ];
     public function user()
     {

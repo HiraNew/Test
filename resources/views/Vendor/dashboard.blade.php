@@ -60,7 +60,8 @@
                                 <th>Product</th>
                                 <th>Status</th>
                                 <th>Amount</th>
-                                <th>Date</th>
+                                <th>Order Date</th>
+                                <th>Delivery Date</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -79,6 +80,12 @@
                                     </td>
                                     <td>${{ number_format($payment->amount, 2) }}</td>
                                     <td>{{ $payment->created_at->timezone('Asia/Kolkata')->format('d M, Y h:i:s A') }}</td>
+                                    @if(!in_array($payment->status, ['pending', 'confirmed', 'shipped']))
+                                    <td>{{ $payment->updated_at->timezone('Asia/Kolkata')->format('d M, Y h:i:s A') }}</td>
+                                                                        
+                                    @else
+                                    <td>No Delivered Yet.</td>
+                                    @endif
                                 </tr>
                                 @endforeach
 

@@ -183,10 +183,12 @@ class VendorProductController extends Controller
     {
         $vendor = auth('vendor')->user();
 
-        $orders = Payment::with('product')
-            ->where('vendor_id', $vendor->id)
-            ->latest()
-            ->get();
+       $orders = Payment::with(['product', 'address', 'user']) // Add 'address' here
+        ->where('vendor_id', $vendor->id)
+        ->latest()
+        ->get();
+        // dd($orders->user);
+
         $deliveryPartners = Partner::all();
         return view('Vendor.orders.index', compact('orders', 'deliveryPartners'));
     }
@@ -201,7 +203,7 @@ class VendorProductController extends Controller
 
     public function ship(Request $request)
     {
-        
+        // dd($request->all());
         $request->validate([
             'payment_id' => 'required|exists:payments,id',
             'delivery_partner_id' => 'required|exists:partners,id',
@@ -219,6 +221,7 @@ class VendorProductController extends Controller
         ->where('vendor_id', auth('vendor')->id())
         ->where('status', 'confirmed')
         ->firstOrFail();
+        // dd($payment);
         $payment->update([
             'status' => 'shipped',
             'delivery_partner_id' => $request->delivery_partner_id,
