@@ -164,7 +164,7 @@
                                     <button class="btn btn-light position-absolute top-0 end-0 m-1 wishlist-btn p-1" data-id="{{ $recent->id }}">
                                 <i class="{{ in_array($recent->id, $wishlistProductIds ?? []) ? 'fas' : 'far' }} fa-heart text-danger"></i>
                             </button>
-                                    <img src="{{ asset($recent->image ?? $recent->images->first()->image_path ?? 'placeholder.jpg') }}"
+                                    <img src="{{ url('storage/'.$recent->image ?? $recent->images->first()->image_path ?? 'placeholder.jpg') }}"
                                         alt="{{ $recent->name }}"
                                         class="card-img-top" style="height: 100px; object-fit: contain;">
                                     <div class="card-body p-2">
