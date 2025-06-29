@@ -64,6 +64,12 @@ class Product extends Model
     {
         return $this->belongsTo(Vendor::class);
     }
+    // Product.php
+    public function extraImages()
+    {
+        return $this->hasMany(ProductImage::class);
+    }
+
 
     protected static function booted()
     {

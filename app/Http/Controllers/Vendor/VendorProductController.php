@@ -25,12 +25,12 @@ class VendorProductController extends Controller
         return view('Vendor.productList', compact('products'));
     }
 
-    public function toggleStatus(Product $product)
-    {
-        $this->authorize('update', $product); // Optional: use policy
-        $product->update(['status' => !$product->status]);
-        return back()->with('success', 'Product status updated.');
-    }
+    // public function toggleStatus(Product $product)
+    // {
+    //     $this->authorize('update', $product); // Optional: use policy
+    //     $product->update(['status' => !$product->status]);
+    //     return back()->with('success', 'Product status updated.');
+    // }
 
     public function create()
     {
@@ -130,13 +130,28 @@ class VendorProductController extends Controller
             'weight' => 'nullable|string',
         ]);
 
+        // Handle main image update
         if ($request->hasFile('image')) {
+            // Optionally delete the old image from storage here
+            if ($product->image) {
+                \Storage::disk('public')->delete($product->image);
+            }
+
             $data['image'] = $request->file('image')->store('products', 'public');
         }
 
+        // Update product with validated data
         $product->update($data);
 
+        // Handle extra images
         if ($request->hasFile('extra_images')) {
+            // Delete old extra images from storage and database
+            foreach ($product->extraImages as $extraImage) {
+                \Storage::disk('public')->delete($extraImage->image_path); // Delete file
+                $extraImage->delete(); // Delete DB record
+            }
+
+            // Store new extra images
             foreach ($request->file('extra_images') as $file) {
                 $path = $file->store('product_images', 'public');
                 ProductImage::create([
@@ -148,6 +163,7 @@ class VendorProductController extends Controller
 
         return redirect()->route('vendor.products.index')->with('success', 'Product updated successfully!');
     }
+
 
     public function destroy(Product $product)
     {
