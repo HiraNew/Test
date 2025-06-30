@@ -76,8 +76,15 @@ class UserProfileController extends Controller
                     ->orderBy('created_at', 'desc')
                     ->paginate(10);
                     // dd($payments)
+        $totalOrders = Payment::where('user_id', Auth::id())->count();
+        $deliveredOrders = Payment::where('user_id', Auth::id())
+            ->where('status', 'delivered')
+            ->count();
+        $cancelledOrders= Payment::where('user_id', Auth::id())
+            ->where('status', 'cancelled')
+            ->count();
 
-        return view('Order.index', compact('payments'));
+        return view('Order.index', compact('payments','totalOrders','deliveredOrders','cancelledOrders'));
     }
 
     // Show single payment/order detail with recent payments

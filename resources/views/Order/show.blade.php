@@ -407,9 +407,9 @@
                 </div>
                 
             </div>
-               @if (isset($payment->is_canceled))
+               @if (isset($payment->is_canceled) && !in_array($payment->status, ['pending', 'confirmed','shipped','delivered']))
                             <div class="d-flex justify-content-between">
-                                <h4>Cancel by you.</h4>
+                                {{-- <h4>Cancel by you.</h4> --}}
                             <span>Cancelation Reason :</span>
                             <span>{{$payment->is_canceled}}</span>
                         </div>
