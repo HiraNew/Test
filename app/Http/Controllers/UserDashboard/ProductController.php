@@ -81,24 +81,45 @@ class ProductController extends Controller
 
     public function notificationView()
     {
-        $user = Auth::user();
-       
-        $notifications = Notification::where('user_id', $user->id)
-                                     ->with('creator') // Load the creator (admin or manager)
-                                     ->orderByDesc('created_at')
-                                     ->get();
-        
-        if(isset($notifications))
-        {
-            DB::table('notifications')
-            ->where('user_id', $user->id) // Specify the condition (e.g., where the notification ID matches)
-            ->update([
-               'status' => '1', // Update the 'status' column
-               'updated_at' => now(), // Update the 'updated_at' timestamp
-            ]);
-            return view('userNotification',compact('notifications'));
-        }
+         $user = Auth::user();
+
+        $notifications = Notification::with('creator')
+                        ->where('user_id', $user->id)
+                        ->orderByDesc('created_at')
+                        ->get();
+
+        // Mark as read
+        Notification::where('user_id', $user->id)
+                    ->where('status', '!=', 1)
+                    ->update([
+                        'status' => 1,
+                        'updated_at' => now(),
+                    ]);
+
+        return view('userNotification',compact('notifications'));
     }
+    public function getNotificationsData()
+    {
+        $user = Auth::user();
+
+        $notifications = Notification::with(['creator', 'product']) // Include product
+                        ->where('user_id', $user->id)
+                        ->orderByDesc('created_at')
+                        ->get();
+
+        // Mark as read
+        Notification::where('user_id', $user->id)
+                    ->where('status', '!=', 1)
+                    ->update([
+                        'status' => 1,
+                        'updated_at' => now(),
+                    ]);
+
+        // Return JSON response
+        return response()->json($notifications);
+    }
+
+
 
     public function categoryView($slug)
     {

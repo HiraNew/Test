@@ -24,7 +24,14 @@ class Notification extends Model
     // Define the relationship with the creator (admin or manager)
     public function creator()
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(Vendor::class, 'created_by');
     }
+    
+    // In your Notification model
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
 }
 

@@ -1,7 +1,7 @@
 
 {{-- @dd(Auth::guard('vendor')->user()->name) --}}
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+{{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"> --}}
 
 <h4 class="text-center"><i class="bi bi-person-badge-fill"></i> Vendor</h4>
 <hr>

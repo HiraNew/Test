@@ -2,6 +2,7 @@
 
 // use App\Http\Controllers\UserDashboard\ProductController;
 
+use App\Http\Controllers\AdminNotifyController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Partner\DeliveryPartnarController;
 use App\Http\Controllers\UserDashboard\UserProfileController;
@@ -9,7 +10,9 @@ use App\Http\Controllers\UserDashboard\UserWishListController;
 use App\Http\Controllers\Vendor\VendorController;
 use App\Http\Controllers\Vendor\VendorProductController;
 use App\Http\Controllers\WishlistController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Broadcast;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +28,7 @@ use Illuminate\Support\Facades\Route;
 // Route::get('/', function () {
 //     return view('home');
 // });
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
 Auth::routes();
 
 // Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
@@ -80,6 +84,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/paymentMethod/proceed', [App\Http\Controllers\UserDashboard\ProductController::class, 'paymentMethodProceed'])->name('paymentMethod.proceed');
     Route::get('/notification', [App\Http\Controllers\UserDashboard\ProductController::class, 'notification'])->name('notification');
     Route::get('/notificationView', [App\Http\Controllers\UserDashboard\ProductController::class, 'notificationView'])->name('notificationView');
+    Route::get('/notifications-data', [App\Http\Controllers\UserDashboard\ProductController::class, 'getNotificationsData'])->name('notifications.data');
+    
 
 
     //not decide
@@ -124,5 +130,10 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
     // Vendor Product controller end
   });
 });
-Route::delete('vendor/products/images/{image}', [VendorProductController::class, 'deleteExtraImage'])
-    ->name('vendor.products.images.destroy');
+// Route::delete('vendor/products/images/{image}', [VendorProductController::class, 'deleteExtraImage'])
+//     ->name('vendor.products.images.destroy');
+
+// // for send notification route 
+// Route::post('/notify/all', [AdminNotifyController::class, 'sendToAll'])->name('notify.all');
+// Route::post('/notify/user/{user}', [AdminNotifyController::class, 'sendToUser'])->name('notify.user');
+

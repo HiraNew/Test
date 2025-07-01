@@ -1,5 +1,5 @@
 @extends('layouts.vendor')
-
+@section('title', 'Orders')
 @section('content')
 <div class="container mt-4">
     <h3>Your Orders</h3>
@@ -31,7 +31,7 @@
                 <td>{{ $payment->qty }}</td>
                 <td>₹{{ $payment->amount }}</td>
                 <td>
-                    <span class="badge bg-{{ $payment->status == 'pending' || $payment->status == 'cancelled'  ? 'warning' : ($payment->status == 'confirmed' ? 'info' : 'success') }}">
+                    <span class="badge bg-{{ $payment->status == 'pending' || $payment->status == 'cancelled'  ? 'danger' : ($payment->status == 'confirmed' ? 'info' : 'success') }}">
                         {{ ucfirst($payment->status) }}
                     </span>
                 </td>
@@ -66,9 +66,9 @@
 
                     @else
                         @if ($payment->status === 'cancelled')
-                        <span class="text-primary">Item Cancelled No Action Reuired</span>
+                        <span class="text-danger">Item Cancelled No Action Reuired</span>
                         @elseif ($payment->status === 'delivered')
-                        <span class="text-primary">Item Delivered No Action Reuired</span>
+                        <span class="text-success">Item Delivered No Action Reuired</span>
                         @endif
                     @endif
                 </td>
