@@ -24,6 +24,13 @@
     @endif
 </a>
 
+<a href="{{ route('vendor.orders.users') }}">
+    <i class="bi bi-bag-check me-2"></i> Users
+    {{-- @if($newOrderNotifications > 0)
+        <span class="badge bg-danger float-end">{{ $newOrderNotifications }}</span>
+    @endif --}}
+</a>
+
 {{-- {{ route('vendor.payouts.index') }} --}}
 <a href="#">
     <i class="bi bi-cash-coin me-2"></i> Payouts

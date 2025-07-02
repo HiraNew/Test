@@ -86,6 +86,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/notificationView', [App\Http\Controllers\UserDashboard\ProductController::class, 'notificationView'])->name('notificationView');
     Route::get('/notifications-data', [App\Http\Controllers\UserDashboard\ProductController::class, 'getNotificationsData'])->name('notifications.data');
     
+    
 
 
     //not decide
@@ -127,6 +128,9 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
     Route::get('orders', [VendorProductController::class, 'vendorOrderList'])->name('orders.index');
     Route::post('orders/confirm/{id}', [VendorProductController::class, 'confirm'])->name('orders.confirm');
     Route::post('orders/ship', [VendorProductController::class, 'ship'])->name('orders.ship');
+    Route::post('/vendor/orders/send-notification', [VendorProductController::class, 'sendNotification'])->name('orders.sendNotification');
+    Route::get('/allUsers', [VendorProductController::class, 'user'])->name('orders.users');
+
     // Vendor Product controller end
   });
 });

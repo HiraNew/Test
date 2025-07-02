@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Vendor;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Notification;
 use App\Models\Partner;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\Subcategory;
+use App\Models\User;
 use App\View\Components\ProductCard;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -246,6 +248,62 @@ class VendorProductController extends Controller
 
         return redirect()->route('vendor.orders.index')->with('success', 'Order marked as shipped.');
     }
+
+    // sending notification on the basis user order item for particular order either canceled order or delivered
+    public function sendNotification(Request $request)
+    {
+        // dd($request->all());
+        $request->validate([
+            'payment_id' => 'nullable|integer',
+            'user_id' => 'required|integer',
+            'product_id' => 'required|integer',
+            'status' => 'nullable|string',
+            'message' => 'required|string',
+        ]);
+
+        // Example logic (log, notify user, save message, etc.)
+        Notification::create([
+            'user_id' => $request->user_id,
+            'product_id' => $request->product_id,
+            'sender_name' => auth()->guard('vendor')->user()->name,
+            'notification' => $request->message,
+            'status' => $request->status,
+        ]);
+
+        return back()->with('success', 'Notification sent successfully.');
+    }
+
+    // user list who belong to vendor id
+    public function user()
+    {
+        $vendorId = auth()->guard('vendor')->user()->id;
+
+        // Get all payments for this vendor, with product and user
+        $payments = Payment::with(['product', 'user'])
+            ->where('vendor_id', $vendorId)
+            ->get();
+
+        $groupedCustomers = $payments->groupBy('user_id')->map(function ($userPayments) {
+            $user = $userPayments->first()->user;
+
+            return [
+                'user' => $user,
+                'products' => $userPayments->pluck('product')->unique('id')->values(),
+                'payments' => $userPayments->values(), // Include all payments for this user
+            ];
+        });
+
+
+        // Also fetch all products owned by this vendor
+        $vendorProducts = \App\Models\Product::where('vendor_id', $vendorId)->get();
+
+        return view('vendor.users.index', [
+            'customers' => $groupedCustomers,
+            'vendorProducts' => $vendorProducts
+        ]);
+
+    }
+
     // Managign available order for vendor end
 
 

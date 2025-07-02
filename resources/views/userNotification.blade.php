@@ -58,7 +58,7 @@ $(document).ready(function() {
                     } else {
                         let rows = '';
                         data.forEach(function(item) {
-                            let productUrl = item.product ? `/detail/${item.product.id}` : '#'; // fallback if no product
+                            let productUrl = item.product ? `/detail/${item.product.id}` : '/notificationView'; // fallback if no product
                             rows += `
                                 <tr>
                                     <td>
@@ -67,7 +67,7 @@ $(document).ready(function() {
                                             ${item.notification}
                                         </a>
                                     </td>
-                                    <td class="text-success fw-semibold">${item.creator.name}</td>
+                                    <td class="text-success fw-semibold"><a href="${productUrl}">${item.sender_name}</a></td>
                                 </tr>
                             `;
                         });

@@ -13,6 +13,8 @@ class Notification extends Model
         'user_id',
         'notification',
         'created_by',
+        'sender_name',
+        'product_id',
     ];
 
     // Define the relationship with the user (who received the notification)

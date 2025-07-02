@@ -16,8 +16,9 @@
                 <th>Action</th>
             </tr>
         </thead>
+        {{-- @if (isset($orders)) --}}
         <tbody>
-            @foreach ($orders as $payment)
+            @forelse ($orders as $payment)
             <tr class="order-row" data-payment='@json($payment)'>
                 <td>{{ $payment->orderid }}</td>
                 <td>{{ $payment->created_at->timezone('Asia/Kolkata')->format('d M, Y h:i:s A') }}</td>
@@ -25,7 +26,7 @@
                 <td>{{ $payment->updated_at->timezone('Asia/Kolkata')->format('d M, Y h:i:s A') }}</td>
                                                                         
                 @else
-                <td>No Delivered Yet.</td>
+                <td>Not Delivered Yet.</td>
                 @endif
                 <td>{{ $payment->product->name ?? 'N/A' }}</td>
                 <td>{{ $payment->qty }}</td>
@@ -66,17 +67,79 @@
 
                     @else
                         @if ($payment->status === 'cancelled')
-                        <span class="text-danger">Item Cancelled No Action Reuired</span>
-                        @elseif ($payment->status === 'delivered')
-                        <span class="text-success">Item Delivered No Action Reuired</span>
-                        @endif
+                          <button class="btn btn-sm btn-secondary text-warning sendNotificationBtn"
+                            data-bs-toggle="modal"
+                            data-id="{{ $payment->id }}"
+                            data-user-id="{{ $payment->user_id }}"
+                            data-product-id="{{ $payment->product_id }}"
+                            data-product-name="{{ $payment->product->name ?? 'N/A' }}"
+                            data-user-name="{{ $payment->user->name ?? 'N/A' }}"
+                            data-status="cancelled"
+                            data-bs-target="#notificationModal">
+                            Send Cancelled Notification
+                        </button>
+
+                      @elseif ($payment->status === 'delivered')
+                          <button class="btn btn-sm btn-success text-white sendNotificationBtn"
+                              data-bs-toggle="modal" 
+                              data-id="{{ $payment->id }}"
+                              data-user-id="{{ $payment->user_id }}"
+                              data-product-id="{{ $payment->product_id }}"
+                              data-product-name="{{ $payment->product->name ?? 'N/A' }}"
+                              data-user-name="{{ $payment->user->name ?? 'N/A' }}"
+                              data-status="delivered"
+                              data-bs-target="#notificationModal">
+                              Send Delivered Notification
+                          </button>
+                      @endif
+
                     @endif
                 </td>
             </tr>
-            @endforeach
+              @empty
+              <tr>
+                  <td colspan="8" class="text-center text-muted">Nobody ordered your product yet. Keep patience 😊</td>
+              </tr>
+            @endforelse
         </tbody>
+       
+          {{-- @endif --}}
     </table>
 </div>
+
+<!-- Notification Modal (Used for both Cancelled and Delivered) -->
+<div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" action="{{ route('vendor.orders.sendNotification') }}">
+      @csrf
+      <input type="hidden" name="payment_id" id="notification_payment_id">
+      <input type="hidden" name="user_id" id="notification_user_id">
+      <input type="hidden" name="product_id" id="notification_product_id">
+      <input type="hidden" name="product_name" id="notification_product_name">
+      <input type="hidden" name="user_name" id="user_name">
+      <input type="hidden" name="status" id="notification_status">
+
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="notificationModalTitle">Send Notification</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="notification_message" class="form-label">Notification Message</label>
+            <textarea name="message" class="form-control" id="notification_message" rows="4" required placeholder="Write notification for this order..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Send Notification</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
 
 <!-- Ship Modal -->
 <div class="modal fade" id="shipModal" tabindex="-1" aria-labelledby="shipModalLabel" aria-hidden="true">
@@ -142,6 +205,7 @@
 <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     {{-- {{ route('vendor.orders.cancel') }} --}}
+    @if (isset($payment_id))
     <form method="POST" action="{{ route('order.cancel', $payment->id) }}">
       @csrf
       @method('PUT')
@@ -173,6 +237,7 @@
         </div>
       </div>
     </form>
+    @endif
   </div>
 </div>
 
@@ -192,6 +257,7 @@
             if (e.target.closest('td:nth-last-child(-n+2)')) return;
 
             const payment = JSON.parse(this.dataset.payment);
+            // alert(payment.product.name)
             
             
             // User info
@@ -234,6 +300,44 @@
             document.getElementById('other_reason').value = '';
         }
     });
+
+
+    // for send notification
+      document.querySelectorAll('.sendNotificationBtn').forEach(button => {
+          button.addEventListener('click', function () {
+              const paymentId = this.dataset.id;
+              const userId = this.dataset.userId;
+              const productId = this.dataset.productId;
+              const productName = this.dataset.productName;
+              const userName = this.dataset.userName;
+              // console.log(productName);
+              const status = this.dataset.status;
+
+              // Set hidden fields
+              document.getElementById('notification_payment_id').value = paymentId;
+              document.getElementById('notification_user_id').value = userId;
+              document.getElementById('notification_product_id').value = productId;
+              document.getElementById('notification_product_name').value = productName;
+              document.getElementById('user_name').value = userName;
+              document.getElementById('notification_status').value = status;
+
+              // Change modal title
+              const titleMap = {
+                  'cancelled': 'Send Cancelled Notification',
+                  'delivered': 'Send Delivered Notification'
+              };
+              document.getElementById('notificationModalTitle').textContent = titleMap[status] || 'Send Notification';
+              // Set default message
+              const defaultMessage = {
+                  'cancelled': `Dear "${userName}", your order for product "${productName}" has been cancelled. We apologize for the inconvenience.`,
+                  'delivered': `Dear "${userName}", your order for "${productName}" has been delivered successfully. Thank you for shopping with us!`
+              };
+
+
+              // Optional: clear previous message
+               document.getElementById('notification_message').value = defaultMessage[status] || '';
+          });
+      });
 </script>
 
 @endsection
