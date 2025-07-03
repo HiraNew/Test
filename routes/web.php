@@ -129,6 +129,7 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
     Route::post('orders/confirm/{id}', [VendorProductController::class, 'confirm'])->name('orders.confirm');
     Route::post('orders/ship', [VendorProductController::class, 'ship'])->name('orders.ship');
     Route::post('/vendor/orders/send-notification', [VendorProductController::class, 'sendNotification'])->name('orders.sendNotification');
+    Route::get('/notifications/sent', [VendorProductController::class, 'sentNotifications'])->name('notifications.sent');
     Route::get('/allUsers', [VendorProductController::class, 'user'])->name('orders.users');
 
     // Vendor Product controller end

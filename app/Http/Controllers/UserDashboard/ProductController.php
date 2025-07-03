@@ -569,6 +569,16 @@ class ProductController extends Controller
         foreach ($carts as $cart) {
             $product = $cart->product;
             $category = $product->category;
+            $vendorId = $product->vendor_id;
+
+            // Get only charges for this vendor
+            $charges = $category->charges()
+                ->where('is_active', true)
+                ->where(function ($query) use ($vendorId) {
+                    $query->where('vendor_id', $vendorId);
+                    // OR use vendor_id = null for admin-defined charges if needed
+                    // ->orWhereNull('vendor_id');
+                })->get();
 
             // Check stock availability
             $isStockExceeded = false;
@@ -588,10 +598,8 @@ class ProductController extends Controller
             $appliedCharges = [];
 
             // Extra charges
-            if (!$user->is_charge_exempt && $category && $category->charges) {
-                foreach ($category->charges as $charge) {
-                    if (!$charge->is_active) continue;
-
+            if (!$user->is_charge_exempt) {
+                foreach ($charges as $charge) {
                     switch ($charge->charge_type) {
                         case 'gst':
                             $amount = $productAmount * ($charge->amount / 100);
@@ -800,7 +808,14 @@ class ProductController extends Controller
 
                 if ($product) {
                     $category = $product->category;
-                    $charges = $category->charges()->where('is_active', true)->get()->keyBy('charge_type');
+                        $vendorId = $product->vendor_id;
+
+                        $charges = $category->charges()
+                            ->where('is_active', true)
+                            ->where('vendor_id', $vendorId)
+                            ->get()
+                            ->keyBy('charge_type');
+
 
                     $baseAmount = $product->price * $order->quantity;
                     $extraCharges = 0;

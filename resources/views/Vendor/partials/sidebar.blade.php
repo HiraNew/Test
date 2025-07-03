@@ -25,7 +25,13 @@
 </a>
 
 <a href="{{ route('vendor.orders.users') }}">
-    <i class="bi bi-bag-check me-2"></i> Users
+    <i class="bi bi-people"></i> Users
+    {{-- @if($newOrderNotifications > 0)
+        <span class="badge bg-danger float-end">{{ $newOrderNotifications }}</span>
+    @endif --}}
+</a>
+<a href="{{ route('vendor.notifications.sent') }}">
+    <i class="bi bi-bell"></i> Notifications
     {{-- @if($newOrderNotifications > 0)
         <span class="badge bg-danger float-end">{{ $newOrderNotifications }}</span>
     @endif --}}

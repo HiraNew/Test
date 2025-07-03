@@ -252,26 +252,65 @@ class VendorProductController extends Controller
     // sending notification on the basis user order item for particular order either canceled order or delivered
     public function sendNotification(Request $request)
     {
-        // dd($request->all());
-        $request->validate([
-            'payment_id' => 'nullable|integer',
-            'user_id' => 'required|integer',
-            'product_id' => 'required|integer',
-            'status' => 'nullable|string',
-            'message' => 'required|string',
+        $validated = $request->validate([
+            'payment_id'   => 'nullable|integer',
+            'user_id'      => 'nullable|integer',
+            'product_id'   => 'required|integer',
+            'status'       => 'nullable|string',
+            'message'      => 'required|string',
+            'send_to_all'  => 'nullable|boolean',
         ]);
 
-        // Example logic (log, notify user, save message, etc.)
+        $vendor = auth()->guard('vendor')->user();
+
+        if ($request->boolean('send_to_all')) {
+            // Send notification to all customers of the vendor
+            $userIds = Payment::where('vendor_id', $vendor->id)
+                            ->pluck('user_id')
+                            ->unique();
+
+            foreach ($userIds as $userId) {
+                Notification::create([
+                    'user_id'      => $userId,
+                    'product_id'   => $validated['product_id'],
+                    'sender_name'  => $vendor->name,
+                    'notification' => $validated['message'],
+                    'status'       => $validated['status'] ?? null,
+                ]);
+            }
+
+            return redirect()->back()->with('success', '✅ Notification sent to all your customers.');
+        }
+
+        // Otherwise send to a single user
+        if (!$validated['user_id']) {
+            return redirect()->back()->with('error', '❌ User ID is required if not sending to all.');
+        }
+
         Notification::create([
-            'user_id' => $request->user_id,
-            'product_id' => $request->product_id,
-            'sender_name' => auth()->guard('vendor')->user()->name,
-            'notification' => $request->message,
-            'status' => $request->status,
+            'user_id'      => $validated['user_id'],
+            'product_id'   => $validated['product_id'],
+            'sender_name'  => $vendor->name,
+            'notification' => $validated['message'],
+            'status'       => $validated['status'] ?? null,
         ]);
 
-        return back()->with('success', 'Notification sent successfully.');
+        return redirect()->back()->with('success', '✅ Notification sent successfully.');
     }
+
+    public function sentNotifications()
+    {
+        $vendor = auth()->guard('vendor')->user();
+
+        $notifications = \App\Models\Notification::where('sender_name', $vendor->name)
+            ->with('user', 'product') // assuming relationships exist
+            ->latest()
+            ->paginate(10); // paginate if needed
+
+        return view('Vendor.Notification.notification', compact('notifications'));
+    }
+
+
 
     // user list who belong to vendor id
     public function user()

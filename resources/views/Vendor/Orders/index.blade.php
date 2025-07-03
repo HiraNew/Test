@@ -201,45 +201,43 @@
   </div>
 </div>
 
-<!-- Cancel Modal -->
-<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    {{-- {{ route('vendor.orders.cancel') }} --}}
-    @if (isset($payment_id))
-    <form method="POST" action="{{ route('order.cancel', $payment->id) }}">
-      @csrf
-      @method('PUT')
-      <input type="hidden" name="payment_id" id="cancel_payment_id">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Cancel Order</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label for="cancel_reason" class="form-label">Reason for Cancellation</label>
-            <select class="form-select" name="cancel_reason" id="cancel_reason" required>
-              <option value="">Select a reason</option>
-              <option value="Canceled by Vendor Admin Due to Out of stock">Out of stock</option>
-              <option value="Canceled by Vendor Admin Due to Incorrect price">Incorrect price</option>
-              <option value="Canceled by Vendor Admin Due to Cannot deliver on time">Cannot deliver on time</option>
-              <option value="Canceled by Vendor Admin Due to Customer request">Customer request</option>
-              <option value="Other">Other</option>
-            </select>
+ <!-- Cancel Modal -->
+  <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <form method="POST" id="cancelOrderForm" action="">
+        @csrf
+        @method('PUT')
+        <input type="hidden" name="payment_id" id="cancel_payment_id">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Cancel Order</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="mb-3 d-none" id="other_reason_box">
-            <label for="other_reason" class="form-label">Other Reason</label>
-            <input type="text" class="form-control" name="other_reason" id="other_reason" placeholder="Specify reason">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="cancel_reason" class="form-label">Reason for Cancellation</label>
+              <select class="form-select" name="cancel_reason" id="cancel_reason" required>
+                <option value="">Select a reason</option>
+                <option value="Canceled by Vendor Admin Due to Out of stock">Out of stock</option>
+                <option value="Canceled by Vendor Admin Due to Incorrect price">Incorrect price</option>
+                <option value="Canceled by Vendor Admin Due to Cannot deliver on time">Cannot deliver on time</option>
+                <option value="Canceled by Vendor Admin Due to Customer request">Customer request</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="mb-3 d-none" id="other_reason_box">
+              <label for="other_reason" class="form-label">Other Reason</label>
+              <input type="text" class="form-control" name="other_reason" id="other_reason" placeholder="Specify reason">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-danger">Confirm Cancel</button>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-danger">Confirm Cancel</button>
-        </div>
-      </div>
-    </form>
-    @endif
+      </form>
+    </div>
   </div>
-</div>
+
 
 
 
@@ -280,26 +278,33 @@
             addressModal.show();
         });
     });
-    // Show cancel modal and set payment_id
-    const cancelModal = document.getElementById('cancelModal');
-    cancelModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const paymentId = button.getAttribute('data-id');
-        document.getElementById('cancel_payment_id').value = paymentId;
-    });
+      // Show cancel modal and set payment_id
+      const cancelModal = document.getElementById('cancelModal');
+      cancelModal.addEventListener('show.bs.modal', function (event) {
+          const button = event.relatedTarget;
+          const paymentId = button.getAttribute('data-id');
 
-    // Toggle "Other Reason" field
-    const reasonSelect = document.getElementById('cancel_reason');
-    const otherReasonBox = document.getElementById('other_reason_box');
+          // Set hidden input value
+          document.getElementById('cancel_payment_id').value = paymentId;
 
-    reasonSelect.addEventListener('change', function () {
-        if (this.value === 'Other') {
-            otherReasonBox.classList.remove('d-none');
-        } else {
-            otherReasonBox.classList.add('d-none');
-            document.getElementById('other_reason').value = '';
-        }
-    });
+          // Dynamically set the form action
+          const form = document.getElementById('cancelOrderForm');
+          form.action = `/order/cancel/${paymentId}`; // adjust route prefix if needed
+      });
+
+
+      // Toggle "Other Reason" field
+      const reasonSelect = document.getElementById('cancel_reason');
+      const otherReasonBox = document.getElementById('other_reason_box');
+
+      reasonSelect.addEventListener('change', function () {
+          if (this.value === 'Other') {
+              otherReasonBox.classList.remove('d-none');
+          } else {
+              otherReasonBox.classList.add('d-none');
+              document.getElementById('other_reason').value = '';
+          }
+      });
 
 
     // for send notification
