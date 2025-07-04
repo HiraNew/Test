@@ -9,11 +9,13 @@ use App\Models\Partner;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\RecentView;
 use App\Models\Subcategory;
 use App\Models\User;
 use App\View\Components\ProductCard;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class VendorProductController extends Controller
@@ -302,13 +304,29 @@ class VendorProductController extends Controller
     {
         $vendor = auth()->guard('vendor')->user();
 
-        $notifications = \App\Models\Notification::where('sender_name', $vendor->name)
-            ->with('user', 'product') // assuming relationships exist
-            ->latest()
-            ->paginate(10); // paginate if needed
+        // Group notifications by product_id for this vendor
+        $productNotifications = \App\Models\Notification::where('sender_name', $vendor->name)
+            ->with('product')
+            ->selectRaw('product_id, COUNT(*) as notification_count')
+            ->groupBy('product_id')
+            ->get();
 
-        return view('Vendor.Notification.notification', compact('notifications'));
+        return view('Vendor.Notification.notification', compact('productNotifications'));
     }
+    public function productNotifications($productId)
+    {
+        $vendor = auth()->guard('vendor')->user();
+
+        $notifications = \App\Models\Notification::with('user')
+            ->where('sender_name', $vendor->name)
+            ->where('product_id', $productId)
+            ->latest()
+            ->get();
+
+        return response()->json($notifications);
+    }
+
+
 
 
 
@@ -342,6 +360,50 @@ class VendorProductController extends Controller
         ]);
 
     }
+
+    public function analysis()
+    {
+        $vendorId = auth()->guard('vendor')->user()->id;
+
+        $recentViews = \App\Models\RecentView::whereHas('product', function ($query) use ($vendorId) {
+            $query->where('vendor_id', $vendorId);
+        })
+        ->with('product')
+        ->select('product_id')
+        ->selectRaw('COUNT(DISTINCT user_id) as unique_user_count')
+        ->groupBy('product_id')
+        ->get();
+
+        return view('Vendor.ProductAnalysis.views', compact('recentViews'));
+    }
+
+
+    public function productAnalysis($productId)
+    {
+        $lastWeek = now()->subWeek();
+        $today = now()->startOfDay();
+        $yesterday = now()->subDay()->startOfDay();
+
+        $data = [
+            'today' => RecentView::with('user')
+                ->where('product_id', $productId)
+                ->whereDate('viewed_at', now())->get(),
+
+            'yesterday' => RecentView::with('user')
+                ->where('product_id', $productId)
+                ->whereDate('viewed_at', now()->subDay())->get(),
+
+            'last_week' => RecentView::with('user')
+                ->where('product_id', $productId)
+                ->where('viewed_at', '>=', $lastWeek)->get(),
+
+            'product' => \App\Models\Product::find($productId)->name ?? 'Product',
+        ];
+
+        return response()->json($data);
+    }
+
+
 
     // Managign available order for vendor end
 

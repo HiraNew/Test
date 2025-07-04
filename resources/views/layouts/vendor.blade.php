@@ -101,6 +101,7 @@
 <!-- Main Content -->
 <div id="main-content">
     @yield('content')
+    @stack('scripts')
 </div>
 
 <!-- Bootstrap Script -->

@@ -36,6 +36,12 @@
         <span class="badge bg-danger float-end">{{ $newOrderNotifications }}</span>
     @endif --}}
 </a>
+<a href="{{ route('vendor.recent-views') }}">
+    <i class="bi bi-eye"></i> Product Views
+    {{-- @if($newOrderNotifications > 0)
+        <span class="badge bg-danger float-end">{{ $newOrderNotifications }}</span>
+    @endif --}}
+</a>
 
 {{-- {{ route('vendor.payouts.index') }} --}}
 <a href="#">

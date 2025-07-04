@@ -255,13 +255,13 @@ class ProductController extends Controller
                 ? Wishlist::where('user_id', Auth::id())->pluck('product_id')->toArray()
                 : [];
             // Recent views
-            if (Auth::check()) {
-                foreach ($Products as $product) {
-                    RecentView::updateOrCreate(
-                        ['user_id' => Auth::id(), 'product_id' => $product->id],
-                        ['viewed_at' => now()]
-                    );
-                }
+            // if (Auth::check()) {
+            //     foreach ($Products as $product) {
+            //         RecentView::updateOrCreate(
+            //             ['user_id' => Auth::id(), 'product_id' => $product->id],
+            //             ['viewed_at' => now('Asia/Kolkata')]
+            //         );
+            //     }
 
                 $recentViews = Product::whereIn('id', RecentView::where('user_id', Auth::id())
                     ->orderByDesc('viewed_at')
@@ -271,9 +271,9 @@ class ProductController extends Controller
                     ->withAvg('reviews', 'rating')
                     ->withCount('reviews')
                     ->get();
-            } else {
-                $recentViews = collect();
-            }
+            // } else {
+            //     $recentViews = collect(); 
+            // }
              // carousle
             $carouselItems = [
                 (object)['image' => 'papaya.png', 'caption' => 'Welcome to Slide 1'],
@@ -309,6 +309,15 @@ class ProductController extends Controller
                                     ->toArray();
 
         $product = Product::with(['images', 'reviews.user'])->where('status', 'active')->findOrFail($id);
+        RecentView::updateOrCreate(
+            [
+                'user_id' => Auth::id(),
+                'product_id' => $product->id
+            ],
+            [
+                'viewed_at' => Carbon::now('Asia/Kolkata') // or just now() if you're using global timezone config
+            ]
+        );
         // color varient on detail page
         $colorVariants = Product::where('name', $product->name)
         ->where('id', '!=', $product->id)

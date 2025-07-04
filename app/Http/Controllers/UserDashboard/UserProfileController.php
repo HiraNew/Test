@@ -46,12 +46,12 @@ class UserProfileController extends Controller
             ? Wishlist::where('user_id', Auth::id())->pluck('product_id')->toArray()
             : [];
         if (Auth::check()) {
-                foreach ($Products as $product) {
-                    RecentView::updateOrCreate(
-                        ['user_id' => Auth::id(), 'product_id' => $product->id],
-                        ['viewed_at' =>  $nowKolkata->format('d M Y, h:i A')]
-                    );
-                }
+                // foreach ($Products as $product) {
+                //     RecentView::updateOrCreate(
+                //         ['user_id' => Auth::id(), 'product_id' => $product->id],
+                //         ['viewed_at' =>  $nowKolkata->format('d M Y, h:i A')]
+                //     );
+                // }
 
                 $recentViews = Product::whereIn('id', RecentView::where('user_id', Auth::id())
                     ->orderByDesc('viewed_at')

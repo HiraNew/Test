@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class RecentView extends Model
 {
     use HasFactory;
-    protected $fillable = ['user_id', 'product_id'];
+    protected $fillable = ['user_id', 'product_id','viewed_at'];
 
     public function user(): BelongsTo {
         return $this->belongsTo(User::class);
