@@ -57,14 +57,17 @@
     .range-wrapper input[type="range"] {
         width: 100%;
     }
+    .filter{
+        color: #52021a;
+    }
 </style>
 
 <!-- Sidebar Triggers -->
-<button id="openSidebarBtn" class="btn btn-primary d-lg-none mb-3">
+<button id="openSidebarBtn" class="filter btn btn-danger d-lg-none mb-3">
     <i class="bi bi-sliders me-2"></i> Apply Filter
 </button>
 <button id="openSidebarBtnLarge"
-    class="btn btn-primary d-none d-lg-inline-block px-4 py-2 fw-semibold shadow-sm rounded-pill mb-4 position-fixed start-0 top-50 translate-middle-y ms-2">
+    class="filter btn btn-danger d-none d-lg-inline-block px-4 py-2 fw-semibold shadow-sm rounded-pill mb-4 position-fixed start-0 top-50 translate-middle-y ms-2">
     <i class="bi bi-sliders me-2"></i> Apply Filter
 </button>
 

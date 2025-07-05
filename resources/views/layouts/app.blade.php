@@ -15,74 +15,90 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-
+    @yield('cdn-css')
     <!-- Styles -->
     
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 
+    
     <style>
-        
         body {
             font-family: 'Nunito', sans-serif;
-            margin-bottom: 60px; /* Space for mobile footer */
+            /* padding-top: 60px;  Space for sticky navbar */
+            padding-bottom: 70px; /* Space for sticky footer */
+            margin: 0;
         }
 
         .icon {
-            font-size: 24px;
-            margin: 0 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            font-size: 20px;
+            transition: transform 0.2s ease;
         }
 
-        .icon:hover,
-        .icon:active {
-            color: #0d6efd;
+        .icon:hover {
+            color: #fff;
             transform: scale(1.2);
-        }
-
-        .badge-count {
-            position: absolute;
-            top: -5px;
-            right: -10px;
-            background-color: #dc3545;
-            color: white;
-            font-size: 11px;
-            padding: 3px 6px;
-            border-radius: 50%;
         }
 
         .icon-container {
             position: relative;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .searchbar,
-        .searchbar-mobile {
-            display: none;
+        .badge-custom,
+        .badge-count-custom {
+            position: absolute;
+            top: -5px;
+            right: -6px;
+            background-color: red;
+            color: white;
+            font-size: 10px;
+            padding: 2px 5px;
+            border-radius: 50%;
+            min-width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .navbar-brand {
-            font-weight: bold;
-            color: #0d6efd !important;
+        .navbar-custom {
+            background-color: #e40046;
+            color: white;
         }
 
-        @media (min-width: 768px) {
-            .searchbar {
-                display: none;
-                max-width: 300px;
-                margin-left: 15px;
-            }
-
-            .searchbar-mobile {
-                display: none !important;
-            }
-
-            .desktop-icons {
-                display: flex !important;
-                align-items: center;
-                gap: 1rem;
-            }
+        .navbar-custom .navbar-brand,
+        .navbar-custom .nav-link,
+        .navbar-custom .icon,
+        .navbar-custom .btn {
+            color: white !important;
         }
+
+        .navbar-custom .search-input {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            border: none;
+            border-radius: 25px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .navbar-custom .search-input:focus {
+            box-shadow: none;
+            outline: none;
+        }
+
+        .sticky-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1050;
+            background-color: #52021a;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+        }
+
 
         @media (max-width: 767.98px) {
             .desktop-navbar {
@@ -95,276 +111,154 @@
                 width: 100%;
                 background: white;
                 border-top: 1px solid #ddd;
-                z-index: 1030;
+                z-index: 1050;
+                box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
             }
 
             .mobile-footer .icon {
-                font-size: 20px;
-                transition: transform 0.2s ease-in-out;
-            }
-
-            .mobile-footer .icon:active {
-                transform: scale(1.3);
-            }
-
-            .badge-count {
-                font-size: 9px;
-                top: -4px;
-                right: -8px;
-            }
-
-            .searchbar-mobile {
-                display: none;
-                margin: 10px auto;
-                width: 90%;
-            }
-        }
-        //for mobile footer sticky
-        .icon-container i {
-            font-size: 20px;
-        }
-        .icon-container small {
-            font-size: 12px;
-            line-height: 1;
-        }
-        .badge-count {
-            position: absolute;
-            top: 4px;
-            right: 12px;
-            font-size: 10px;
-            background: red;
-            color: white;
-            padding: 2px 5px;
-            border-radius: 50%;
-        }
-        .badge-count-custom {
-            position: absolute;
-            bottom: 0px;   /* Moves the badge below */
-            right: 1px;     /* Moves the badge to the left */
-            background-color: red;
-            color: white;
-            font-size: 10px;
-            padding: 2px 5px;
-            border-radius: 50%;
-            /* min-width: 16px;
-            text-align: center;
-            line-height: 1; */
-        }
-       @media (max-width: 575.98px) {
-            .navbar .btn-sm {
-                font-size: 0.75rem;
-                padding: 0.25rem 0.4rem;
+                font-size: 18px;
             }
 
             .navbar-brand {
-                font-size: 0.95rem;
+                font-size: 1rem;
             }
         }
-        /* Ensure both mobile and desktop navbars are sticky */
-        .sticky-navbar {
-            position: sticky;
-            top: 0;
-            z-index: 1040;
-            background-color: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        .mobile-footer {
+            background-color: #52021a !important;
+            color: white !important;
         }
-
-        /* Prevent body overlap under navbar */
-        body {
-            padding-top: 0px; /* Height of navbar */
-        }
-
-        /* Adjust padding for smaller screen navbar height */
-        @media (max-width: 767.98px) {
-            body {
-                padding-top: 0px; /* Slightly taller mobile navbar */
-            }
-        }
-
 
     </style>
+
+
+
+
 </head>
 <body>
-    <div id="app">
-       {{-- Mobile Header --}}
-        <nav class="navbar navbar-light bg-white shadow-sm d-md-none px-2 py-2" style="position: sticky; top: 0; z-index: 1040;">
-            <div class="d-flex align-items-center w-100 gap-2">
-
-                {{-- Brand --}}
-                <a class="navbar-brand fw-bold text-primary mb-0 me-1 flex-shrink-0" href="{{ ('products') }}" style="font-size: 1rem;">
-                    {{ config('app.name', 'E-SAKROULI') }}
+    <div id="app" style="margin-bottom: 80px;">
+        <nav class="navbar navbar-expand-md navbar-custom sticky-navbar shadow-sm py-2 px-3">
+            <div class="container-fluid d-flex flex-wrap align-items-center justify-content-between">
+                {{-- Logo --}}
+                <a href="{{ url('/') }}" class="navbar-brand fw-bold">
+                    <span class="d-inline d-md-none">E-Mart</span>
+                    <span class="d-none d-md-inline">{{ config('app.name', 'E-SAKROULI') }}</span>
                 </a>
 
-                {{-- Searchbar (smaller) --}}
-                <form method="GET" action="{{ route('products') }}" class="position-relative flex-grow-1">
-                    <input type="search" name="query" id="live-search-mobile" class="form-control form-control-sm px-2 py-1" placeholder="Search..." autocomplete="off" style="font-size: 0.8rem;">
-                    <div id="live-search-results-mobile" class="list-group position-absolute w-100 d-none" style="z-index: 999;"></div>
-                </form>
+                {{-- Icons --}}
+                <div class="d-flex align-items-center gap-3 order-md-3">
+                    <a href="{{ route('wishlist.index') }}" class="icon"><i class="fas fa-heart fs-5"></i></a>
 
-                {{-- Wishlist Icon --}}
-                <div class="text-center flex-shrink-0">
-                    {{-- {{ route('wishlist.index') }} --}}
-                    <a href="{{ route('wishlist.index') }}" class="d-flex flex-column align-items-center text-decoration-none text-dark">
-                        <i class="fas fa-heart text-danger" style="font-size: 1rem;"></i>
-                        <small style="font-size: 0.65rem;">Wishlist</small>
+                    <a href="{{ route('cartView') }}" class="icon position-relative">
+                        <i class="fas fa-shopping-cart fs-5"></i>
+                        <span class="badge bg-light text-danger badge-custom position-absolute top-0 start-100 translate-middle">
+                            {{ Session::get('key') ?? 0 }}
+                        </span>
+                    </a>
+
+                    <a href="{{ route('notificationView') }}" class="icon position-relative">
+                        <i class="fas fa-bell fs-5"></i>
+                        <span class="badge bg-warning text-dark badge-custom position-absolute top-0 start-100 translate-middle clickNotification">
+                            0
+                        </span>
+
                     </a>
                 </div>
 
-                {{-- Auth Buttons --}}
-                @guest
-                    <div class="d-flex flex-shrink-0 gap-1">
-                        <a href="{{ route('login') }}" class="btn btn-outline-primary btn-sm px-2 py-1">Login</a>
-                        <a href="{{ route('register') }}" class="btn btn-primary btn-sm px-2 py-1">Register</a>
-                    </div>
-                @endguest
-            </div>
-        </nav>
-
-
-
-
-        {{-- Desktop Navbar --}}
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm desktop-navbar sticky-navbar">
-            <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
-                </a>
-
-                <div class="collapse navbar-collapse show">
-                    <ul class="navbar-nav me-auto">
-                        {{-- @auth --}}
-                            <li class="nav-item desktop-icons">
-                                {{-- Search --}}
-                                {{-- <div class="icon-container">
-                                    <i class="fas fa-search icon search-desktop"></i>
-                                </div> --}}
-                               {{-- Desktop Searchbar --}}
-                                <form method="GET" action="{{ route('products') }}" class="position-relative">
-                                    <input type="search" name="query" id="live-search" class="form-control searchbar" placeholder="Search..." autocomplete="off">
-                                    <div id="live-search-results" class="list-group position-absolute w-100 d-none" style="z-index: 999;"></div>
-                                </form>
-
-                                {{-- Cart --}}
-                                <div class="icon-container">
-                                    <a href="{{ route('cartView') }}">
-                                        <i class="fas fa-shopping-cart icon"></i>
-                                        <span class="badge-count" id="cart-count">{{ Session::get('key') ?? 0 }}</span>
-                                    </a>
-                                </div>
-
-                                {{-- Notifications --}}
-                                <div class="icon-container">
-                                    <a href="{{ route('notificationView') }}">
-                                        <i class="fas fa-bell icon"></i>
-                                        <span class="badge-count clickNotification">0</span>
-                                    </a>
-                                </div>
-
-                                {{-- Coins --}}
-                                <div class="icon-container">
-                                    <i class="fas fa-coins icon"></i>
-                                    <span class="badge-count">{{ Auth::user()->coins ?? 0 }}</span>
-                                </div>
-
-                                {{-- Profile --}}
-                                <div class="icon-container">
-                                    {{-- {{ route('profile') }} --}}
-                                    <a href="">
-                                        <i class="fas fa-user icon"></i>
-                                    </a>
-                                </div>
-                                {{-- {{ route('wishlist.index') }} --}}
-                                <div class="icon-container">
-                                    {{-- {{ route('profile') }} --}}
-                                    <a href="{{ route('wishlist.index') }}">Wishlist</a>
-                                </div>
-                            </li>
-                        {{-- @endauth --}}
+                {{-- Searchbar (stacked only on small screen) --}}
+                <div class="w-100 mt-2 d-md-none order-3">
+                    <form method="GET" action="{{ route('products') }}" class="mobile-search d-flex align-items-center gap-2">
+                        <input type="search" name="query" class="form-control search-input" placeholder="Search for products...">
                         
-                    </ul>
-                    <ul class="navbar-nav ms-auto">
                         @guest
-                            @if (Route::has('login'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                                </li>
-                            @endif
-                            @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                                </li>
-                            @endif
-                        @else
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
-                                   data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Hi, {{ Auth::user()->name }}
-                                </a>
-
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
-                                    </a>
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
-                                </div>
-                            </li>
+                            <a href="{{ route('login') }}" class="btn btn-success btn-sm">Login</a>
+                            <a href="{{ route('register') }}" class="btn btn-secondary btn-sm text-danger fw-bold">Register</a>
                         @endguest
-                    </ul>
+                    </form>
+                </div>
+
+
+                {{-- Search inline on larger screens --}}
+                <div class="d-none d-md-block w-50">
+                    <form method="GET" action="{{ route('products') }}">
+                        <input type="search" name="query" class="form-control search-input" placeholder="Search for products...">
+                    </form>
+                </div>
+
+                {{-- Auth Buttons --}}
+                <div class="d-none d-md-flex gap-2">
+                    @guest
+                        <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm">Login</a>
+                        <a href="{{ route('register') }}" class="btn btn-light btn-sm text-danger fw-bold">Register</a>
+                    @else
+                        <div class="dropdown">
+                            <a class="btn btn-outline-success btn-sm dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                Hi, {{ Auth::user()->name }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('logout') }}"
+                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
+                                </li>
+                            </ul>
+                        </div>
+                    @endguest
                 </div>
             </div>
         </nav>
+
+</div>
+
+    {{-- Recently Viewed Section (Optional)
+    <div class="container my-3">
+        <h6 class="fw-bold mb-2">Recently viewed products</h6>
+        <div class="d-flex align-items-center gap-3 overflow-auto">
+            <div class="card border-0 shadow-sm" style="width: 100px;">
+                <img src="{{ asset('images/sample-product.jpg') }}" class="card-img-top" alt="Product">
+                <div class="card-body p-1 text-center">
+                    <small class="text-muted">₹311</small>
+                </div>
+            </div>
+            Repeat product card here
+        </div>
+    </div> --}}
+</div>
+
 
         <main class="py-4 container">
             @yield('content')
         </main>
 
         {{-- Mobile Sticky Footer --}}
-        {{-- @auth --}}
-        <footer class="mobile-footer d-md-none">
-            <div class="d-flex justify-content-around align-items-center py-2 text-center">
-                {{-- Home --}}
-                <a href="{{ url('/') }}" class="icon-container d-flex flex-column align-items-center text-decoration-none text-dark">
-                    <i class="fas fa-home icon text-primary"></i>
-                    <small>Home</small>
-                </a>
+        <footer class="mobile-footer d-md-none" style="background-color: #e40046; color: white;">
+        <div class="d-flex justify-content-around align-items-center py-2 text-center">
 
-                {{-- Cart --}}
-                <a href="{{ route('cartView') }}" class="icon-container d-flex flex-column align-items-center position-relative text-decoration-none text-dark">
-                    <div class="icon-container position-relative">
-                        <i class="fas fa-shopping-cart icon text-primary"></i>
-                        <span class="badge-count-custom" id="cart-count-mobile">
-                            {{ Session::get('key') ?? 0 }}
-                        </span>
-                    </div>
-                    <small>Cart</small>
-                </a>
+            {{-- 🏠 Home --}}
+            <a href="{{ url('/') }}" class="icon-container d-flex flex-column align-items-center text-decoration-none text-white">
+                <i class="fas fa-home icon"></i>
+                <small>Home</small>
+            </a>
 
-                {{-- Notifications --}}
-                <a href="{{ route('notificationView') }}" class="icon-container d-flex flex-column align-items-center position-relative text-decoration-none text-dark">
-                    <i class="fas fa-bell icon text-primary"></i>
-                    <span class="badge-count clickNotification">0</span>
-                    <small>Notifications</small>
-                </a>
+            {{-- 👤 Account --}}
+            <a href="{{ route('user.account') }}" class="icon-container d-flex flex-column align-items-center text-decoration-none text-white">
+                <i class="fas fa-user icon"></i>
+                <small>Account</small>
+            </a>
 
-                {{-- Logout --}}
-                @auth
-                <a href="#" class="icon-container d-flex flex-column align-items-center text-decoration-none text-dark" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="fas fa-sign-out-alt icon text-danger"></i>
+            {{-- 🚪 Logout (only for authenticated users) --}}
+            @auth
+                <a href="#" class="icon-container d-flex flex-column align-items-center text-decoration-none text-white"
+                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="fas fa-sign-out-alt icon text-warning"></i>
                     <small>Logout</small>
                 </a>
-                @endauth
+            @endauth
 
-                {{-- Profile --}}
-                <a href="{{route('user.account')}}" class="icon-container d-flex flex-column align-items-center text-decoration-none text-dark">
-                    <i class="fas fa-user icon text-primary"></i>
-                    <small>Account</small>
-                </a>
-            </div>
+        </div>
+    </footer>
 
-            
-        </footer>
-        {{-- @endauth --}}
+
+
     </div>
 
     <!-- Scripts -->

@@ -4,7 +4,7 @@
 
 @section('content')
 
-<!-- GLightbox CSS -->
+{{-- <!-- GLightbox CSS -->
 <link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet" />
 
 <!-- GLightbox JS (at end of body) -->
@@ -15,7 +15,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> --}}
 
 <style>
     .review {
@@ -486,29 +486,48 @@
 
                         {{-- @auth --}}
                         <!-- Add Review Form -->
-                        <div class="card my-4">
-                            <div class="card-body">
-                                <h5 class="card-title">Write a Review</h5>
-                                <form action="{{ route('reviews.store', $product->id) }}" method="POST">
-                                    @csrf
-                                    <div class="mb-3">
-                                        <label class="form-label d-block">Rating</label>
+                        @php
+                            $user = auth()->user();
+                            $hasDeliveredOrder = \DB::table('payments')
+                                ->where('user_id', $user->id)
+                                ->where('product_id', $product->id)
+                                ->where('status', 'delivered')
+                                ->exists();
+
+                            $alreadyReviewed = $product->reviews()
+                                ->where('user_id', $user->id)
+                                ->exists();
+                        @endphp
+
+                        @if($hasDeliveredOrder && !$alreadyReviewed)
+                            <div class="card my-4">
+                                <div class="card-body">
+                                    <h5 class="card-title">Write a Review</h5>
+                                    <form action="{{ route('reviews.store', $product->id) }}" method="POST">
+                                        @csrf
+                                        <div class="mb-3">
+                                            <label class="form-label d-block">Rating</label>
                                             <div id="starRating" class="mb-3">
                                                 @for($i = 1; $i <= 5; $i++)
                                                     <i class="fa fa-star fs-4 text-muted star" data-value="{{ $i }}"></i>
                                                 @endfor
                                             </div>
                                             <input type="hidden" name="rating" id="ratingInput" required>
-
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="comment" class="form-label">Comment</label>
-                                        <textarea name="comment" id="comment" rows="3" class="form-control" placeholder="Write your thoughts..." required></textarea>
-                                    </div>
-                                    <button type="submit" class="btn btn-success">Submit Review</button>
-                                </form>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="comment" class="form-label">Comment</label>
+                                            <textarea name="comment" id="comment" rows="3" class="form-control" placeholder="Write your thoughts..."></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-success">Submit Review</button>
+                                    </form>   
+                                </div>
                             </div>
-                        </div>
+                        @elseif($alreadyReviewed)
+                            <div class="alert alert-info">You have already reviewed this product.</div>
+                        @elseif(!$hasDeliveredOrder)
+                            <div class="alert alert-warning">You can only review this product once it's delivered.</div>
+                        @endif
+
                         {{-- @endauth --}}
                         
                         

@@ -311,7 +311,7 @@ class ProductController extends Controller
         $product = Product::with(['images', 'reviews.user'])->where('status', 'active')->findOrFail($id);
         RecentView::updateOrCreate(
             [
-                'user_id' => Auth::id(),
+                'user_id' => Auth::id() ?? null,
                 'product_id' => $product->id
             ],
             [
@@ -395,19 +395,44 @@ class ProductController extends Controller
 
     public function storeReview(Request $request, Product $product)
     {
+        $userId = auth()->id();
+
+        // Check if user has a 'delivered' order for this product in payment table
+        $hasDeliveredOrder = DB::table('payments')
+            ->where('user_id', $userId)
+            ->where('product_id', $product->id)
+            ->where('status', 'delivered')
+            ->exists();
+
+        if (!$hasDeliveredOrder) {
+            return back()->with('error', 'You can only review products that were delivered.');
+        }
+
+        // Check if user has already reviewed this product
+        $alreadyReviewed = $product->reviews()
+            ->where('user_id', $userId)
+            ->exists();
+
+        if ($alreadyReviewed) {
+            return back()->with('error', 'You have already submitted a review for this product.');
+        }
+
+        // Validate input
         $request->validate([
             'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'required|string|max:1000',
+            'comment' => 'nullable|string|max:1000',
         ]);
-        // dd($product->reviews);
+
+        // Create review
         $product->reviews()->create([
-            'user_id' => auth()->id(),
+            'user_id' => $userId,
             'rating' => $request->rating,
-            'review' => $request->comment ?? 'N/A  ',
+            'review' => $request->comment ?? 'N/A',
         ]);
 
         return back()->with('success', 'Review submitted successfully!');
     }
+
 
     public function like($id)
     {

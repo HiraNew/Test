@@ -4,7 +4,7 @@
 {{-- @section('title', $product->name) --}}
 
 @section('content')
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+{{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"> --}}
 
     <style>
         body {
@@ -162,7 +162,7 @@
                             <a href="{{ url('detail', $recent->id) }}" class="text-decoration-none">
                                 <div class="card border-0 shadow-sm" style="min-width: 140px; max-width: 140px; font-size: 0.85rem;">
                                     <button class="btn btn-light position-absolute top-0 end-0 m-1 wishlist-btn p-1" data-id="{{ $recent->id }}">
-                                <i class="{{ in_array($recent->id, $wishlistProductIds ?? []) ? 'fas' : 'far' }} fa-heart text-danger"></i>
+                                {{-- <i class="{{ in_array($recent->id, $wishlistProductIds ?? []) ? 'fas' : 'far' }} fa-heart text-danger"></i> --}}
                             </button>
                                     <img src="{{ url('storage/'.$recent->image ?? $recent->images->first()->image_path ?? 'placeholder.jpg') }}"
                                         alt="{{ $recent->name }}"

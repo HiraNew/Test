@@ -4,17 +4,27 @@
 
  @include('components.sidebar')
 <style>
-    /* Dropdown */
- .subcategory-dropdown {
-        display: none;
-        position: absolute;
-        top: 90%;
-        left: 0;
-        z-index: 1000;
-        min-width: 150px;
+    .category-item {
+        transition: transform 0.3s ease;
     }
 
-    /* Show on hover (non-touch devices only) */
+    .category-item:hover {
+        transform: translateY(-4px);
+    }
+
+    .subcategory-dropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        min-width: 160px;
+        background-color: white;
+        border-radius: 0.25rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
     @media (hover: hover) and (pointer: fine) {
         .category-item:hover .subcategory-dropdown {
             display: block;
@@ -25,7 +35,6 @@
         }
     }
 
-    /* For touch devices: only show when active class is toggled */
     .category-item.show-submenu .subcategory-dropdown {
         display: block;
     }
@@ -33,28 +42,29 @@
     .dropdown-toggle-btn {
         cursor: pointer;
         font-size: 14px;
-        color: #333;
-        user-select: none;
+        color: #444;
     }
 
     .dropdown-arrow {
         display: inline-block;
-        transition: transform 0.3s;
+        transition: transform 0.3s ease;
     }
 
     .category-item.show-submenu .dropdown-arrow {
         transform: rotate(180deg);
     }
+
     .wishlist-btn {
-        width: 34px;
-        height: 34px;
+        width: 32px;
+        height: 32px;
         background-color: white;
-        color: #000;
+        border: 1px solid #ddd;
+        color: red;
         transition: all 0.3s ease;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        border-radius: 50%;
     }
 
     .wishlist-btn.wishlist-active {
@@ -62,7 +72,28 @@
         color: white;
     }
 
+    .product-card .card {
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+    .product-card .card:hover {
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        transform: translateY(-4px);
+    }
+
+    .card-img-top {
+        transition: transform 0.3s ease;
+    }
+
+    .card-img-top:hover {
+        transform: scale(1.05);
+    }
+
+    .btn {
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
 </style>
+
 <div class="container">
     <div class="row justify-content-center mb-4 pb-2">
         <div class="col-12 col-xl-11 px-0">
@@ -110,7 +141,7 @@
     {{-- <h4 class="fw-bold mb-3">{{ $categories->name }}</h4> --}}
     
     <div class="container my-4">
-    <h3 class="mb-4">
+        <h3 class="mb-4">
         @if($categories)
             Products in Category: <span class="text-primary">{{ $categories->name }}</span>
         @elseif($subcategory)
@@ -119,6 +150,7 @@
             Products
         @endif
     </h3>
+
 
     @if ($products->count() > 0)
     <div class="row">
