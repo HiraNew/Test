@@ -95,7 +95,7 @@
             left: 0;
             width: 100%;
             z-index: 1050;
-            background-color: #52021a;
+            background-color: #FE5D26;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
         }
 
@@ -124,7 +124,7 @@
             }
         }
         .mobile-footer {
-            background-color: #52021a !important;
+            background-color: #014d23 !important;
             color: white !important;
         }
 

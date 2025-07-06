@@ -7,56 +7,66 @@
 {{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"> --}}
 
     <style>
-        body {
-            background-color: #f5f6fa;
+    body {
+        background-color: #f5f6fa;
+    }
+    .profile-card {
+        border-radius: 15px;
+        background: linear-gradient(135deg, #ffffff, #f1f3f6);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+    .feature-btn {
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        padding: 1.2rem 0.5rem;
+        background-color: #fff;
+        transition: 0.3s ease;
+        height: 100%;
+        font-size: 0.95rem;
+    }
+    .feature-btn:hover {
+        background-color: #f8f9fa;
+        transform: scale(1.02);
+    }
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border-top: 1px solid #dee2e6;
+        background-color: #fff;
+        z-index: 1030;
+    }
+    .bottom-nav a {
+        color: #333;
+        text-decoration: none;
+        padding: 0.5rem 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 0.85rem;
+    }
+    .badge-cart {
+        position: absolute;
+        top: 2px;
+        right: 20px;
+        font-size: 0.7rem;
+    }
+
+    /* Mobile scroll arrows hide on small screens */
+    @media (max-width: 576px) {
+        .scroll-btn {
+            display: none;
         }
-        .profile-card {
-            border-radius: 15px;
-            background: linear-gradient(135deg, #ffffff, #f1f3f6);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-        }
-        .feature-btn {
-            border: 1px solid #dee2e6;
-            border-radius: 12px;
-            padding: 1rem;
-            background-color: #fff;
-            transition: 0.3s ease;
-            height: 100%;
-        }
-        .feature-btn:hover {
-            background-color: #f8f9fa;
-        }
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            border-top: 1px solid #dee2e6;
-            background-color: #fff;
-            z-index: 1030;
-        }
-        .bottom-nav a {
-            color: #333;
-            text-decoration: none;
-            padding: 0.5rem 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 0.85rem;
-        }
-        .badge-cart {
-            position: absolute;
-            top: 2px;
-            right: 20px;
-            font-size: 0.7rem;
-        }
-    </style>
+    }
+</style>
+
 
 <div class="container py-4 mb-5">
     <!-- Profile Section -->
     <div class="profile-card p-3 mb-4 d-flex justify-content-between align-items-center">
         <div>
-            <h5 class="mb-1">{{ $user->name ?? 'Guest' }}</h5>
+            <h5 class="mb-1 fw-bold fs-2">{{ $user->name ?? 'Guest' }}</h5>
             <small class="text-muted fw-semibold">✨ {{ $membership['level'] }}</small><br>
             <small class="text-muted">valid till {{ $membership['valid_till'] }}</small>
         </div>
@@ -67,7 +77,7 @@
 
 
     <!-- Buttons -->
-    <div class="row g-3 text-center mb-4">
+    <div class="row row-cols-2 row-cols-md-4 g-3 text-center mb-4">
         <div class="col-6 col-md-3">
             <a href="{{ route('payments.index') }}" class="feature-btn h-100 d-block text-decoration-none text-dark">
                 📦<br><strong>Orders</strong>
@@ -157,10 +167,10 @@
                     </button>
 
                     <!-- Scrollable Container -->
-                    <div id="recent-scroll" class="d-flex overflow-auto px-2 py-1" style="gap: 10px; scroll-behavior: smooth;">
+                    <div id="recent-scroll" class="d-flex overflow-auto px-2 py-1" style="gap: 12px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
                         @foreach($recentViews as $recent)
                             <a href="{{ url('detail', $recent->id) }}" class="text-decoration-none">
-                                <div class="card border-0 shadow-sm" style="min-width: 140px; max-width: 140px; font-size: 0.85rem;">
+                                <div class="card border-0 shadow-sm rounded" style="min-width: 140px; max-width: 140px; font-size: 0.85rem;">
                                     <button class="btn btn-light position-absolute top-0 end-0 m-1 wishlist-btn p-1" data-id="{{ $recent->id }}">
                                 {{-- <i class="{{ in_array($recent->id, $wishlistProductIds ?? []) ? 'fas' : 'far' }} fa-heart text-danger"></i> --}}
                             </button>
