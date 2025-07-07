@@ -42,6 +42,7 @@ Route::get('/detail/{id}', [App\Http\Controllers\UserDashboard\ProductController
 Route::get('/live-search', [App\Http\Controllers\UserDashboard\ProductController::class, 'liveSearch'])->name('products.liveSearch');
 // Route::get('/product/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'show'])->name('product.show');
 Route::get('/category/{slug}', [App\Http\Controllers\UserDashboard\ProductController::class, 'categoryView'])->name('category.view');
+// Route::get('/categories', [App\Http\Controllers\UserDashboard\ProductController::class, 'allCategory'])->name('allCategory.view');
 
 
 

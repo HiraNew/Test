@@ -186,7 +186,7 @@ class UserProfileController extends Controller
         return back()->with('success', 'Address updated successfully.');
     }
 
-    public function cancel(Request $request, $paymentId)
+   public function cancel(Request $request, $paymentId)
     {
         $request->validate([
             'cancel_reason' => 'required|string',
@@ -194,18 +194,23 @@ class UserProfileController extends Controller
         ]);
 
         $payment = Payment::where('id', $paymentId)
-                          ->where('user_id', Auth::id())
-                          ->firstOrFail();
+                        ->where('user_id', Auth::id())
+                        ->firstOrFail();
 
-        $reason = $request->cancel_reason === 'Other reasons' ? $request->other_reason_text : $request->cancel_reason;
+        $reason = $request->cancel_reason === 'Other reasons'
+            ? $request->other_reason_text
+            : $request->cancel_reason;
 
+        // Save the current status as previous_status before cancellation
         $payment->update([
+            'previous_status' => $payment->status,
             'status' => 'cancelled',
             'is_canceled' => $reason,
         ]);
 
         return back()->with('success', 'Order cancelled successfully.');
     }
+
 
     public function getStates($countryId)
     {

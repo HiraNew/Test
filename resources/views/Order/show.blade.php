@@ -196,6 +196,11 @@
         50% { transform: scale(1.2); opacity: 1; }
         100% { transform: scale(1); opacity: 0.8; }
     }
+    
+    .cancelled .step-icon {
+        background-color: red;
+        color: white;
+    }
 
 
 
@@ -339,36 +344,70 @@
                         <h4>Status Tracking</h4>
                         @php
                             $statuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
-                            $currentIndex = array_search($payment->status, $statuses);
+                            $status = $payment->status;
+
+                            $currentIndex = array_search($status, $statuses);
+
+                            if ($status === 'cancelled') {
+                                // Use the previous status to determine how far the order had progressed
+                                $previousStatus = $payment->previous_status ?? 'pending';
+                                $lastValidIndex = array_search($previousStatus, $statuses);
+
+                                // Fallback to pending if something went wrong
+                                if ($lastValidIndex === false) {
+                                    $lastValidIndex = array_search('pending', $statuses);
+                                }
+                            }
                         @endphp
 
+
                         <div class="tracker">
-                            @foreach($statuses as $index => $status)
+                            @foreach($statuses as $index => $step)
                                 @php
                                     $class = '';
-                                    if ($index < $currentIndex) $class = 'completed';
-                                    elseif ($index == $currentIndex) $class = 'current';
+                                    $icon = $index + 1;
+
+                                    if ($status === 'cancelled') {
+                                        if ($step === 'cancelled') {
+                                            $class = 'cancelled';
+                                            $icon = '<i class="fas fa-check"></i>';
+                                            // $icon = '<i class="fas fa-times"></i>';
+                                        } elseif ($index <= $lastValidIndex) {
+                                            $class = 'completed';
+                                            $icon = '<i class="fas fa-check"></i>';
+                                        } else {
+                                            $class = ''; // not completed
+                                            $icon = $index + 1;
+                                        }
+                                    } else {
+                                        if ($index < $currentIndex) {
+                                            $class = 'completed';
+                                            $icon = '<i class="fas fa-check"></i>';
+                                        } elseif ($index === $currentIndex) {
+                                            $class = 'current';
+                                            $icon = $index + 1;
+                                        } else {
+                                            $class = '';
+                                            $icon = $index + 1;
+                                        }
+                                    }
+
+
                                 @endphp
 
                                 <div class="tracker-step {{ $class }}">
-                                    <div class="step-icon">
-                                        @if($class == 'completed')
-                                            <i class="fas fa-check"></i>
-                                        @else
-                                            {{ $index + 1 }}
-                                        @endif
-                                    </div>
-                                    <div class="step-label">{{ ucfirst($status) }}</div>
+                                    <div class="step-icon">{!! $icon !!}</div>
+                                    <div class="step-label">{{ ucfirst($step) }}</div>
+                                    
                                 </div>
 
-                                {{-- Insert minimal "Out for Delivery" icon between shipped and delivered --}}
-                                @if($status === 'shipped' && $payment->status !== 'delivered' && $payment->status !== 'cancelled' && $payment->status !== 'pending' && $payment->status !== 'confirmed')
-                                    <div class="out-for-delivery-alert">
-                                        <i class="fas fa-truck-moving" title="Your item is out for delivery"> </i> out for delivery
-                                    </div>
-                                @endif
                             @endforeach
+                            
+
                         </div>
+
+
+
 
 
                         {{-- Action Buttons Based on Status --}}

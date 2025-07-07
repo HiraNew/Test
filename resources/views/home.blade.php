@@ -644,4 +644,5 @@ document.querySelectorAll('.position-relative').forEach(function(categoryDiv) {
     });
 
 </script>
+{{-- @include('components.sidebar') --}}
 @endsection

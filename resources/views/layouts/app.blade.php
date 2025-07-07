@@ -22,6 +22,8 @@
 
     
     <style>
+
+        
         body {
             font-family: 'Nunito', sans-serif;
             /* padding-top: 60px;  Space for sticky navbar */
@@ -95,7 +97,7 @@
             left: 0;
             width: 100%;
             z-index: 1050;
-            background-color: #FE5D26;
+            background: linear-gradient(135deg, rgb(193, 116, 39), rgb(255, 165, 0));
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
         }
 
@@ -124,7 +126,7 @@
             }
         }
         .mobile-footer {
-            background-color: #014d23 !important;
+            background: linear-gradient(135deg, rgb(193, 116, 39), rgb(255, 165, 0));
             color: white !important;
         }
 
@@ -231,30 +233,40 @@
 
         {{-- Mobile Sticky Footer --}}
         <footer class="mobile-footer d-md-none" style="background-color: #e40046; color: white;">
-        <div class="d-flex justify-content-around align-items-center py-2 text-center">
+            <div class="d-flex justify-content-around align-items-center py-2 text-center">
+ {{-- bg-dark --}}
+        {{-- 🏠 Home --}}
+        <a href="{{ url('/') }}" class="icon-container d-flex flex-column align-items-center text-decoration-none text-white">
+            <i class="fas fa-home icon"></i>
+            <small>Home</small>
+        </a>
 
-            {{-- 🏠 Home --}}
-            <a href="{{ url('/') }}" class="icon-container d-flex flex-column align-items-center text-decoration-none text-white">
-                <i class="fas fa-home icon"></i>
-                <small>Home</small>
+        {{-- 📂 Categories --}}
+        {{-- {{ route('allCategory.view') }} --}}
+        <a href="#" class="icon-container d-flex flex-column align-items-center text-decoration-none text-white">
+            <i class="fas fa-th-large icon"></i>
+            <small>Categories</small>
+        </a>
+
+        {{-- 👤 Account --}}
+        <a href="{{ route('user.account') }}" class="icon-container d-flex flex-column align-items-center text-decoration-none text-white">
+            <i class="fas fa-user icon"></i>
+            <small>Account</small>
+        </a>
+
+        {{-- 🚪 Logout (only for authenticated users) --}}
+        @auth
+            <a href="#" class="icon-container d-flex flex-column align-items-center text-decoration-none text-white"
+            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                <i class="fas fa-sign-out-alt icon text-warning"></i>
+                <small>Logout</small>
             </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                @csrf
+            </form>
+        @endauth
+    </div>
 
-            {{-- 👤 Account --}}
-            <a href="{{ route('user.account') }}" class="icon-container d-flex flex-column align-items-center text-decoration-none text-white">
-                <i class="fas fa-user icon"></i>
-                <small>Account</small>
-            </a>
-
-            {{-- 🚪 Logout (only for authenticated users) --}}
-            @auth
-                <a href="#" class="icon-container d-flex flex-column align-items-center text-decoration-none text-white"
-                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="fas fa-sign-out-alt icon text-warning"></i>
-                    <small>Logout</small>
-                </a>
-            @endauth
-
-        </div>
     </footer>
 
 
