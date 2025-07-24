@@ -19,6 +19,7 @@
     <!-- Styles -->
     
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+     {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
 
     
     <style>
@@ -238,20 +239,20 @@
         {{-- 🏠 Home --}}
         <a href="{{ url('/') }}" class="icon-container d-flex flex-column align-items-center text-decoration-none text-white">
             <i class="fas fa-home icon"></i>
-            <small>Home</small>
+            <small><b>Home</b></small>
         </a>
 
         {{-- 📂 Categories --}}
         {{-- {{ route('allCategory.view') }} --}}
         <a href="#" class="icon-container d-flex flex-column align-items-center text-decoration-none text-white">
             <i class="fas fa-th-large icon"></i>
-            <small>Categories</small>
+            <small><b>Categories</b></small>
         </a>
 
         {{-- 👤 Account --}}
         <a href="{{ route('user.account') }}" class="icon-container d-flex flex-column align-items-center text-decoration-none text-white">
             <i class="fas fa-user icon"></i>
-            <small>Account</small>
+            <small><b>Account</b></small>
         </a>
 
         {{-- 🚪 Logout (only for authenticated users) --}}
@@ -259,7 +260,7 @@
             <a href="#" class="icon-container d-flex flex-column align-items-center text-decoration-none text-white"
             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                 <i class="fas fa-sign-out-alt icon text-warning"></i>
-                <small>Logout</small>
+                <small><b>Logout</b></small>
             </a>
             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                 @csrf

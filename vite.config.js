@@ -22,7 +22,7 @@ export default defineConfig({
         port: 5173,
         strictPort: true,
         hmr: {
-            host: '192.168.1.7', // Your PC IP
+            host: '192.168.1.44', // Your PC IP
         },
     },
     plugins: [

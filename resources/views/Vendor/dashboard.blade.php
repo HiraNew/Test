@@ -80,11 +80,13 @@
                                     </td>
                                     <td>${{ number_format($payment->amount, 2) }}</td>
                                     <td>{{ $payment->created_at->timezone('Asia/Kolkata')->format('d M, Y h:i:s A') }}</td>
-                                    @if(!in_array($payment->status, ['pending', 'confirmed', 'shipped']))
+                                    @if(!in_array($payment->status, ['pending', 'confirmed', 'shipped','cancelled']))
                                     <td>{{ $payment->updated_at->timezone('Asia/Kolkata')->format('d M, Y h:i:s A') }}</td>
                                                                         
+                                    @elseif ($payment->status !== 'cancelled')
+                                    <td>Item Cancelled</td>
                                     @else
-                                    <td>No Delivered Yet.</td>
+                                    <td>Not Delivered Yet.</td>
                                     @endif
                                 </tr>
                                 @endforeach

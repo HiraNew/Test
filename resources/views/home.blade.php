@@ -20,36 +20,42 @@
 <div class="container-fluid py-4">
    
 
+    <!-- Full Width Container -->
     <div class="row justify-content-center mb-4 pb-2">
-        <div class="col-12 col-xl-11 px-0">
-            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3 px-3 py-3 bg-white rounded shadow-sm">
+        <div class="bg-white py-3 shadow-sm">
+            <!-- Horizontal Scrollable Row -->
+            <div class="d-flex flex-nowrap overflow-auto px-2" id="category-scroll">
                 @foreach ($categories as $category)
-                    <div class="col category-item text-center position-relative product-card">
+                    <div class="category-item text-center position-relative flex-shrink-0 mx-2" style="width: 100px;">
+                        <!-- Category Link -->
                         <a href="{{ route('category.view', $category->slug) }}"
                         class="text-decoration-none text-dark d-flex flex-column align-items-center">
-                        <img src="{{ asset($category->icon) }}" alt="{{ $category->name }}" class="rounded-circle img-fluid mb-1" style="width: 50px; height: 50px; object-fit: cover;">
-                            <div class="small mt-1 {{ strtolower($category->name) == 'fashion' ? 'text-primary' : '' }}">
-                                <small class="mt-2 text-truncate fw-bold" style="max-width: 70px;">{{ $category->name }}</small>
-                            </div>
+                            <img src="{{ asset($category->icon) }}" alt="{{ $category->name }}"
+                                class="rounded-circle img-fluid mb-1"
+                                style="width: 50px; height: 50px; object-fit: cover;">
+                            <small class="fw-bold text-truncate d-block {{ strtolower($category->name) == 'fashion' ? 'text-primary' : '' }}"
+                                style="max-width: 70px;">
+                                {{ $category->name }}
+                            </small>
                         </a>
 
                         @if ($category->subcategories->count())
-                            <!-- Mobile dropdown toggle -->
-                            <div class="dropdown-toggle-btn d-md-none mt-1" onclick="toggleSubDropdown(this)">
+                            <!-- Dropdown Toggle (Mobile Only) -->
+                            <div class="dropdown-toggle-btn d-md-none mt-1 text-center" onclick="toggleSubDropdown(this)" style="cursor: pointer;">
                                 <span class="dropdown-arrow">&#x25BC;</span>
                             </div>
 
-                            <!-- Subcategories dropdown -->
-                            <div class="subcategory-dropdown bg-white border rounded shadow-sm mt-1">
+                            <!-- Subcategories (Initially Hidden) -->
+                            <div class="subcategory-dropdown d-none bg-white border rounded shadow-sm mt-1 position-absolute start-50 translate-middle-x z-3"
+                                style="min-width: 150px;">
                                 @foreach ($category->subcategories as $sub)
                                     <a href="{{ route('category.view', $sub->slug) }}"
-                                    class="dropdown-item text-decoration-none text-dark d-block px-3 py-2">
+                                    class="dropdown-item text-decoration-none text-dark px-3 py-2">
                                         {{ $sub->name }}
                                     </a>
                                 @endforeach
                             </div>
                         @endif
-
                     </div>
                 @endforeach
             </div>
@@ -642,6 +648,10 @@ document.querySelectorAll('.position-relative').forEach(function(categoryDiv) {
                 .forEach(el => el.classList.remove('show-submenu'));
         }
     });
+     function toggleSubDropdown(btn) {
+        const dropdown = btn.nextElementSibling;
+        dropdown.classList.toggle('d-none');
+    }
 
 </script>
 {{-- @include('components.sidebar') --}}
