@@ -153,9 +153,10 @@
 
                     <a href="{{ route('cartView') }}" class="icon position-relative">
                         <i class="fas fa-shopping-cart fs-5"></i>
-                        <span class="badge bg-light text-danger badge-custom position-absolute top-0 start-100 translate-middle">
+                        <span id="cart-count" class="badge bg-light text-danger badge-custom position-absolute top-0 start-100 translate-middle">
                             {{ Session::get('key') ?? 0 }}
                         </span>
+
                     </a>
 
                     <a href="{{ route('notificationView') }}" class="icon position-relative">
