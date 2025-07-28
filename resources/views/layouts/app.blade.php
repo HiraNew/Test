@@ -130,14 +130,41 @@
             background: linear-gradient(135deg, rgb(193, 116, 39), rgb(255, 165, 0));
             color: white !important;
         }
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.6;
+                transform: scale(1.1);
+            }
+        }
+        .animate-pulse {
+            animation: pulse 1.5s infinite;
+        }
+
 
     </style>
 
-
-
-
 </head>
 <body>
+    {{-- <!-- ✅ Splash Screen (first thing after body) -->
+    <div id="splash-screen" style=" 
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.5s ease;
+    ">
+        <div style="text-align: center;">
+            <img src="{{ asset('apple.png') }}" alt="Logo" style="width: 100px; height: 100px; margin-bottom: 20px; animation: pulse 1.5s infinite;">
+            <p style="color: #444; font-size: 1.2rem;">Every things that you need. Get In minutes..</p>
+        </div>
+    </div> --}}
     <div id="app" style="margin-bottom: 80px;">
         <nav class="navbar navbar-expand-md navbar-custom sticky-navbar shadow-sm py-2 px-3">
             <div class="container-fluid d-flex flex-wrap align-items-center justify-content-between">
@@ -278,6 +305,20 @@
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <script>
+        window.addEventListener('load', function () {
+            const splash = document.getElementById('splash-screen');
+            // Add fade-out effect
+            splash.style.opacity = '0';
+            splash.style.transition = 'opacity 0.5s ease';
+            // Remove splash after fade
+            setTimeout(() => {
+                splash.style.display = 'none';
+            }, 600); // fade time + small buffer
+        });
+    </script>
+
 
     <script>
         let lastCartCount = null;

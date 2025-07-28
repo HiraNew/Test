@@ -2,6 +2,22 @@
 
 @section('content')
  @include('components.sidebar')
+ <!-- ✅ Splash Screen (first thing after body) -->
+    <div id="splash-screen" style="
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.5s ease;
+    ">
+        <div style="text-align: center;">
+            <img src="{{ asset('apple.png') }}" alt="Logo" style="width: 100px; height: 100px; margin-bottom: 20px; animation: pulse 1.5s infinite;">
+            <p style="color: #444; font-size: 1.2rem;">Every things that you need. Get In minutes..</p>
+        </div>
+    </div> 
 
 {{-- SweetAlert2 --}}
 <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
