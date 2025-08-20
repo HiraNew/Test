@@ -404,11 +404,7 @@
                             @endforeach
                             
 
-                        </div>
-
-
-
-
+                        </div> 
 
                         {{-- Action Buttons Based on Status --}}
                         <div class="d-flex justify-content-between mt-4">
