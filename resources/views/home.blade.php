@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
- @include('components.sidebar')
+
  <!-- ✅ Splash Screen (first thing after body) -->
     <div id="splash-screen" style="
         position: fixed;
@@ -18,6 +18,31 @@
             <p style="color: #444; font-size: 1.2rem;">Every things that you need. Get In minutes..</p>
         </div>
     </div> 
+    <p>Delivery Address : @if(isset($latestAddress) && $latestAddress)
+    <div class="user-address card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Your Latest Address</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>Address:</strong> {{ $latestAddress->address }}</p>
+            <p><strong>Landmark:</strong> {{ $latestAddress->landmark }}</p>
+            <p><strong>Pincode:</strong> {{ $latestAddress->pincode }}</p>
+            <p><strong>Postal Code:</strong> {{ $latestAddress->postal_code }}</p>
+            <p><strong>Mobile:</strong> {{ $latestAddress->mobile_number }}</p>
+            @if($latestAddress->alt_mobile_number)
+                <p><strong>Alternate Mobile:</strong> {{ $latestAddress->alt_mobile_number }}</p>
+            @endif
+        </div>
+    </div>
+@else
+    <div class="user-address card mb-4">
+        <div class="card-body text-muted">
+            <p>No saved address found.</p>
+        </div>
+    </div>
+@endif
+</p>
+    @include('components.sidebar')
 
 {{-- SweetAlert2 --}}
 <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
