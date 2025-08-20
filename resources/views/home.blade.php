@@ -18,30 +18,55 @@
             <p style="color: #444; font-size: 1.2rem;">Every things that you need. Get In minutes..</p>
         </div>
     </div> 
-    <p>Delivery Address : @if(isset($latestAddress) && $latestAddress)
-    <div class="user-address card mb-4">
-        <div class="card-header">
-            <h5 class="mb-0">Your Latest Address</h5>
+    
+
+    @if(isset($latestAddress) && $latestAddress)
+        <div class="user-address card mb-4 shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <p class="mb-0 fw-semibold text-primary">Delivery Address</p>
+                <!-- Toggle button -->
+                <button class="btn btn-sm btn-outline-primary collapsed d-flex align-items-center"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#fullAddressDetails"
+                        aria-expanded="false"
+                        aria-controls="fullAddressDetails">
+                    <span class="dropdown-toggle-icon">▼</span>
+                </button>
+            </div>
+
+            <div class="card-body">
+                <!-- Initially visible -->
+                <p class="mb-2"><strong>Address:</strong> {{ $latestAddress->address }}</p>
+
+                <!-- Collapsible Section -->
+                <div class="collapse mt-3 colorful-bg p-3 rounded text-white" id="fullAddressDetails">
+                    <div class="row">
+                        <div class="col-md-6 col-12 mb-2">
+                            <p class="mb-1"><strong>Landmark:</strong> {{ $latestAddress->landmark }}</p>
+                            <p class="mb-1"><strong>Pincode:</strong> {{ $latestAddress->pincode }}</p>
+                        </div>
+                        <div class="col-md-6 col-12 mb-2">
+                            <p class="mb-1"><strong>Postal Code:</strong> {{ $latestAddress->postal_code }}</p>
+                            <p class="mb-1"><strong>Mobile:</strong> {{ $latestAddress->mobile_number }}</p>
+                            @if($latestAddress->alt_mobile_number)
+                                <p class="mb-1"><strong>Alternate Mobile:</strong> {{ $latestAddress->alt_mobile_number }}</p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            <p><strong>Address:</strong> {{ $latestAddress->address }}</p>
-            <p><strong>Landmark:</strong> {{ $latestAddress->landmark }}</p>
-            <p><strong>Pincode:</strong> {{ $latestAddress->pincode }}</p>
-            <p><strong>Postal Code:</strong> {{ $latestAddress->postal_code }}</p>
-            <p><strong>Mobile:</strong> {{ $latestAddress->mobile_number }}</p>
-            @if($latestAddress->alt_mobile_number)
-                <p><strong>Alternate Mobile:</strong> {{ $latestAddress->alt_mobile_number }}</p>
-            @endif
-        </div>
-    </div>
-@else
-    <div class="user-address card mb-4">
-        <div class="card-body text-muted">
-            <p>No saved address found.</p>
-        </div>
-    </div>
-@endif
-</p>
+    {{-- @else
+        <div class="user-address card mb-4">
+            <div class="card-body text-muted">
+                <p>Please log in to view your address.</p>
+            </div>
+        </div> --}}
+    @endif
+
+
+    {{-- Include Sidebar --}}
+
     @include('components.sidebar')
 
 {{-- SweetAlert2 --}}
@@ -522,9 +547,29 @@
         text-overflow: ellipsis;
     }
 
+    .colorful-bg {
+        background: linear-gradient(135deg, #007bff, #00c6ff); /* blue gradient */
+    }
 
+    /* Dropdown arrow animation */
+    .dropdown-toggle-icon {
+        transition: transform 0.3s ease;
+    }
 
+    .collapsed .dropdown-toggle-icon {
+        transform: rotate(0deg);
+    }
 
+    [aria-expanded="true"] .dropdown-toggle-icon {
+        transform: rotate(180deg);
+    }
+
+    /* Responsive spacing for small devices */
+    @media (max-width: 576px) {
+        .user-address .card-body p {
+            font-size: 14px;
+        }
+    }
     
 
 </style>

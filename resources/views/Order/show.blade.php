@@ -341,7 +341,7 @@
                         <hr>
 
                         {{-- Horizontal order tracking progress bar --}}
-                        <h4>Status Tracking</h4>
+                        <h4>Order Tracking</h4>
                         @php
                             $statuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
                             $status = $payment->status;
