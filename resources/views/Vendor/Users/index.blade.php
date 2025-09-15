@@ -26,9 +26,12 @@
             </tr>
         </thead>
         <tbody>
+            @php
+                $i = 1;
+            @endphp
             @foreach($customers as $index => $data)
                 <tr>
-                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $i++}}</td>
                     <td>{{ $data['user']->name }}</td>
                     <td>{{ $data['user']->email }}</td>
                     <td>{{ $data['user']->number ?? 'N/A' }}</td>

@@ -31,6 +31,7 @@ use App\Models\Village;
 use Illuminate\Support\Facades\Session;
 use App\Notifications\OrderPlacedNotification;
 use App\Notifications\LowStockNotification;
+// use App\Models\Addre;
 
 class ProductController extends Controller
 {
@@ -186,6 +187,7 @@ class ProductController extends Controller
 
     public function product(Request $request)
     {
+        // dd('All');
         
         $this->carting(); // Loads or prepares cart session data
         
@@ -284,11 +286,17 @@ class ProductController extends Controller
             ->where('status', 0)
             ->orderBy('name')
             ->get();
+
+            $latestAddress = null;
+                $latestAddress = Addre::where('user_id', Auth::id())
+                    ->latest('created_at') // Or use latest('id') if that’s more accurate
+                    ->first();
+
             if(isset($query)){
-                return view('home', compact('Products', 'cartProductIds', 'wishlistProductIds', 'query', 'recentViews', 'categories'));
+                return view('home', compact('Products', 'cartProductIds', 'wishlistProductIds', 'query', 'recentViews', 'categories','latestAddress'));
             }
 
-            return view('home', compact('Products', 'cartProductIds', 'wishlistProductIds', 'query', 'recentViews', 'carouselItems', 'categories'));
+            return view('home', compact('Products', 'cartProductIds', 'wishlistProductIds', 'query', 'recentViews', 'carouselItems', 'categories','latestAddress'));
 
         } catch (\Exception $e) {
             \Log::error('Product Search Error: ' . $e->getMessage(), ['exception' => $e]);

@@ -143,6 +143,19 @@
             </a>
         </div>
     </div>
+    
+    <div class="card mb-3">
+        <div class="card-body">
+            <h6 class="card-title">Address Details</h6>
+            <a href="#" class="text-decoration-none d-flex justify-content-between align-items-start">
+                <div>
+                    <strong>Change Address</strong><br>
+                    <small class="text-muted">Update your delivery address.</small>
+                </div>
+                ➡️
+            </a>
+        </div>
+    </div>
 
     <!-- Notifications -->
     <div class="card">
@@ -208,7 +221,7 @@
                                                 <small class="ms-1 text-muted">({{ number_format($recent->averageRating, 1) }})</small>
                                             </div>
                                         @else
-                                            <small class="text-muted">No ratings yet</small>
+                                            <small class="text-muted">No ratings.</small>
                                         @endif
 
                                     </div>

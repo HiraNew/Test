@@ -13,6 +13,9 @@ class Payment extends Model
         'status',
         'delivery_partner_id', 
         'feild1',
+        'feild5',
+        'feild6',
+        'previous_status',
     ];
     public function user()
     {

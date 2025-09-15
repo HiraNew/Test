@@ -72,7 +72,7 @@
                                         @endif">
                                         {{ ucfirst($payment->status) }}
                                     </span>
-                                    {{$payment->product->id}}
+                                    {{-- {{$payment->product->id}} --}}
                                 </div>
 
                                 {{-- Timestamp --}}

@@ -484,12 +484,12 @@
                     @endif
 
 
-                        {{-- @auth --}}
+                        @auth
                         <!-- Add Review Form -->
                         @php
                             $user = auth()->user();
                             $hasDeliveredOrder = \DB::table('payments')
-                                ->where('user_id', $user->id)
+                                ->where('user_id', $user->id ?? '')
                                 ->where('product_id', $product->id)
                                 ->where('status', 'delivered')
                                 ->exists();
@@ -528,7 +528,7 @@
                             <div class="alert alert-warning">You can only review this product once it's delivered.</div>
                         @endif
 
-                        {{-- @endauth --}}
+                        @endauth
                         
                         
                     @php
@@ -578,6 +578,9 @@
                                             <button class="btn btn-danger btn-sm vote-btn" data-review-id="{{ $review->id }}" data-vote="like">Disliked (Undo or Switch)</button>
                                         @endif
                                         @endauth
+                                        @guest
+                                            <p>Login first.</p>
+                                        @endguest
                                     </div>
                                 </div>
                                 @endforeach

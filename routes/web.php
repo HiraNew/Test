@@ -13,6 +13,7 @@ use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Log;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +34,10 @@ Auth::routes();
 
 // Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
 // Route::get('/hiralal', [App\Http\Controllers\HomeController::class, 'hiralal']);
+Route::get('/test-log', function () {
+    Log::info('✅ Test log from browser');
+    return 'Log written';
+});
 Route::get('/', [App\Http\Controllers\UserDashboard\ProductController::class, 'product'])->name('products');
 Route::get('/mainantance', [App\Http\Controllers\UserDashboard\ProductController::class, 'mainance']);
 Route::get('/search-products', [App\Http\Controllers\UserDashboard\ProductController::class, 'searchProducts'])->name('search.products');
@@ -42,6 +47,7 @@ Route::get('/detail/{id}', [App\Http\Controllers\UserDashboard\ProductController
 Route::get('/live-search', [App\Http\Controllers\UserDashboard\ProductController::class, 'liveSearch'])->name('products.liveSearch');
 // Route::get('/product/{id}', [App\Http\Controllers\UserDashboard\ProductController::class, 'show'])->name('product.show');
 Route::get('/category/{slug}', [App\Http\Controllers\UserDashboard\ProductController::class, 'categoryView'])->name('category.view');
+// Route::get('/categories', [App\Http\Controllers\UserDashboard\ProductController::class, 'allCategory'])->name('allCategory.view');
 
 
 

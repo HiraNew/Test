@@ -1,7 +1,73 @@
 @extends('layouts.app')
 
 @section('content')
- @include('components.sidebar')
+
+ <!-- ✅ Splash Screen (first thing after body) -->
+    <div id="splash-screen" style="
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.5s ease;
+    ">
+        <div style="text-align: center;">
+            <img src="{{ asset('apple.png') }}" alt="Logo" style="width: 100px; height: 100px; margin-bottom: 20px; animation: pulse 1.5s infinite;">
+            <p style="color: #444; font-size: 1.2rem;">Every things that you need. Get In minutes..</p>
+        </div>
+    </div> 
+    
+
+    @if(isset($latestAddress) && $latestAddress)
+        <div class="user-address card mb-4 shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <p class="mb-0 fw-semibold text-primary">Delivery Address</p>
+                <!-- Toggle button -->
+                <button class="btn btn-sm btn-outline-primary collapsed d-flex align-items-center"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#fullAddressDetails"
+                        aria-expanded="false"
+                        aria-controls="fullAddressDetails">
+                    <span class="dropdown-toggle-icon">▼</span>
+                </button>
+            </div>
+
+            <div class="card-body">
+                <!-- Initially visible -->
+                <p class="mb-2"><strong>Address:</strong> {{ $latestAddress->address }}</p>
+
+                <!-- Collapsible Section -->
+                <div class="collapse mt-3 colorful-bg p-3 rounded text-white" id="fullAddressDetails">
+                    <div class="row">
+                        <div class="col-md-6 col-12 mb-2">
+                            <p class="mb-1"><strong>Landmark:</strong> {{ $latestAddress->landmark }}</p>
+                            <p class="mb-1"><strong>Pincode:</strong> {{ $latestAddress->pincode }}</p>
+                        </div>
+                        <div class="col-md-6 col-12 mb-2">
+                            <p class="mb-1"><strong>Postal Code:</strong> {{ $latestAddress->postal_code }}</p>
+                            <p class="mb-1"><strong>Mobile:</strong> {{ $latestAddress->mobile_number }}</p>
+                            @if($latestAddress->alt_mobile_number)
+                                <p class="mb-1"><strong>Alternate Mobile:</strong> {{ $latestAddress->alt_mobile_number }}</p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{-- @else
+        <div class="user-address card mb-4">
+            <div class="card-body text-muted">
+                <p>Please log in to view your address.</p>
+            </div>
+        </div> --}}
+    @endif
+
+
+    {{-- Include Sidebar --}}
+
+    @include('components.sidebar')
 
 {{-- SweetAlert2 --}}
 <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
@@ -20,36 +86,41 @@
 <div class="container-fluid py-4">
    
 
+    <!-- Full Width Container -->
     <div class="row justify-content-center mb-4 pb-2">
         <div class="col-12 col-xl-11 px-0">
-            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-0 px-3 py-3 bg-white rounded shadow-sm">
+            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3 px-3 py-3 bg-white rounded shadow-sm">
                 @foreach ($categories as $category)
-                    <div class="col category-item text-center position-relative product-card">
+                    <div class="category-item text-center position-relative flex-shrink-0 mx-2" style="width: 100px;">
+                        <!-- Category Link -->
                         <a href="{{ route('category.view', $category->slug) }}"
                         class="text-decoration-none text-dark d-flex flex-column align-items-center">
-                        <img src="{{ asset($category->icon) }}" alt="{{ $category->name }}" class="rounded-circle img-fluid mb-1" style="width: 50px; height: 50px; object-fit: cover;">
-                            <div class="small mt-1 {{ strtolower($category->name) == 'fashion' ? 'text-primary' : '' }}">
-                                <small class="mt-2 text-truncate fw-bold" style="max-width: 70px;">{{ $category->name }}</small>
-                            </div>
+                            <img src="{{ asset($category->icon) }}" alt="{{ $category->name }}"
+                                class="rounded-circle img-fluid mb-1"
+                                style="width: 50px; height: 50px; object-fit: cover;">
+                            <small class="fw-bold text-truncate d-block {{ strtolower($category->name) == 'fashion' ? 'text-primary' : '' }}"
+                                style="max-width: 70px;">
+                                {{ $category->name }}
+                            </small>
                         </a>
 
                         @if ($category->subcategories->count())
-                            <!-- Mobile dropdown toggle -->
-                            <div class="dropdown-toggle-btn d-md-none mt-1" onclick="toggleSubDropdown(this)">
+                            <!-- Dropdown Toggle (Mobile Only) -->
+                            <div class="dropdown-toggle-btn d-md-none mt-1 text-center" onclick="toggleSubDropdown(this)" style="cursor: pointer;">
                                 <span class="dropdown-arrow">&#x25BC;</span>
                             </div>
 
-                            <!-- Subcategories dropdown -->
-                            <div class="subcategory-dropdown bg-white border rounded shadow-sm mt-1">
+                            <!-- Subcategories (Initially Hidden) -->
+                            <div class="subcategory-dropdown d-none bg-white border rounded shadow-sm mt-1 position-absolute start-50 translate-middle-x z-3"
+                                style="min-width: 150px;">
                                 @foreach ($category->subcategories as $sub)
                                     <a href="{{ route('category.view', $sub->slug) }}"
-                                    class="dropdown-item text-decoration-none text-dark d-block px-3 py-2">
+                                    class="dropdown-item text-decoration-none text-dark px-3 py-2">
                                         {{ $sub->name }}
                                     </a>
                                 @endforeach
                             </div>
                         @endif
-
                     </div>
                 @endforeach
             </div>
@@ -475,9 +546,29 @@
         text-overflow: ellipsis;
     }
 
+    .colorful-bg {
+        background: linear-gradient(135deg, #007bff, #00c6ff); /* blue gradient */
+    }
 
+    /* Dropdown arrow animation */
+    .dropdown-toggle-icon {
+        transition: transform 0.3s ease;
+    }
 
+    .collapsed .dropdown-toggle-icon {
+        transform: rotate(0deg);
+    }
 
+    [aria-expanded="true"] .dropdown-toggle-icon {
+        transform: rotate(180deg);
+    }
+
+    /* Responsive spacing for small devices */
+    @media (max-width: 576px) {
+        .user-address .card-body p {
+            font-size: 14px;
+        }
+    }
     
 
 </style>
@@ -642,6 +733,11 @@ document.querySelectorAll('.position-relative').forEach(function(categoryDiv) {
                 .forEach(el => el.classList.remove('show-submenu'));
         }
     });
+     function toggleSubDropdown(btn) {
+        const dropdown = btn.nextElementSibling;
+        dropdown.classList.toggle('d-none');
+    }
 
 </script>
+{{-- @include('components.sidebar') --}}
 @endsection
