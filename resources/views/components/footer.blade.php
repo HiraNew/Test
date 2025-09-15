@@ -4,6 +4,7 @@
 
 <footer class="text-white pt-5 border-top w-100" style="background-color: #52021a;">
     <div class="container">
+        
         <div class="row">
             <!-- Shop -->
             <div class="col-lg-3 col-6 mb-4 text-center">

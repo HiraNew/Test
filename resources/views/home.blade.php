@@ -22,7 +22,7 @@
 
     <div class="row justify-content-center mb-4 pb-2">
         <div class="col-12 col-xl-11 px-0">
-            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3 px-3 py-3 bg-white rounded shadow-sm">
+            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-0 px-3 py-3 bg-white rounded shadow-sm">
                 @foreach ($categories as $category)
                     <div class="col category-item text-center position-relative product-card">
                         <a href="{{ route('category.view', $category->slug) }}"
@@ -62,7 +62,7 @@
     @if (isset($carouselItems))
     <div class="row justify-content-center mb-4 pb-2">
          <div class="col-12 col-xl-11 px-0">
-             <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3 px-3 py-3 bg-white rounded shadow-sm">
+             <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-0 px-3 py-3 bg-white rounded shadow-sm">
                  <div id="dynamicCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
                      <div class="carousel-inner">
                          @foreach ($carouselItems as $index => $item)
